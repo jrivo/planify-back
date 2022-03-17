@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String? @unique
+  username     String? @unique
+  password     String
+  firstName    String?
+  lastName     String?
+  role         Role @default(USER)
+  reviews      Review[]
+  status       UserStatus? @relation(fields: [userStatusId], references: [id])
+  // messages     Message[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  userStatusId String?
+}
+
+model UserStatus {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[]
+}
+
+model Review {
+  id             String       @id @default(uuid())
+  author         User         @relation(fields: [userId], references: [id])
+  place          Place        @relation(fields: [placeId], references: [id])
+  rating         Int
+  description    String
+  medias         Media[]
+  status         ReviewStatus @relation(fields: [reviewStatusId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  userId         String
+  placeId        String
+  reviewStatusId String
+}
+
+model ReviewStatus {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Review    Review[]
+}
+
+// model Message {
+//   id         String   @id @default(uuid())
+//   author    User    @relation(name:"author",fields: [userId], references: [id])
+//   userId     String
+//   authorId   String
+//   receiver   User    @relation(name:"receiver",fields: [receiverId], references: [id])
+//   receiverId String
+//   content    String
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+// }
+
+model Media {
+  id        String   @id @default(uuid())
+  url       String
+  type      String
+  name      String
+  place    Place    @relation(fields: [placeId], references: [id])
+  placeId  String
+  activity Activity @relation(fields: [activityId], references: [id])
+  activityId String
+  review   Review   @relation(fields: [reviewId], references: [id])
+  reviewId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Place {
+  id          String     @id @default(uuid())
+  name        String
+  type        PlaceType  @relation(fields: [placeTypeId], references: [id])
+  description String
+  address     String
+  medias      Media[]
+  website     String
+  phone       String
+  email       String
+  activities  Activity[]
+  Review      Review[]
+  placeTypeId String
+}
+
+model PlaceType {
+  id        String   @id @default(uuid())
+  name      String
+  filters   String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Place     Place[]
+}
+
+model Activity {
+  id          String   @id @default(uuid())
+  name        String
+  place       Place    @relation(fields: [placeId], references: [id])
+  medias      Media[]
+  description String
+  date        DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  placeId     String
+}
+
+enum Role{
+  ADMIN
+  USER
+  MODERATOR
+}
