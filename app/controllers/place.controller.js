@@ -39,8 +39,6 @@ exports.getByName = (req, res) => {
 };
 
 exports.create = (req, res) => {
-  // console.log("will create")
-  console.log(req.body);
   prisma.place
     .create({
       data: {

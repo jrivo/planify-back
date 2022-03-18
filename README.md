@@ -33,7 +33,7 @@ Here, "dev" is the name of the migration, you can modify it as your convenience.
 
 Endpoints :
 
-- /signup :
+- /register :
 
 You must provide :
 
@@ -45,7 +45,7 @@ password
 
 (role)
 
-- /signin
+- /login
 
 You must provide :
 

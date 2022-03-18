@@ -4,7 +4,6 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 verifyToken = (req, res, next) => {
-    console.log(req.headers)
   let token = req.headers["authorization"];
   if (!token) {
     return res.status(403).send({

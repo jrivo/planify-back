@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-exports.signup = (req, res) => {
+exports.register = (req, res) => {
   prisma.user
     .create({
       data: {
@@ -20,7 +20,7 @@ exports.signup = (req, res) => {
     });
 };
 
-exports.signin = (req, res) => {
+exports.login = (req, res) => {
   prisma.user
     .findFirst({ where: { username: req.body.username } })
     .then((user) => {

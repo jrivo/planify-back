@@ -9,11 +9,11 @@ module.exports = function(app) {
     next();
   });
   app.post(
-    "/signup",
+    "/register",
     [
       verifySignUp.checkDuplicateUsernameOrEmail,
     ],
-    controller.signup
+    controller.register
   );
-  app.post("/signin", controller.signin);
+  app.post("/login", controller.login);
 };
