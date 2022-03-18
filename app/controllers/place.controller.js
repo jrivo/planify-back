@@ -28,12 +28,17 @@ exports.getById = (req, res) => {
 exports.getByName = (req, res) => {
   prisma.place
     .findMany({
-      where: { name: req.params.name },
+      where: {
+        name: {
+          search: req.params.name,
+        },
+      },
     })
     .then((places) => {
       res.status(200).send(places);
     })
     .catch((err) => {
+      console.log(err);
       res.status(500).send(err);
     });
 };
