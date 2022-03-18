@@ -65,7 +65,7 @@ You have 3 endpoints to test them :
 
 - /test/admin
 
-- /test/mod
+- /test/moderator
 
 Put the JWT in the "Authorization" header field.
 

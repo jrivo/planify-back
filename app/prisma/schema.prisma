@@ -12,8 +12,8 @@ datasource db {
 
 model User {
   id           String     @id @default(uuid())
-  email        String? @unique
-  username     String? @unique
+  email        String @unique
+  username     String @unique
   password     String
   firstName    String?
   lastName     String?
@@ -21,6 +21,7 @@ model User {
   reviews      Review[]
   status       UserStatus? @relation(fields: [userStatusId], references: [id])
   // messages     Message[]
+  places       Place[]
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   userStatusId String?
@@ -39,7 +40,7 @@ model Review {
   author         User         @relation(fields: [userId], references: [id])
   place          Place        @relation(fields: [placeId], references: [id])
   rating         Int
-  description    String
+  description    String?
   medias         Media[]
   status         ReviewStatus @relation(fields: [reviewStatusId], references: [id])
   createdAt      DateTime     @default(now())
@@ -87,16 +88,18 @@ model Media {
 model Place {
   id          String     @id @default(uuid())
   name        String
-  type        PlaceType  @relation(fields: [placeTypeId], references: [id])
-  description String
-  address     String
+  owner       User       @relation(fields: [ownerId], references: [id])
+  type        PlaceType?  @relation(fields: [placeTypeId], references: [id])
+  description String?
+  address     String?
   medias      Media[]
-  website     String
-  phone       String
-  email       String
+  website     String?
+  phone       String?
+  email       String?
   activities  Activity[]
   Review      Review[]
-  placeTypeId String
+  placeTypeId String?
+  ownerId     String
 }
 
 model PlaceType {

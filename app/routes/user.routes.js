@@ -15,7 +15,7 @@ module.exports = function(app) {
     controller.userBoard
   );
   app.get(
-    "/test/mod",
+    "/test/moderator",
     [authJwt.verifyToken, authJwt.isModerator],
     controller.moderatorBoard
   );
