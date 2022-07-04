@@ -4,28 +4,34 @@
 
 - Install dependencies
 
-```yarn```
+```
+yarn
+```
 
 - Run the database
 
-``` docker-compose build -t planify-db ```
+```
+ docker-compose build -t planify-db
+ docker-compose up -d
+```
 
-``` docker-compose up -d```
 - Create a .env file based on the .env.example, containing the database URL
 
 - Apply database structure using prisma
 
-``` cd app```
-
-``` ./refreshPrisma.sh dev```
+```
+cd app
+./refreshPrisma.sh dev
+```
 
 Here, "dev" is the name of the migration, you can modify it as your convenience.
 
 - Launch the API
 
-``` cd ..```
-
-```npx nodemon server.js```
+```
+cd ..
+npx nodemon server.js
+```
 
 ## Features
 
