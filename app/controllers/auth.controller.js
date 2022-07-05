@@ -1,6 +1,7 @@
 const config = require("../config/auth.config");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const authJwt = require("../middleware/authJwt");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -51,4 +52,18 @@ exports.login = (req, res) => {
     .catch((err) => {
       res.status(500).send({ message: err.message });
     });
+};
+
+exports.me = (req, res) => {
+    prisma.user
+      .findUnique({
+        where: { id: req.userId },
+      })
+      .then((user) => {
+        res.send(user);
+      })
+      .catch((err) => {
+        res.status(500).send(err);
+      });
+  return res.status(500);
 };

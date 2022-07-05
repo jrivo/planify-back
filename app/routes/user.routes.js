@@ -8,20 +8,5 @@ module.exports = function(app) {
     );
     next();
   });
-  app.get("/test/all", controller.allAccess);
-  app.get(
-    "/test/user",
-    [authJwt.verifyToken],
-    controller.userBoard
-  );
-  app.get(
-    "/test/moderator",
-    [authJwt.verifyToken, authJwt.isModerator],
-    controller.moderatorBoard
-  );
-  app.get(
-    "/test/admin",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    controller.adminBoard
-  );
+  app.put("/users/:id/change-role", [authJwt.verifyToken,authJwt.isAdmin], controller.changeRole);
 };

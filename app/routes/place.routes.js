@@ -1,4 +1,4 @@
-const { authJwt } = require("../middleware");
+const { authJwt, url } = require("../middleware");
 const controller = require("../controllers/place.controller");
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -8,18 +8,20 @@ module.exports = function (app) {
     );
     next();
   });
-  app.get("/place/all", controller.getAll);
-  app.get("/place/:id", controller.getById);
-  app.get("/place/search/:name", controller.getByName);
-  app.post("/place/create", [authJwt.verifyToken],controller.create);
-  app.post(
-    "/place/update/:id",
-    [authJwt.verifyToken],
-    controller.update
+  app.get("/places", controller.getAll);
+  app.get("/places/:id", controller.getById);
+  app.get("/places/search/:name", controller.getByName);
+  app.get(
+    "/places/:id/activities",
+    [authJwt.verifyToken, url.intifyId],
+    controller.getActivities
   );
+  app.post("/places", [authJwt.verifyToken], controller.create);
   app.post(
-    "/place/delete/:id",
-    [authJwt.verifyToken],
-    controller.delete
+    "/places/:id/create-activity",
+    [authJwt.verifyToken, url.intifyId],
+    controller.createActivity
   );
+  app.put("/places/:id", [authJwt.verifyToken], controller.update);
+  app.delete("/places/:id", [authJwt.verifyToken], controller.delete);
 };

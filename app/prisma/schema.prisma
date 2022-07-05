@@ -33,6 +33,7 @@ enum Role {
   ADMIN
   USER
   MODERATOR
+  MERCHANT
 }
 
 model UserStatus {
@@ -140,11 +141,12 @@ model Activity {
   place       Place    @relation(fields: [placeId], references: [id])
   medias      Media[]
   description String
-  date        DateTime
+  date        DateTime?
   trips       Trip[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   placeId     Int
+  price       Int?
 }
 
 model Notification {
@@ -161,7 +163,7 @@ model Trip {
   name        String
   description String
   activities  Activity[]
-  User       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
   userId     Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

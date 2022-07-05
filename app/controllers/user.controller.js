@@ -1,12 +1,18 @@
-exports.allAccess = (req, res) => {
-    res.status(200).send("Public Content.");
-  };
-  exports.userBoard = (req, res) => {
-    res.status(200).send("User Content.");
-  };
-  exports.adminBoard = (req, res) => {
-    res.status(200).send("Admin Content.");
-  };
-  exports.moderatorBoard = (req, res) => {
-    res.status(200).send("Moderator Content.");
-  };
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
+exports.changeRole = (req, res) => {
+  prisma.user
+    .update({
+      where: { id: req.params.id },
+      data: {
+        role: req.body.role,
+      },
+    })
+    .then((user) => {
+      res.status(200).send(user);
+    })
+    .catch((err) => {
+      res.status(500).send(err);
+    });
+}
