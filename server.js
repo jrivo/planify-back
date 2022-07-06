@@ -9,7 +9,7 @@ const urlMiddleware = require("./app/middleware/url");
 // const prisma = new PrismaClient();
 
 var corsOptions = {
-  origin: "http://localhost:8081",
+  origin: "http://localhost:5000",
 };
 
 app.use(cors(corsOptions));
