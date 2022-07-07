@@ -71,8 +71,7 @@ exports.create = (req, res) => {
           },
         })
         .then((place) => {
-          console.log("created");
-          res.status(200).send(place);
+          res.status(201).send(place);
         })
         .catch((err) => {
           prisma.address.delete({ where: { id: address.id } });
@@ -154,7 +153,7 @@ exports.createActivity = async (req, res) => {
       },
     })
     .then((activity) => {
-      res.status(200).send(activity);
+      res.status(201).send(activity);
     })
     .catch((err) => {
       console.log(err);

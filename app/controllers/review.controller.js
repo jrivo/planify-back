@@ -25,26 +25,25 @@ exports.getById = (req, res) => {
     });
 };
 
-exports.create = (req, res) => {
-  prisma.review
-    .create({
-      data: {
-        author: { connect: { id: req.userId } },
-        rating: req.body.rating,
-        description: req.body.description,
-        placeId: req.body.placeId,
-        reviewStatusId: 0,
-      },
-    })
-    .then((review) => {
-      console.log("created");
-      res.status(200).send(review);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).send(err);
-    });
-};
+// exports.create = (req, res) => {
+//   prisma.review
+//     .create({
+//       data: {
+//         author: { connect: { id: req.userId } },
+//         rating: req.body.rating,
+//         description: req.body.description,
+//         placeId: req.body.placeId,
+//         reviewStatusId: 0,
+//       },
+//     })
+//     .then((review) => {
+//       res.status(201).send(review);
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//       res.status(500).send(err);
+//     });
+// };
 
 exports.update = async (req, res) => {
   targetReview = await prisma.review.findUnique({ where: { id: req.params.id } });

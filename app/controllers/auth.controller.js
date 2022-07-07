@@ -13,6 +13,7 @@ exports.register = (req, res) => {
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 8),
         role: req.body.role,
+        //TODO: set userStatus + handle email verification
       },
     })
     .then(() => res.send({ message: "User was registered successfully!" }))

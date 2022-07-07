@@ -56,7 +56,7 @@ exports.create = (req, res) => {
       },
     })
     .then((trip) => {
-      res.status(200).send(trip);
+      res.status(201).send(trip);
     })
     .catch((err) => {
       res.status(500).send(err);

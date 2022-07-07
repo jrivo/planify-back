@@ -41,8 +41,7 @@ exports.create = (req, res) => {
       },
     })
     .then((type) => {
-      console.log("created");
-      res.status(200).send(type);
+      res.status(201).send(type);
     })
     .catch((err) => {
       console.log(err);
