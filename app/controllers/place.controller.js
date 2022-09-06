@@ -1,9 +1,16 @@
 const { PrismaClient } = require("@prisma/client");
+const { CDN_URL, CDN_STORAGE_ZONE, CDN_STORAGE_PATH } = require("../const/const");
+const {
+  uploadFile,
+  generateRandomString,
+  generateRandomFileName,
+  sanitizeFileName,
+} = require("../utils/utils");
 const prisma = new PrismaClient();
 
 exports.getAll = (req, res) => {
   prisma.place
-    .findMany()
+    .findMany({ include: { medias: true } })
     .then((places) => {
       res.status(200).send(places);
     })
@@ -16,7 +23,7 @@ exports.getById = (req, res) => {
   prisma.place
     .findUnique({
       where: { id: parseInt(req.params.id) },
-      include: { activities: true },
+      include: { activities: true, medias: true },
     })
     .then((place) => {
       res.status(200).send(place);
@@ -71,10 +78,41 @@ exports.create = (req, res) => {
           },
         })
         .then((place) => {
+          if (req.files) {
+            try {
+              req.files.forEach((file) => {
+                sanitizedName = sanitizeFileName(file.originalname);
+                prisma.media
+                  .create({
+                    data: {
+                      name: sanitizedName,
+                      url:
+                      "https://" +
+                        CDN_STORAGE_ZONE +
+                        ".b-cdn.net/" +
+                        CDN_STORAGE_PATH +
+                        "/" +
+                        sanitizedName,
+                      place: { connect: { id: place.id } },
+                    },
+                  })
+                  .catch((err) => {
+                    console.log("MEDIA CREATION ERROR: " + err);
+                    prisma.address.delete({ where: { id: address.id } });
+                    prisma.place.delete({ where: { id: place.id } });
+                  });
+              });
+            } catch (err) {
+              res.send(err);
+              prisma.address.delete({ where: { id: address.id } });
+              prisma.place.delete({ where: { id: place.id } });
+            }
+          }
           res.status(201).send(place);
         })
         .catch((err) => {
           prisma.address.delete({ where: { id: address.id } });
+          prisma;
           console.log(err);
           res.status(500).send(err);
         });

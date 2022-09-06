@@ -1,4 +1,4 @@
-const { authJwt, url } = require("../middleware");
+const { authJwt, url, files, ids } = require("../middleware");
 const controller = require("../controllers/place.controller");
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -16,12 +16,12 @@ module.exports = function (app) {
     [authJwt.verifyToken, url.intifyId],
     controller.getActivities
   );
-  app.post("/places", [authJwt.verifyToken], controller.create);
+  app.post("/places", [authJwt.verifyToken,files.uploadFiles,ids.intifyIds], controller.create);
   app.post(
     "/places/:id/create-activity",
     [authJwt.verifyToken, url.intifyId],
     controller.createActivity
   );
   app.put("/places/:id", [authJwt.verifyToken], controller.update);
-  app.delete("/places/:id", [authJwt.verifyToken], controller.delete);
+  app.delete("/places/:id", [authJwt.verifyToken,url.intifyId], controller.delete);
 };
