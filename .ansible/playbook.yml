@@ -6,6 +6,8 @@
         repo: 'git@github.com:jrivo/planify-back.git'
         dest: ~/planify-back
         version: "{{ lookup('env', 'BRANCH') }}"
+        clone: true
+        update: true
 
     - name: Enter in app & pull new image
       become: true
@@ -20,6 +22,10 @@
         CDN_STORAGE_PATH: "{{ lookup('env', 'CDN_STORAGE_PATH') }}"
         CDN_ACCESS_KEY: "{{ lookup('env', 'CDN_ACCESS_KEY') }}"
       shell: 'export DATABASE_URL=$DATABASE_URL && export CDN_URL=$CDN_URL && export CDN_STORAGE_ZONE=$CDN_STORAGE_ZONE && export CDN_STORAGE_PATH=$CDN_STORAGE_PATH && export CDN_ACCESS_KEY=$CDN_ACCESS_KEY'
+
+    # - name: get DB URL
+    #   ansible.builtin.debug:
+    #     msg: "{{ lookup('env', 'DATABASE_URL') }}"
 
     - name: Run new image
       become: true
