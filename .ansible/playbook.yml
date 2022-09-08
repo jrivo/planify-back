@@ -26,7 +26,7 @@
     - name: Inject env variables
       become: true
       environment:
-        DATABASE_URL: "{{ lookup('env', 'DATABASE_URL') }}"
+        DATABASE_URL: DB_URL "{{ lookup('env', 'DATABASE_URL') }}"
         CDN_URL: "{{ lookup('env', 'CDN_URL') }}"
         CDN_STORAGE_ZONE: "{{ lookup('env', 'CDN_STORAGE_ZONE') }}"
         CDN_STORAGE_PATH: "{{ lookup('env', 'CDN_STORAGE_PATH') }}"
