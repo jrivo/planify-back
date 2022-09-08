@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(upload.array());
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to planify-backend CI/CD" });
+  res.json({ message: "Welcome to planify-backend Master Pull Request" });
 });
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile))
 require('./app/routes/auth.routes')(app);
