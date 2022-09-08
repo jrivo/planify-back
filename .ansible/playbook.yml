@@ -1,6 +1,12 @@
 ---
 - hosts: dev_server
   tasks:
+    - name: Install Docker  Module for Python
+      pip:
+        name:
+          - docker
+          - docker-compose
+          
     - name: Pull code from github
       ansible.builtin.git:
         repo: "git@github.com:jrivo/planify-back.git"

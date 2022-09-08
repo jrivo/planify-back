@@ -30,18 +30,33 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:latest
 
-  # test:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Run tests
-  #       run: yarn test
+      - name: "Caching"
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: "Caching"
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Run tests
+        run: yarn test
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    
+
       - name: Extract branch name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: extract_branch
