@@ -20,36 +20,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      # - name: Set up Docker Buildx
-      #   uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      # - name: Login to DockerHub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
-      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # - name: Build and push
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:latest
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:latest
       
-      # - name: Test all secrets
-      #   env:
-      #     DATABASE_URL: ${{secrets.DATABASE_URL}}
-      #     CDN_URL: ${{secrets.CDN_URL}}
-      #     CDN_STORAGE_ZONE: ${{secrets.CDN_STORAGE_ZONE}}
-      #     CDN_STORAGE_PATH: ${{secrets.CDN_STORAGE_PATH}}
-      #     CDN_ACCESS_KEY: ${{secrets.CDN_ACCESS_KEY}}
-      #   run: |
-      #     echo $DATABASE_URL
-      #     echo $CDN_URL
-      #     echo $CDN_STORAGE_ZONE
-      #     echo $CDN_STORAGE_PATH
-      #     echo $CDN_ACCESS_KEY
-
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
@@ -59,13 +45,21 @@ jobs:
           inventory: |
             [dev_server]
             ${{secrets.DEV_URL}}
+
+            [dev_server:vars]
+            DATABASE_URL=${{secrets.DATABASE_URL}}
+            CDN_URL=${{secrets.CDN_URL}}
+            CDN_STORAGE_ZONE=${{secrets.CDN_STORAGE_ZONE}}
+            CDN_STORAGE_PATH=${{secrets.CDN_STORAGE_PATH}}
+            CDN_ACCESS_KEY=${{secrets.CDN_ACCESS_KEY}}
+            BRANCH=${{ steps.extract_branch.outputs.branch }}
           options: |
             --inventory .hosts
             --verbose
-        env:
-          DATABASE_URL: ${{secrets.DATABASE_URL}}
-          CDN_URL: ${{secrets.CDN_URL}}
-          CDN_STORAGE_ZONE: ${{secrets.CDN_STORAGE_ZONE}}
-          CDN_STORAGE_PATH: ${{secrets.CDN_STORAGE_PATH}}
-          CDN_ACCESS_KEY: ${{secrets.CDN_ACCESS_KEY}}
-          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+        # env:
+        #   DATABASE_URL: ${{secrets.DATABASE_URL}}
+        #   CDN_URL: ${{secrets.CDN_URL}}
+        #   CDN_STORAGE_ZONE: ${{secrets.CDN_STORAGE_ZONE}}
+        #   CDN_STORAGE_PATH: ${{secrets.CDN_STORAGE_PATH}}
+        #   CDN_ACCESS_KEY: ${{secrets.CDN_ACCESS_KEY}}
+        #   BRANCH: ${{ steps.extract_branch.outputs.branch }}
