@@ -154,6 +154,7 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
   targetPlace = await prisma.place.findUnique({ where: { id: req.params.id } });
+  //TODO: middleware ownerOrAdmin
   if (targetPlace.ownerId === req.userId) {
     prisma.place
       .delete({
