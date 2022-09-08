@@ -36,14 +36,14 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:latest
       
-      - name: Inject Github secrets and others in env
-        env:
-          DATABASE_URL: ${{secrets.DATABASE_URL}}
-          CDN_URL: ${{secrets.CDN_URL}}
-          CDN_STORAGE_ZONE: ${{secrets.CDN_STORAGE_ZONE}}
-          CDN_STORAGE_PATH: ${{secrets.CDN_STORAGE_PATH}}
-          CDN_ACCESS_KEY: ${{secrets.CDN_ACCESS_KEY}}
-          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+      # - name: Inject Github secrets and others in env
+      #   env:
+      #     DATABASE_URL: ${{secrets.DATABASE_URL}}
+      #     CDN_URL: ${{secrets.CDN_URL}}
+      #     CDN_STORAGE_ZONE: ${{secrets.CDN_STORAGE_ZONE}}
+      #     CDN_STORAGE_PATH: ${{secrets.CDN_STORAGE_PATH}}
+      #     CDN_ACCESS_KEY: ${{secrets.CDN_ACCESS_KEY}}
+      #     BRANCH: ${{ steps.extract_branch.outputs.branch }}
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
@@ -57,3 +57,10 @@ jobs:
           options: |
             --inventory .hosts
             --verbose
+        env:
+          DATABASE_URL: ${{secrets.DATABASE_URL}}
+          CDN_URL: ${{secrets.CDN_URL}}
+          CDN_STORAGE_ZONE: ${{secrets.CDN_STORAGE_ZONE}}
+          CDN_STORAGE_PATH: ${{secrets.CDN_STORAGE_PATH}}
+          CDN_ACCESS_KEY: ${{secrets.CDN_ACCESS_KEY}}
+          BRANCH: ${{ steps.extract_branch.outputs.branch }}
