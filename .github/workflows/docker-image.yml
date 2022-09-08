@@ -10,9 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Extract branch name
-        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
-        id: extract_branch
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -45,6 +42,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     
+      - name: Extract branch name
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        id: extract_branch
+
       - name: Checkout
         uses: actions/checkout@v3
 
