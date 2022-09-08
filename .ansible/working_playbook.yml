@@ -1,0 +1,28 @@
+---
+- hosts: dev_server
+  tasks:
+    - name: Pull code from github
+      ansible.builtin.git:
+        repo: "git@github.com:jrivo/planify-back.git"
+        dest: ~/planify-back
+        version: "{{ BRANCH }}"
+        clone: true
+        update: true
+
+    - name: Enter in app & pull new image
+      become: true
+      shell: "cd planify-back && docker compose pull"
+
+    - name: Inject env variables
+      become: true
+      shell: "export DATABASE_URL={{DATABASE_URL}} && export CDN_URL={{CDN_URL}} && export CDN_STORAGE_ZONE={{CDN_STORAGE_ZONE}} && export CDN_STORAGE_PATH={{CDN_STORAGE_PATH}} && export CDN_ACCESS_KEY={{CDN_ACCESS_KEY}}"
+
+    - name: Run new image
+      become: true
+      environment:
+        DATABASE_URL: "{{ DATABASE_URL }}"
+        CDN_URL: "{{ CDN_URL }}"
+        CDN_STORAGE_ZONE: "{{ CDN_STORAGE_ZONE }}"
+        CDN_STORAGE_PATH: "{{ CDN_STORAGE_PATH }}"
+        CDN_ACCESS_KEY: "{{ CDN_ACCESS_KEY }}"
+      shell: "cd planify-back && docker compose up -d"

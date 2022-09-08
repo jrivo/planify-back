@@ -1,10 +1,11 @@
 const config = require("../config/auth.config");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const authJwt = require("../middleware/authJwt");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-exports.signup = (req, res) => {
+exports.register = (req, res) => {
   prisma.user
     .create({
       data: {
@@ -12,6 +13,7 @@ exports.signup = (req, res) => {
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 8),
         role: req.body.role,
+        //TODO: set userStatus + handle email verification
       },
     })
     .then(() => res.send({ message: "User was registered successfully!" }))
@@ -20,7 +22,7 @@ exports.signup = (req, res) => {
     });
 };
 
-exports.signin = (req, res) => {
+exports.login = (req, res) => {
   prisma.user
     .findFirst({ where: { username: req.body.username } })
     .then((user) => {
@@ -51,4 +53,18 @@ exports.signin = (req, res) => {
     .catch((err) => {
       res.status(500).send({ message: err.message });
     });
+};
+
+exports.me = (req, res) => {
+    prisma.user
+      .findUnique({
+        where: { id: req.userId },
+      })
+      .then((user) => {
+        res.send(user);
+      })
+      .catch((err) => {
+        res.status(500).send(err);
+      });
+  return res.status(500);
 };

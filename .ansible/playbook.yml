@@ -1,0 +1,32 @@
+---
+- hosts: dev_server
+  tasks:
+    - name: install pip3
+      apt: name=python3-pip state=present 
+      
+    - name: Install Docker  Module for Python
+      pip:
+        name:
+          - docker
+          - docker-compose
+
+    - name: Pull code from github
+      ansible.builtin.git:
+        repo: "git@github.com:jrivo/planify-back.git"
+        dest: ~/planify-back
+        version: "{{ BRANCH }}"
+        clone: true
+        update: true
+
+    - name: Pull and run new image
+      become: true
+      community.docker.docker_compose:
+        project_src: ~/planify-back
+        state: present
+        pull: true
+      environment:
+        DATABASE_URL: "{{ DATABASE_URL }}"
+        CDN_URL: "{{ CDN_URL }}"
+        CDN_STORAGE_ZONE: "{{ CDN_STORAGE_ZONE }}"
+        CDN_STORAGE_PATH: "{{ CDN_STORAGE_PATH }}"
+        CDN_ACCESS_KEY: "{{ CDN_ACCESS_KEY }}"

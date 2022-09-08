@@ -1,17 +1,14 @@
 version: '3.8'
 
 services:
-    # planify-back:
-    #     build: .
-    #     ports:
-    #         - "8090:8090"
-    #     links:
-    #         - planify-db
-    planify-db:
-      image: postgres
-      restart: always
-      ports:
-        - 5432:5432
-      environment:
-        POSTGRES_PASSWORD: POSTGRES_PASSWORD
+    planify-back:
+        image: kreyzix/planify-back:latest
+        ports:
+            - "5000:5000"
+        environment:
+            - DATABASE_URL=${DATABASE_URL}
+            - CDN_URL=${CDN_URL}
+            - CDN_STORAGE_ZONE=${CDN_STORAGE_ZONE}
+            - CDN_STORAGE_PATH=${CDN_STORAGE_PATH}
+            - CDN_ACCESS_KEY=${CDN_ACCESS_KEY}
 

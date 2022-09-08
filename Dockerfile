@@ -4,8 +4,14 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN yarn
 
 COPY . .
 
-EXPOSE 8090
+RUN cd app; \
+    npx prisma generate; \
+    cd ..
+
+EXPOSE 5000
+
+CMD ["node", "server.js"]
