@@ -34,15 +34,15 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:latest
 
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Run tests
-        run: yarn test
+  # test:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Run tests
+  #       run: yarn test
 
   deploy:
-    needs: test
+    # needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Run playbook
