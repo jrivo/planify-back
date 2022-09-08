@@ -42,7 +42,7 @@ jobs:
   #       run: yarn test
 
   deploy:
-    # needs: test
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Run playbook
