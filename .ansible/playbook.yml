@@ -8,11 +8,11 @@
     - name: Inject env variables
       become: true
       environment:
-        DATABASE_URL: {{lookup('env', 'DATABASE_URL')}}
-        CDN_URL: {{lookup('env', 'CDN_URL')}}
-        CDN_STORAGE_ZONE: {{lookup('env', 'CDN_STORAGE_ZONE')}}
-        CDN_STORAGE_PATH: {{lookup('env', 'CDN_STORAGE_PATH')}}
-        CDN_ACCESS_KEY: {{lookup('env', 'CDN_ACCESS_KEY')}}
+        DATABASE_URL: "{{ lookup('env', 'DATABASE_URL') }}"
+        CDN_URL: "{{ lookup('env', 'CDN_URL') }}"
+        CDN_STORAGE_ZONE: "{{ lookup('env', 'CDN_STORAGE_ZONE') }}"
+        CDN_STORAGE_PATH: "{{ lookup('env', 'CDN_STORAGE_PATH') }}"
+        CDN_ACCESS_KEY: "{{ lookup('env', 'CDN_ACCESS_KEY') }}"
       shell: 'export DATABASE_URL=$DATABASE_URL && export CDN_URL=$CDN_URL && export CDN_STORAGE_ZONE=$CDN_STORAGE_ZONE && export CDN_STORAGE_PATH=$CDN_STORAGE_PATH && export CDN_ACCESS_KEY=$CDN_ACCESS_KEY'
 
     - name: Run new image
