@@ -36,6 +36,10 @@
     - name: Check env variables
       become: true
       shell: 'echo $DATABASE_URL && echo $CDN_URL && echo $CDN_STORAGE_ZONE && echo $CDN_STORAGE_PATH && echo $CDN_ACCESS_KEY'
+      register: env_vars
+
+    - debug:
+        var: env_vars.stdout_lines
 
     # - name: get DB URL
     #   ansible.builtin.debug:
