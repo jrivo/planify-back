@@ -1,9 +1,6 @@
 ---
 - hosts: dev_server
   tasks:
-    - name: Include variables
-      include_vars: vars.yml
-
     - name: Pull code from github
       ansible.builtin.git:
         repo: "git@github.com:jrivo/planify-back.git"
