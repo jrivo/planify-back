@@ -2,7 +2,7 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev","master" ]
   pull_request:
     branches: [ "master" ]
 
@@ -51,6 +51,7 @@ jobs:
 
   deploy:
     needs: test
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
 
