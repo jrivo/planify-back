@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
 
       - name: Extract branch name
@@ -35,7 +33,18 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:latest
-      
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: yarn test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
@@ -56,3 +65,5 @@ jobs:
           options: |
             --inventory .hosts
             --verbose
+
+
