@@ -10,7 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - name: Extract branch name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: extract_branch
@@ -45,6 +44,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+    
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
         with:
