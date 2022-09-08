@@ -1,6 +1,12 @@
 ---
 - hosts: dev_server
   tasks:
+    - name: Pull code from github
+      ansible.builtin.git:
+        repo: 'git@github.com:jrivo/planify-back.git'
+        dest: ~/planify-back
+        version: "{{ lookup('env', 'BRANCH') }}"
+
     - name: Enter in app & pull new image
       become: true
       shell: 'cd planify-back && docker compose pull'
