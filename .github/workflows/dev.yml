@@ -33,7 +33,7 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v3
-        
+
       - name: release-it
         uses: TheRealWaldo/release-it@v0.7.2
         with:
@@ -54,7 +54,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:${{ steps.release-it.outputs.version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:dev${{ steps.release-it.outputs.version }}
 
       - name: Extract branch name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
