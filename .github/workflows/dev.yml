@@ -41,9 +41,9 @@ jobs:
       #   run: yarn release --preRelease=dev 
       #   id: release-it
 
-      - name: 'Get Last tag'
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      - name: Get Last Tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: lastTag
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -59,7 +59,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:${{ steps.get_last_tag.outputs.stdout }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:${{ steps.lastTag.outputs.tag }}
 
       - name: Extract branch name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
@@ -82,7 +82,7 @@ jobs:
             CDN_STORAGE_PATH=${{secrets.CDN_STORAGE_PATH}}
             CDN_ACCESS_KEY=${{secrets.CDN_ACCESS_KEY}}
             BRANCH=${{ steps.extract_branch.outputs.branch }}
-            NEW_VERSION=${{ steps.get_last_tag.outputs.stdout }}
+            NEW_VERSION=${{ steps.lastTag.outputs.tag }}
 
           options: |
             --inventory .hosts
