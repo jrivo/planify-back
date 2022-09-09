@@ -1,24 +1,13 @@
-name: Docker Image CI + Versioning
+name: Docker Image CI
 
 on:
   push:
-    branches: [ "release-it" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
-  # build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: Build app
-  #       run: yarn build
-
   test:
-    # needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,7 +19,7 @@ jobs:
       - name: "Caching"
         uses: actions/cache@v2
         with:
-          path: '**/node_modules'
+          path: "**/node_modules"
           key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
 
       - name: Run tests
@@ -41,14 +30,10 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - name: release-it
         uses: TheRealWaldo/release-it@v0.7.2
         with:
-          json-opts: '{"dry-run": true, "npm": false}'
+          json-opts: '{"npm": false}'
         id: release-it
 
       - name: Set up Docker Buildx
@@ -70,6 +55,9 @@ jobs:
       - name: Extract branch name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: extract_branch
+
+      - name: Checkout
+        uses: actions/checkout@v3
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
@@ -93,5 +81,3 @@ jobs:
           options: |
             --inventory .hosts
             --verbose
-
-
