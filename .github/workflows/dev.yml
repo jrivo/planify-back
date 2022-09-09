@@ -34,11 +34,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: release-it
-        uses: TheRealWaldo/release-it@v0.7.2
-        with:
-          json-opts: '{"npm": false}'
-        id: release-it
+      # - name: release-it
+      #   # uses: TheRealWaldo/release-it@v0.7.2
+      #   # with:
+      #   #   json-opts: '{"npm": {"publish": false}}'
+      #   run: yarn release --preRelease=dev 
+      #   id: release-it
+
+      - name: Get Last Tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: lastTag
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -54,7 +59,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:dev-${{ steps.release-it.outputs.version }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/planify-back:${{ steps.lastTag.outputs.tag }}
 
       - name: Extract branch name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
@@ -77,7 +82,7 @@ jobs:
             CDN_STORAGE_PATH=${{secrets.CDN_STORAGE_PATH}}
             CDN_ACCESS_KEY=${{secrets.CDN_ACCESS_KEY}}
             BRANCH=${{ steps.extract_branch.outputs.branch }}
-            NEW_VERSION=dev-${{ steps.release-it.outputs.version }}
+            NEW_VERSION=${{ steps.lastTag.outputs.tag }}
 
           options: |
             --inventory .hosts

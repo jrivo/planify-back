@@ -1,4 +1,7 @@
 {
+  "name": "planify-back",
+  "version": "1.0.0",
+  "description": "Backend of Planify",
   "dependencies": {
     "@prisma/client": "^3.11.0",
     "bcryptjs": "^2.4.3",
@@ -11,6 +14,7 @@
     "nodemon": "^2.0.15",
     "pg": "^8.7.3",
     "pg-hstore": "^2.3.4",
+    "release-it": "^15.4.1",
     "swagger-ui-express": "^4.3.0"
   },
   "devDependencies": {
@@ -20,6 +24,7 @@
     "webpack-cli": "^4.10.0"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "release": "release-it"
   }
 }
