@@ -30,3 +30,4 @@
         CDN_STORAGE_ZONE: "{{ CDN_STORAGE_ZONE }}"
         CDN_STORAGE_PATH: "{{ CDN_STORAGE_PATH }}"
         CDN_ACCESS_KEY: "{{ CDN_ACCESS_KEY }}"
+        VERSION: "{{ NEW_VERSION }}"
