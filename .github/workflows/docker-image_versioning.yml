@@ -42,6 +42,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      -name: Checkout
+       uses: actions/checkout@v3
+
       - name: release-it
         uses: TheRealWaldo/release-it@v0.7.2
         with:
@@ -67,9 +70,6 @@ jobs:
       - name: Extract branch name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: extract_branch
-
-      - name: Checkout
-        uses: actions/checkout@v3
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
