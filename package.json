@@ -1,4 +1,7 @@
 {
+  "name": "planify-back",
+  "version": "0.0.1",
+  "description": "Backend of Planify",
   "dependencies": {
     "@prisma/client": "^3.11.0",
     "bcryptjs": "^2.4.3",
