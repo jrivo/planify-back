@@ -41,9 +41,9 @@ jobs:
       #   run: yarn release --preRelease=dev 
       #   id: release-it
 
-      - name: "Get last tag"
-        run: git describe --tags --abbrev=0
-        id: get_last_tag
+      - name: 'Get Last tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
