@@ -1,8 +1,8 @@
-name: Docker Image CI
+name: Docker Image CI + Versioning
 
 on:
   push:
-    branches: [ "dev","master" ]
+    branches: [ "release-it" ]
   pull_request:
     branches: [ "master" ]
 

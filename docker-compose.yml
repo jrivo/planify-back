@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
     planify-back:
-        image: kreyzix/planify-back:latest
+        image: kreyzix/planify-back:${VERSION}
+        build: .
         ports:
             - "5000:5000"
         environment:

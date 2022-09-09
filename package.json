@@ -16,7 +16,8 @@
   "devDependencies": {
     "jest": "^29.0.2",
     "prisma": "^3.11.0",
-    "swagger-autogen": "^2.21.1"
+    "swagger-autogen": "^2.21.1",
+    "webpack-cli": "^4.10.0"
   },
   "scripts": {
     "test": "jest"
