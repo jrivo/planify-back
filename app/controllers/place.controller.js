@@ -52,6 +52,7 @@ exports.getByName = (req, res) => {
 };
 
 exports.create = (req, res) => {
+  console.log(req.body)
   prisma.address
     .create({
       data: {
@@ -186,7 +187,7 @@ exports.createActivity = async (req, res) => {
       data: {
         name: req.body.name,
         description: req.body.description,
-        price: req.body.price,
+        price: req.body.price && parseInt(req.body.price),
         place: { connect: { id: req.params.id } },
         //TODO: add medias, dates, etc.
       },

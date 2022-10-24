@@ -16,7 +16,7 @@ module.exports = function (app) {
     [authJwt.verifyToken, url.intifyId],
     controller.getActivities
   );
-  app.post("/places", [authJwt.verifyToken,files.uploadFiles,ids.intifyIds], controller.create);
+  app.post("/places", [authJwt.verifyToken,ids.intifyIds], controller.create);
   app.post(
     "/places/:id/create-activity",
     [authJwt.verifyToken, url.intifyId],

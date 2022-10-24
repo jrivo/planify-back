@@ -79,13 +79,18 @@ model ReviewStatus {
 //   updatedAt  DateTime @updatedAt
 // }
 
+enum MediaType {
+  MAIN_IMAGE
+  IMAGE
+  DOCUMENT
+}
 model Media {
   id         Int      @id @default(autoincrement())
   url        String
-  type       String?
+  type       MediaType?
   name       String
-  place      Place    @relation(fields: [placeId], references: [id])
-  placeId    Int
+  place      Place?    @relation(fields: [placeId], references: [id])
+  placeId    Int?
   activity   Activity? @relation(fields: [activityId], references: [id])
   activityId Int?
   review     Review?  @relation(fields: [reviewId], references: [id])

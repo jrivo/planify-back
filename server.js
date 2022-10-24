@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const multer = require("multer");
-const upload = multer();
+// const multer = require("multer");
+// const upload = multer();
 const app = express();
 const swaggerUi = require('swagger-ui-express')
 const swaggerFile = require('./swagger_output.json')
@@ -17,7 +17,7 @@ var corsOptions = {
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(upload.array());
+// app.use(upload.array());
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to planify-backend" });
 });
