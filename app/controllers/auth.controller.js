@@ -23,9 +23,11 @@ exports.register = (req, res) => {
 };
 
 exports.login = (req, res) => {
+  console.log(req.body)
   prisma.user
-    .findFirst({ where: { username: req.body.username } })
+    .findFirst({where: {email: req.body.email}})
     .then((user) => {
+      console.log(user)
       if (!user) {
         return res.status(404).send({ message: "User Not found." });
       }
@@ -44,13 +46,13 @@ exports.login = (req, res) => {
       });
       res.status(200).send({
         id: user.id,
-        username: user.username,
         email: user.email,
         role: user.role,
         accessToken: token,
       });
     })
     .catch((err) => {
+      console.log(err)
       res.status(500).send({ message: err.message });
     });
 };
