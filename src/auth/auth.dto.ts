@@ -12,4 +12,49 @@ export class LoginDto {
 }
 
 export class RegisterDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsString()
+  password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  firstName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  lastName: string;
+
+  @IsOptional()
+  @IsPhoneNumber()
+  phoneNumber: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // street: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // streetNumber: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // city: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // postalCode: string;
+
+  // @IsNotEmpty()
+  // @IsString()
+  // country: string;
+
+  // @IsOptional()
+  // @IsString()
+  // region?: string;
+  address : Address
+
 }

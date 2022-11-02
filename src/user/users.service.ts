@@ -49,31 +49,15 @@ export class UsersService {
         password: '',
         firstName: '',
         lastName: '',
-        phoneNumber: '',
-        role: 'DELETED',
-        organization: {
+        phone: '',
+        role: Role.DELETED,
+        profilePicture: {
           disconnect: true,
         },
         deletedAt: new Date(),
       },
     });
     return exclude(user, 'password');
-  }
-
-  async getOrganizationId(id: string) {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: Number(id),
-      },
-      select: {
-        organization: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-    return user.organization.id;
   }
 }
 

@@ -1,5 +1,4 @@
 import { Controller, Get, Request, Post, UseGuards, Body } from '@nestjs/common';
-import { createSftpUser } from 'src/utils/sftpgo';
 import { LoginDto, RegisterDto } from './auth.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';

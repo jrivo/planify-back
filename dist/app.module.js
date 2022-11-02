@@ -8,15 +8,58 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
+const config_1 = require("@nestjs/config");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
+const auth_module_1 = require("./auth/auth.module");
+const trip_module_1 = require("./trip/trip.module");
+const review_module_1 = require("./review/review.module");
+const place_module_1 = require("./place/place.module");
+const activity_module_1 = require("./activity/activity.module");
+const place_type_module_1 = require("./place-type/place-type.module");
+const users_module_1 = require("./user/users.module");
+const auth_controller_1 = require("./auth/auth.controller");
+const place_controller_1 = require("./place/place.controller");
+const place_service_1 = require("./place/place.service");
+const users_controller_1 = require("./user/users.controller");
+const users_service_1 = require("./user/users.service");
+const place_type_controller_1 = require("./place-type/place-type.controller");
+const place_type_service_1 = require("./place-type/place-type.service");
+const core_1 = require("@nestjs/core");
+const roles_guard_1 = require("./auth/roles.guard");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [],
-        controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService],
+        imports: [
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+            }),
+            auth_module_1.AuthModule,
+            trip_module_1.TripModule,
+            review_module_1.ReviewModule,
+            place_module_1.PlaceModule,
+            activity_module_1.ActivityModule,
+            place_type_module_1.PlaceTypeModule,
+            users_module_1.UsersModule,
+        ],
+        controllers: [
+            app_controller_1.AppController,
+            auth_controller_1.AuthController,
+            place_controller_1.PlaceController,
+            users_controller_1.UsersController,
+            place_type_controller_1.PlaceTypeController,
+        ],
+        providers: [
+            app_service_1.AppService,
+            place_service_1.PlaceService,
+            users_service_1.UsersService,
+            place_type_service_1.PlaceTypeService,
+            {
+                provide: core_1.APP_GUARD,
+                useClass: roles_guard_1.RolesGuard,
+            },
+        ],
     })
 ], AppModule);
 exports.AppModule = AppModule;

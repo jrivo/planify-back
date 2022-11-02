@@ -4,7 +4,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
-  binaryTargets   = ["native","linux-musl"]
+  binaryTargets   = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -13,21 +13,25 @@ datasource db {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  email         String         @unique
-  username      String         @unique
-  password      String
-  firstName     String?
-  lastName      String?
-  role          Role           @default(USER)
-  reviews       Review[]
-  status        UserStatus?    @relation(fields: [userStatusId], references: [id])
-  places        Place[]
-  userStatusId  Int?
-  notifications Notification[]
-  trips        Trip[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id             Int            @id @default(autoincrement())
+  email          String         @unique
+  password       String
+  firstName      String?
+  lastName       String?
+  phone          String?
+  address        Address       @relation(fields: [addressId], references: [id])
+  profilePicture Media?
+  role           Role           @default(USER)
+  reviews        Review[]
+  status         UserStatus     @default(UNVERIFIED)
+  places         Place[]
+  userStatusId   Int?
+  notifications  Notification[]
+  trips          Trip[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+  addressId      Int
 }
 
 enum Role {
@@ -35,14 +39,14 @@ enum Role {
   USER
   MODERATOR
   MERCHANT
+  DELETED
 }
 
-model UserStatus {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  User      User[]
+enum UserStatus {
+  UNVERIFIED
+  VERIFIED
+  INACTIVE
+  BANNED
 }
 
 model Review {
@@ -83,20 +87,24 @@ enum MediaType {
   MAIN_IMAGE
   IMAGE
   DOCUMENT
+  PROFILE_PICTURE
 }
+
 model Media {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   url        String
   type       MediaType?
   name       String
-  place      Place?    @relation(fields: [placeId], references: [id])
+  user       User?      @relation(fields: [userId], references: [id])
+  userId     Int?       @unique
+  place      Place?     @relation(fields: [placeId], references: [id])
   placeId    Int?
-  activity   Activity? @relation(fields: [activityId], references: [id])
+  activity   Activity?  @relation(fields: [activityId], references: [id])
   activityId Int?
-  review     Review?  @relation(fields: [reviewId], references: [id])
+  review     Review?    @relation(fields: [reviewId], references: [id])
   reviewId   Int?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 }
 
 model Place {
@@ -120,7 +128,7 @@ model Place {
 }
 
 model Address {
-  id           Int    @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   street       String
   streetNumber String
   city         String
@@ -129,7 +137,8 @@ model Address {
   region       String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  Place Place[]
+  places       Place[]
+  users        User[]
 }
 
 model PlaceType {
@@ -142,15 +151,15 @@ model PlaceType {
 }
 
 model Activity {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
-  place       Place    @relation(fields: [placeId], references: [id])
+  place       Place     @relation(fields: [placeId], references: [id])
   medias      Media[]
   description String
   date        DateTime?
   trips       Trip[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   placeId     Int
   price       Int?
 }
@@ -165,12 +174,12 @@ model Notification {
 }
 
 model Trip {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   name        String
   description String
   activities  Activity[]
-  user       User     @relation(fields: [userId], references: [id])
-  userId     Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
