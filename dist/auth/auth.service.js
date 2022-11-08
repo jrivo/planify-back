@@ -22,12 +22,12 @@ var __rest = (this && this.__rest) || function (s, e) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
-const users_service_1 = require("../user/users.service");
 const jwt_1 = require("@nestjs/jwt");
 const client_1 = require("@prisma/client");
 const const_1 = require("../const");
 const bcrypt = require("bcrypt");
 const utils_1 = require("../utils");
+const users_service_1 = require("../user/users.service");
 const prisma = new client_1.PrismaClient();
 let AuthService = class AuthService {
     constructor(usersService, jwtService) {

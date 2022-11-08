@@ -24,6 +24,7 @@ import { ActivityService } from "./activity/activity.service";
 import { TripService } from "./trip/trip.service";
 import { TripController } from "./trip/trip.controller";
 import { CdnService } from "./cdn/cdn.service";
+import { JwtService } from "@nestjs/jwt";
 
 @Module({
   imports: [
@@ -54,7 +55,9 @@ import { CdnService } from "./cdn/cdn.service";
     PlaceTypeService,
     ActivityService,
     TripService,
-    CdnService
+    CdnService,
+    AuthService,
+    JwtService
   ],
 })
 export class AppModule {}

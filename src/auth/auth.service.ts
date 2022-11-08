@@ -1,5 +1,4 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { UsersService } from "src/user/users.service";
 import { JwtService } from "@nestjs/jwt";
 import { MediaType, PrismaClient, Role } from "@prisma/client";
 import { RegisterDto } from "./auth.dto";
@@ -10,6 +9,7 @@ import {
 } from "../const";
 import * as bcrypt from "bcrypt";
 import { sanitizeFileName } from "src/utils";
+import { UsersService } from "src/user/users.service";
 
 const prisma = new PrismaClient();
 

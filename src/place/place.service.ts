@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
-import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
+import { CDN_STORAGE_PATH,CDN_STORAGE_ZONE } from "src/const";
 import { sanitizeFileName } from "src/utils";
 import { createActivityDto, createPlaceDto, updatePlaceDto } from "./place.dto";
 const { PrismaClient } = require("@prisma/client");
