@@ -1,4 +1,4 @@
-import { Activity, Address } from "@prisma/client";
+import { Activity} from "@prisma/client";
 import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class createPlaceDto {

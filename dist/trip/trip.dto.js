@@ -10,8 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateTripDto = exports.createTripDto = void 0;
+const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class createTripDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { name: { required: true, type: () => String }, description: { required: true, type: () => String } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
@@ -25,6 +29,9 @@ __decorate([
 ], createTripDto.prototype, "description", void 0);
 exports.createTripDto = createTripDto;
 class updateTripDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { name: { required: false, type: () => String }, description: { required: false, type: () => String } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsOptional)(),

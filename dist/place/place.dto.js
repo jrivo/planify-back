@@ -10,8 +10,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createActivityDto = exports.updatePlaceDto = exports.createPlaceDto = void 0;
+const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class createPlaceDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { name: { required: true, type: () => String }, description: { required: false, type: () => String }, street: { required: true, type: () => String }, streetNumber: { required: true, type: () => String }, city: { required: true, type: () => String }, postalCode: { required: true, type: () => String }, country: { required: true, type: () => String }, region: { required: false, type: () => String }, website: { required: false, type: () => String }, phone: { required: false, type: () => String }, email: { required: false, type: () => String }, placeTypeId: { required: true, type: () => Number }, activities: { required: false, type: () => [Object] }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
@@ -93,6 +97,9 @@ __decorate([
 ], createPlaceDto.prototype, "documents", void 0);
 exports.createPlaceDto = createPlaceDto;
 class updatePlaceDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { name: { required: false, type: () => String }, description: { required: false, type: () => String }, street: { required: false, type: () => String }, streetNumber: { required: false, type: () => String }, city: { required: false, type: () => String }, postalCode: { required: false, type: () => String }, country: { required: false, type: () => String }, region: { required: false, type: () => String }, website: { required: false, type: () => String }, phone: { required: false, type: () => String }, email: { required: false, type: () => String }, placeTypeId: { required: false, type: () => Number }, activities: { required: false, type: () => [Object] }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsOptional)(),
@@ -181,6 +188,9 @@ __decorate([
 ], updatePlaceDto.prototype, "documents", void 0);
 exports.updatePlaceDto = updatePlaceDto;
 class createActivityDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { name: { required: true, type: () => String }, description: { required: true, type: () => String }, price: { required: false, type: () => Number }, date: { required: false, type: () => Date }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),

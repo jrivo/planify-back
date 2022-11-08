@@ -13,6 +13,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActivityController = void 0;
+const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
@@ -90,6 +91,7 @@ let ActivityController = class ActivityController {
 };
 __decorate([
     (0, common_1.Get)(),
+    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -97,6 +99,7 @@ __decorate([
 ], ActivityController.prototype, "getAll", null);
 __decorate([
     (0, common_1.Get)(":id"),
+    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -105,6 +108,7 @@ __decorate([
 ], ActivityController.prototype, "getById", null);
 __decorate([
     (0, common_1.Get)("category/:id"),
+    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -113,6 +117,7 @@ __decorate([
 ], ActivityController.prototype, "getByCategory", null);
 __decorate([
     (0, common_1.Get)("search/:name"),
+    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("name")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -123,6 +128,7 @@ __decorate([
     (0, common_1.Put)(":id"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Request)()),
@@ -135,6 +141,7 @@ __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
     (0, common_1.Delete)(":id"),
+    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),

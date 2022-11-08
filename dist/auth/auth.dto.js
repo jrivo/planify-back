@@ -10,9 +10,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterDto = exports.LoginDto = void 0;
+const openapi = require("@nestjs/swagger");
 const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
 class LoginDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { email: { required: true, type: () => String }, password: { required: true, type: () => String } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
@@ -26,6 +30,9 @@ __decorate([
 ], LoginDto.prototype, "password", void 0);
 exports.LoginDto = LoginDto;
 class RegisterDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { email: { required: true, type: () => String }, password: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: true, type: () => String }, street: { required: true, type: () => String }, streetNumber: { required: true, type: () => String }, city: { required: true, type: () => String }, postalCode: { required: true, type: () => String }, country: { required: true, type: () => String }, region: { required: false, type: () => String }, role: { required: false, type: () => Object } };
+    }
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
