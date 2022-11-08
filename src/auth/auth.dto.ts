@@ -1,4 +1,4 @@
-import { Address } from "@prisma/client";
+import { Address, Role } from "@prisma/client";
 import { IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class LoginDto {
@@ -32,29 +32,34 @@ export class RegisterDto {
   @IsPhoneNumber()
   phoneNumber: string;
 
-  // @IsNotEmpty()
-  // @IsString()
-  // street: string;
+  @IsNotEmpty()
+  @IsString()
+  street: string;
 
-  // @IsNotEmpty()
-  // @IsString()
-  // streetNumber: string;
+  @IsNotEmpty()
+  @IsString()
+  streetNumber: string;
 
-  // @IsNotEmpty()
-  // @IsString()
-  // city: string;
+  @IsNotEmpty()
+  @IsString()
+  city: string;
 
-  // @IsNotEmpty()
-  // @IsString()
-  // postalCode: string;
+  @IsNotEmpty()
+  @IsString()
+  postalCode: string;
 
-  // @IsNotEmpty()
-  // @IsString()
-  // country: string;
+  @IsNotEmpty()
+  @IsString()
+  country: string;
 
-  // @IsOptional()
-  // @IsString()
-  // region?: string;
-  address : Address
+  @IsOptional()
+  @IsString()
+  region?: string;
+
+  @IsOptional()
+  @IsString()
+
+  role?:Role;
+  // address : Address
 
 }

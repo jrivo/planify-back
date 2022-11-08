@@ -14,6 +14,8 @@ let UsersService = class UsersService {
     async findById(id, params = null) {
         const user = await prisma.user.findUnique(Object.assign({ where: {
                 id: Number(id),
+            }, include: {
+                profilePicture: true,
             } }, params));
         return exclude(user, 'password');
     }
@@ -53,6 +55,17 @@ let UsersService = class UsersService {
             },
         });
         return exclude(user, 'password');
+    }
+    async getRole(id) {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+            select: {
+                role: true,
+            },
+        });
+        return user.role;
     }
 };
 UsersService = __decorate([

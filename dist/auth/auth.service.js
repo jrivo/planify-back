@@ -27,6 +27,7 @@ const jwt_1 = require("@nestjs/jwt");
 const client_1 = require("@prisma/client");
 const const_1 = require("../const");
 const bcrypt = require("bcrypt");
+const utils_1 = require("../utils");
 const prisma = new client_1.PrismaClient();
 let AuthService = class AuthService {
     constructor(usersService, jwtService) {
@@ -55,19 +56,19 @@ let AuthService = class AuthService {
             access_token: this.jwtService.sign(payload),
         };
     }
-    async register(body) {
+    async register(req, body) {
         const user = await this.usersService.findByEmail(body.email);
         if (user) {
             throw new common_1.UnauthorizedException("User already exists");
         }
         let address = await prisma.address.create({
             data: {
-                street: body.address.street,
-                streetNumber: body.address.streetNumber,
-                city: body.address.city,
-                postalCode: body.address.postalCode,
-                country: body.address.country,
-                region: body.address.region && body.address.region,
+                street: body.street,
+                streetNumber: body.streetNumber,
+                city: body.city,
+                postalCode: body.postalCode,
+                country: body.country,
+                region: body.region && body.region,
             },
         });
         let newUser = await prisma.user.create({
@@ -78,12 +79,40 @@ let AuthService = class AuthService {
                 lastName: body.lastName,
                 phone: body.phoneNumber && body.phoneNumber,
                 address: { connect: { id: address.id } },
+                role: client_1.Role[body.role],
+            },
+            include: {
+                profilePicture: true,
+                address: true,
             },
         });
-        const payload = { sub: user.id, email: user.email };
+        if (req.files) {
+            try {
+                req.files.forEach(async (file) => {
+                    let type = client_1.MediaType.PROFILE_PICTURE;
+                    await prisma.media.create({
+                        data: {
+                            name: (0, utils_1.sanitizeFileName)(file.originalname),
+                            url: "https://" +
+                                const_1.CDN_STORAGE_ZONE +
+                                ".b-cdn.net/" +
+                                const_1.CDN_STORAGE_PATH +
+                                "/" +
+                                file.uploadName,
+                            type: type,
+                            user: { connect: { id: Number(newUser.id) } },
+                        },
+                    });
+                });
+            }
+            catch (err) {
+                throw err;
+            }
+        }
+        const payload = { sub: newUser.id, email: newUser.email };
         return {
-            id: user.id,
-            email: user.email,
+            id: newUser.id,
+            email: newUser.email,
             access_token: this.jwtService.sign(payload),
         };
     }

@@ -15,7 +15,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let PlaceService = class PlaceService {
     async getAll() {
-        return await prisma.place.findMany();
+        return await prisma.place.findMany({
+            include: {
+                address: true,
+            },
+        });
     }
     async getById(id) {
         return await prisma.place.findUnique({
@@ -50,12 +54,12 @@ let PlaceService = class PlaceService {
         try {
             const address = await prisma.address.create({
                 data: {
-                    street: body.address.street,
-                    streetNumber: body.address.streetNumber,
-                    city: body.address.city,
-                    postalCode: body.address.postalCode,
-                    country: body.address.country,
-                    region: body.address.region && body.address.region,
+                    street: body.street,
+                    streetNumber: body.streetNumber,
+                    city: body.city,
+                    postalCode: body.postalCode,
+                    country: body.country,
+                    region: body.region && body.region,
                 },
             });
             const place = await prisma.place.create({
@@ -66,8 +70,12 @@ let PlaceService = class PlaceService {
                     website: body.website,
                     phone: body.phone,
                     email: body.email,
-                    type: { connect: { id: body.placeTypeId } },
-                    owner: { connect: { id: req.user.id } },
+                    type: { connect: { id: Number(body.placeTypeId) } },
+                    owner: { connect: { id: Number(req.user.id) } },
+                },
+                include: {
+                    address: true,
+                    medias: true,
                 },
             });
             if (req.files) {
@@ -95,7 +103,7 @@ let PlaceService = class PlaceService {
                                     "/" +
                                     file.uploadName,
                                 type: type,
-                                place: { connect: { id: place.id } },
+                                place: { connect: { id: Number(place.id) } },
                             },
                         });
                     });
@@ -110,24 +118,112 @@ let PlaceService = class PlaceService {
             throw err;
         }
     }
-    async update(id, body) {
-        return await prisma.place.update({
+    async update(id, req, body) {
+        const place = await prisma.place.update({
             where: { id: Number(id) },
-            data: {
-                name: body.name,
-                description: body.description,
-                address: body.address,
-                website: body.website,
-                phone: body.phone,
-                email: body.email,
-                placeTypeId: body.placeTypeId,
+            data: body,
+            include: {
+                address: true,
+                medias: true,
+            },
+        });
+        if (req.files) {
+            try {
+                req.files.forEach(async (file) => {
+                    let type = "";
+                    switch (file.fieldname) {
+                        case "mainImage":
+                            type = client_1.MediaType.MAIN_IMAGE;
+                            break;
+                        case "image":
+                            type = client_1.MediaType.IMAGE;
+                            break;
+                        case "document":
+                            type = client_1.MediaType.DOCUMENT;
+                            break;
+                    }
+                    await prisma.media.create({
+                        data: {
+                            name: (0, utils_1.sanitizeFileName)(file.originalname),
+                            url: "https://" +
+                                const_1.CDN_STORAGE_ZONE +
+                                ".b-cdn.net/" +
+                                const_1.CDN_STORAGE_PATH +
+                                "/" +
+                                file.uploadName,
+                            type: type,
+                            place: { connect: { id: Number(place.id) } },
+                        },
+                    });
+                });
+            }
+            catch (err) {
+                throw err;
+            }
+        }
+        return place;
+    }
+    async delete(id) {
+        return await prisma.place.delete({
+            where: { id: Number(id) },
+        });
+    }
+    async getActivities(id) {
+        return await prisma.activity.findMany({
+            where: {
+                placeId: Number(id),
             },
         });
     }
-    delete(id) {
-        return prisma.place.delete({
-            where: { id: Number(id) },
+    async createActivity(id, req, body) {
+        console.log(body);
+        const activity = await prisma.activity.create({
+            data: {
+                name: body.name,
+                description: body.description,
+                place: { connect: { id: Number(id) } },
+                price: body.price && body.price,
+                date: body.date && body.date,
+            },
+            include: {
+                medias: true,
+            },
         });
+        if (req.files) {
+            try {
+                req.files.forEach(async (file) => {
+                    let type = "";
+                    switch (file.fieldname) {
+                        case "mainImage":
+                            type = client_1.MediaType.MAIN_IMAGE;
+                            break;
+                        case "image":
+                            type = client_1.MediaType.IMAGE;
+                            break;
+                        case "document":
+                            type = client_1.MediaType.DOCUMENT;
+                            break;
+                    }
+                    await prisma.media.create({
+                        data: {
+                            name: (0, utils_1.sanitizeFileName)(file.originalname),
+                            url: "https://" +
+                                const_1.CDN_STORAGE_ZONE +
+                                ".b-cdn.net/" +
+                                const_1.CDN_STORAGE_PATH +
+                                "/" +
+                                file.uploadName,
+                            type: type,
+                            activity: { connect: { id: activity.id } },
+                        },
+                    });
+                });
+            }
+            catch (err) {
+                throw err;
+            }
+        }
+        return activity;
     }
 };
 PlaceService = __decorate([

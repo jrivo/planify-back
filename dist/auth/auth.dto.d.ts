@@ -1,4 +1,4 @@
-import { Address } from "@prisma/client";
+import { Role } from "@prisma/client";
 export declare class LoginDto {
     email: string;
     password: string;
@@ -9,5 +9,11 @@ export declare class RegisterDto {
     firstName: string;
     lastName: string;
     phoneNumber: string;
-    address: Address;
+    street: string;
+    streetNumber: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    region?: string;
+    role?: Role;
 }

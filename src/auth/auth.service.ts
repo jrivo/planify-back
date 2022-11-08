@@ -1,10 +1,15 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { UsersService } from "src/user/users.service";
 import { JwtService } from "@nestjs/jwt";
-import { PrismaClient } from "@prisma/client";
+import { MediaType, PrismaClient, Role } from "@prisma/client";
 import { RegisterDto } from "./auth.dto";
-import { BCRYPT_SALT_ROUNDS } from "../const";
+import {
+  BCRYPT_SALT_ROUNDS,
+  CDN_STORAGE_PATH,
+  CDN_STORAGE_ZONE,
+} from "../const";
 import * as bcrypt from "bcrypt";
+import { sanitizeFileName } from "src/utils";
 
 const prisma = new PrismaClient();
 
@@ -41,19 +46,19 @@ export class AuthService {
     };
   }
 
-  async register(body: RegisterDto) {
+  async register(req: any, body: RegisterDto) {
     const user = await this.usersService.findByEmail(body.email);
     if (user) {
       throw new UnauthorizedException("User already exists");
     }
     let address = await prisma.address.create({
       data: {
-        street: body.address.street,
-        streetNumber: body.address.streetNumber,
-        city: body.address.city,
-        postalCode: body.address.postalCode,
-        country: body.address.country,
-        region: body.address.region && body.address.region,
+        street: body.street,
+        streetNumber: body.streetNumber,
+        city: body.city,
+        postalCode: body.postalCode,
+        country: body.country,
+        region: body.region && body.region,
       },
     });
     let newUser = await prisma.user.create({
@@ -64,13 +69,40 @@ export class AuthService {
         lastName: body.lastName,
         phone: body.phoneNumber && body.phoneNumber,
         address: { connect: { id: address.id } },
+        role: Role[body.role],
+      },
+      include: {
+        profilePicture: true,
+        address: true,
       },
     });
-    //media creation
-    const payload = { sub: user.id, email: user.email };
+    if (req.files) {
+      try {
+        req.files.forEach(async (file) => {
+          let type = MediaType.PROFILE_PICTURE;
+          await prisma.media.create({
+            data: {
+              name: sanitizeFileName(file.originalname),
+              url:
+                "https://" +
+                CDN_STORAGE_ZONE +
+                ".b-cdn.net/" +
+                CDN_STORAGE_PATH +
+                "/" +
+                file.uploadName,
+              type: type,
+              user: { connect: { id: Number(newUser.id) } },
+            },
+          });
+        });
+      } catch (err) {
+        throw err;
+      }
+    }
+    const payload = { sub: newUser.id, email: newUser.email };
     return {
-      id: user.id,
-      email: user.email,
+      id: newUser.id,
+      email: newUser.email,
       access_token: this.jwtService.sign(payload),
     };
   }

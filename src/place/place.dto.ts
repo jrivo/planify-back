@@ -1,5 +1,5 @@
 import { Activity, Address } from "@prisma/client";
-import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsDateString, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 export class createPlaceDto {
 
@@ -13,7 +13,30 @@ export class createPlaceDto {
     description?: string;
 
     @IsNotEmpty()
-    address: Address;
+    @IsString()
+    street: string;
+
+    @IsNotEmpty()
+    @IsString()
+    streetNumber: string;
+
+    @IsNotEmpty()
+    @IsString()
+    city: string;
+
+    @IsNotEmpty()
+    @IsString()
+    postalCode: string;
+
+
+    @IsNotEmpty()
+    @IsString()
+    country: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    region?: string;
 
     @IsOptional()
     @IsString()
@@ -58,7 +81,34 @@ export class updatePlaceDto {
 
     @IsOptional()
     @IsNotEmpty()
-    address?: Address;
+    @IsString()
+    street?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    streetNumber?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    city?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    postalCode?: string;
+
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    country?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    region?: string;
 
     @IsOptional()
     @IsString()
@@ -79,6 +129,33 @@ export class updatePlaceDto {
 
     @IsOptional()
     activities?: Activity[];
+
+    @IsOptional()
+    mainImage? : any;
+
+    @IsOptional()
+    images? : any;
+
+    @IsOptional()
+    documents? : any;
+}
+
+export class createActivityDto {
+    @IsNotEmpty()
+    @IsString()
+    name: string;
+
+    @IsNotEmpty()
+    @IsString()
+    description: string;
+
+    @IsOptional()
+    @IsNumber()
+    price?: number;
+
+    @IsOptional()
+    @IsDateString()
+    date?: Date;
 
     @IsOptional()
     mainImage? : any;

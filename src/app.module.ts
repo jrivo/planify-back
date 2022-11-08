@@ -19,6 +19,11 @@ import { PlaceTypeController } from "./place-type/place-type.controller";
 import { PlaceTypeService } from "./place-type/place-type.service";
 import { APP_GUARD } from "@nestjs/core";
 import { RolesGuard } from "./auth/roles.guard";
+import { ActivityController } from "./activity/activity.controller";
+import { ActivityService } from "./activity/activity.service";
+import { TripService } from "./trip/trip.service";
+import { TripController } from "./trip/trip.controller";
+import { CdnService } from "./cdn/cdn.service";
 
 @Module({
   imports: [
@@ -39,16 +44,17 @@ import { RolesGuard } from "./auth/roles.guard";
     PlaceController,
     UsersController,
     PlaceTypeController,
+    ActivityController,
+    TripController,
   ],
   providers: [
     AppService,
     PlaceService,
     UsersService,
     PlaceTypeService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
+    ActivityService,
+    TripService,
+    CdnService
   ],
 })
 export class AppModule {}

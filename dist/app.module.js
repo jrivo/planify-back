@@ -25,8 +25,11 @@ const users_controller_1 = require("./user/users.controller");
 const users_service_1 = require("./user/users.service");
 const place_type_controller_1 = require("./place-type/place-type.controller");
 const place_type_service_1 = require("./place-type/place-type.service");
-const core_1 = require("@nestjs/core");
-const roles_guard_1 = require("./auth/roles.guard");
+const activity_controller_1 = require("./activity/activity.controller");
+const activity_service_1 = require("./activity/activity.service");
+const trip_service_1 = require("./trip/trip.service");
+const trip_controller_1 = require("./trip/trip.controller");
+const cdn_service_1 = require("./cdn/cdn.service");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -49,16 +52,17 @@ AppModule = __decorate([
             place_controller_1.PlaceController,
             users_controller_1.UsersController,
             place_type_controller_1.PlaceTypeController,
+            activity_controller_1.ActivityController,
+            trip_controller_1.TripController,
         ],
         providers: [
             app_service_1.AppService,
             place_service_1.PlaceService,
             users_service_1.UsersService,
             place_type_service_1.PlaceTypeService,
-            {
-                provide: core_1.APP_GUARD,
-                useClass: roles_guard_1.RolesGuard,
-            },
+            activity_service_1.ActivityService,
+            trip_service_1.TripService,
+            cdn_service_1.CdnService
         ],
     })
 ], AppModule);

@@ -11,9 +11,9 @@ export declare class AuthService {
         email: any;
         access_token: string;
     }>;
-    register(body: RegisterDto): Promise<{
-        id: any;
-        email: any;
+    register(req: any, body: RegisterDto): Promise<{
+        id: number;
+        email: string;
         access_token: string;
     }>;
 }

@@ -9,6 +9,9 @@ export class UsersService {
       where: {
         id: Number(id),
       },
+      include: {
+        profilePicture: true,
+      },
       ...params,
     });
     return exclude(user, 'password');
@@ -58,6 +61,18 @@ export class UsersService {
       },
     });
     return exclude(user, 'password');
+  }
+
+  async getRole(id: string){
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        role: true,
+      },
+    });
+    return user.role;
   }
 }
 

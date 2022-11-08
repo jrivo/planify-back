@@ -1,7 +1,9 @@
 import { CanActivate, ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
+import { UsersService } from "src/user/users.service";
 export declare class RolesGuard implements CanActivate {
     private reflector;
-    constructor(reflector: Reflector);
-    canActivate(context: ExecutionContext): boolean;
+    private usersService;
+    constructor(reflector: Reflector, usersService: UsersService);
+    canActivate(context: ExecutionContext): Promise<boolean>;
 }

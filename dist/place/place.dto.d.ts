@@ -1,8 +1,13 @@
-import { Activity, Address } from "@prisma/client";
+import { Activity } from "@prisma/client";
 export declare class createPlaceDto {
     name: string;
     description?: string;
-    address: Address;
+    street: string;
+    streetNumber: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    region?: string;
     website?: string;
     phone?: string;
     email?: string;
@@ -15,12 +20,26 @@ export declare class createPlaceDto {
 export declare class updatePlaceDto {
     name?: string;
     description?: string;
-    address?: Address;
+    street?: string;
+    streetNumber?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+    region?: string;
     website?: string;
     phone?: string;
     email?: string;
     placeTypeId?: number;
     activities?: Activity[];
+    mainImage?: any;
+    images?: any;
+    documents?: any;
+}
+export declare class createActivityDto {
+    name: string;
+    description: string;
+    price?: number;
+    date?: Date;
     mainImage?: any;
     images?: any;
     documents?: any;

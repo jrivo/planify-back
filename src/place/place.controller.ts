@@ -9,17 +9,21 @@ import {
   Res,
   Delete,
   Put,
+  UseInterceptors,
+  UploadedFiles,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { createPlaceDto, updatePlaceDto } from "./place.dto";
+import { createActivityDto, createPlaceDto, updatePlaceDto } from "./place.dto";
 import { PlaceService } from "./place.service";
 import { prismaErrorHandler } from "src/prisma/errorsHandler";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
+import { AnyFilesInterceptor, FileInterceptor } from "@nestjs/platform-express";
+import { CdnService } from "src/cdn/cdn.service";
 
 @Controller("places")
 export class PlaceController {
-  constructor(private placeService: PlaceService) {}
+  constructor(private placeService: PlaceService,private cdnService: CdnService) {}
 
   @Get()
   async getAll(@Res() res) {
@@ -34,7 +38,6 @@ export class PlaceController {
   }
 
   @Get(":id")
-  @Roles("MERCHANT")
   async getById(@Param("id") id: string, @Res() res) {
     this.placeService
       .getById(id)
@@ -74,9 +77,29 @@ export class PlaceController {
       });
   }
 
-  // @Roles("MERCHANT")
+  @Get(":id/activities")
+  async getActivities(@Param("id") id: string, @Res() res) {
+    this.placeService
+      .getActivities(id)
+      .then((activities) => {
+        res.status(200).send(activities);
+      })
+      .catch((err) => {
+        res.status(500).send(err);
+      });
+  }
+
   @Post()
-  async create(@Body() body: createPlaceDto, @Request() req: any, @Res() res) {
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MERCHANT")
+  @UseInterceptors(AnyFilesInterceptor())
+  async create(
+    @Body() body: createPlaceDto,
+    @Request() req: any,
+    @Res() res,
+    @UploadedFiles() files: Array<Express.Multer.File>
+  ) {
+    files ? req = await this.cdnService.upload(req,files) : null
     this.placeService
       .create(req, body)
       .then((place) => {
@@ -87,16 +110,44 @@ export class PlaceController {
       });
   }
 
-  @UseGuards()
+  @Post(":id/activities")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MERCHANT")
+  @UseInterceptors(AnyFilesInterceptor())
+  //add owner or admin guard
+  async createActivity(
+    @Param("id") id: string,
+    @Body() body: createActivityDto,
+    @Request() req: any,
+    @Res() res,
+    @UploadedFiles() files: Array<Express.Multer.File>
+  ) {
+    files ? req = await this.cdnService.upload(req,files) : null
+    this.placeService
+      .createActivity(id, req, body)
+      .then((activity) => {
+        res.status(201).send(activity);
+      })
+      .catch((err) => {
+        res.status(500).send(prismaErrorHandler(err));
+      });
+  }
+
   @Put(":id")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MERCHANT")
+  @UseInterceptors(AnyFilesInterceptor())
+  //add owner or admin guard
   async update(
     @Param("id") id: string,
     @Body() body: updatePlaceDto,
     @Request() req: any,
-    @Res() res
+    @Res() res,
+    @UploadedFiles() files: Array<Express.Multer.File>
   ) {
+    files ? req = await this.cdnService.upload(req,files) : null
     this.placeService
-      .update(id, body)
+      .update(id, req,body)
       .then((place) => {
         res.status(202).send(place);
       })
@@ -105,7 +156,9 @@ export class PlaceController {
       });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MERCHANT")
+  //add owner or admin guard
   @Delete(":id")
   async delete(@Param("id") id: string, @Res() res) {
     this.placeService

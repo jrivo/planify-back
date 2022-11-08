@@ -19,9 +19,13 @@ const place_dto_1 = require("./place.dto");
 const place_service_1 = require("./place.service");
 const errorsHandler_1 = require("../prisma/errorsHandler");
 const roles_decorator_1 = require("../auth/roles.decorator");
+const roles_guard_1 = require("../auth/roles.guard");
+const platform_express_1 = require("@nestjs/platform-express");
+const cdn_service_1 = require("../cdn/cdn.service");
 let PlaceController = class PlaceController {
-    constructor(placeService) {
+    constructor(placeService, cdnService) {
         this.placeService = placeService;
+        this.cdnService = cdnService;
     }
     async getAll(res) {
         this.placeService
@@ -67,7 +71,18 @@ let PlaceController = class PlaceController {
             res.status(500).send(err);
         });
     }
-    async create(body, req, res) {
+    async getActivities(id, res) {
+        this.placeService
+            .getActivities(id)
+            .then((activities) => {
+            res.status(200).send(activities);
+        })
+            .catch((err) => {
+            res.status(500).send(err);
+        });
+    }
+    async create(body, req, res, files) {
+        files ? req = await this.cdnService.upload(req, files) : null;
         this.placeService
             .create(req, body)
             .then((place) => {
@@ -77,9 +92,21 @@ let PlaceController = class PlaceController {
             res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
-    async update(id, body, req, res) {
+    async createActivity(id, body, req, res, files) {
+        files ? req = await this.cdnService.upload(req, files) : null;
         this.placeService
-            .update(id, body)
+            .createActivity(id, req, body)
+            .then((activity) => {
+            res.status(201).send(activity);
+        })
+            .catch((err) => {
+            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
+        });
+    }
+    async update(id, body, req, res, files) {
+        files ? req = await this.cdnService.upload(req, files) : null;
+        this.placeService
+            .update(id, req, body)
             .then((place) => {
             res.status(202).send(place);
         })
@@ -107,7 +134,6 @@ __decorate([
 ], PlaceController.prototype, "getAll", null);
 __decorate([
     (0, common_1.Get)(":id"),
-    (0, roles_decorator_1.Roles)("MERCHANT"),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -131,27 +157,57 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "getByName", null);
 __decorate([
+    (0, common_1.Get)(":id/activities"),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PlaceController.prototype, "getActivities", null);
+__decorate([
     (0, common_1.Post)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __param(2, (0, common_1.Res)()),
+    __param(3, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [place_dto_1.createPlaceDto, Object, Object]),
+    __metadata("design:paramtypes", [place_dto_1.createPlaceDto, Object, Object, Array]),
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "create", null);
 __decorate([
-    (0, common_1.UseGuards)(),
-    (0, common_1.Put)(":id"),
+    (0, common_1.Post)(":id/activities"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Request)()),
     __param(3, (0, common_1.Res)()),
+    __param(4, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, place_dto_1.updatePlaceDto, Object, Object]),
+    __metadata("design:paramtypes", [String, place_dto_1.createActivityDto, Object, Object, Array]),
+    __metadata("design:returntype", Promise)
+], PlaceController.prototype, "createActivity", null);
+__decorate([
+    (0, common_1.Put)(":id"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Request)()),
+    __param(3, (0, common_1.Res)()),
+    __param(4, (0, common_1.UploadedFiles)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, place_dto_1.updatePlaceDto, Object, Object, Array]),
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
     (0, common_1.Delete)(":id"),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
@@ -161,7 +217,7 @@ __decorate([
 ], PlaceController.prototype, "delete", null);
 PlaceController = __decorate([
     (0, common_1.Controller)("places"),
-    __metadata("design:paramtypes", [place_service_1.PlaceService])
+    __metadata("design:paramtypes", [place_service_1.PlaceService, cdn_service_1.CdnService])
 ], PlaceController);
 exports.PlaceController = PlaceController;
 //# sourceMappingURL=place.controller.js.map
