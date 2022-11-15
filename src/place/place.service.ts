@@ -24,6 +24,7 @@ export class PlaceService {
       include: {
         activities: {
           include: {
+            //TODO: add address to activity
             medias: true,
           },
         },
