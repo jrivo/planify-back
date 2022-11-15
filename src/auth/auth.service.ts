@@ -75,7 +75,7 @@ export class AuthService {
         firstName: body.firstName,
         lastName: body.lastName,
         phone: body.phoneNumber && body.phoneNumber,
-        address: address ? { connect: { id: address.id } } : null,
+        address: address ? { connect: { id: address.id } } : undefined,
         role: Role[body.role],
       },
       include: {

@@ -12,7 +12,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let ActivityService = class ActivityService {
     async getAll() {
-        return await prisma.activity.findMany();
+        return await prisma.activity.findMany({
+            include: {
+                medias: true,
+            },
+        });
     }
     async getById(id) {
         return await prisma.activity.findUnique({
@@ -29,6 +33,9 @@ let ActivityService = class ActivityService {
                     search: name,
                 },
             },
+            include: {
+                medias: true,
+            }
         });
     }
     async getByCategory(categoryId) {
@@ -38,12 +45,18 @@ let ActivityService = class ActivityService {
                     placeTypeId: Number(categoryId),
                 },
             },
+            include: {
+                medias: true,
+            }
         });
     }
     async update(id, body) {
         return await prisma.activity.update({
             where: { id: Number(id) },
             data: body,
+            include: {
+                medias: true,
+            }
         });
     }
     async delete(id) {

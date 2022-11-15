@@ -19,7 +19,7 @@ model User {
   firstName      String?
   lastName       String?
   phone          String?
-  address        Address        @relation(fields: [addressId], references: [id])
+  address        Address?        @relation(fields: [addressId], references: [id])
   profilePicture Media?
   role           Role           @default(USER)
   reviews        Review[]
@@ -31,7 +31,7 @@ model User {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   deletedAt      DateTime?
-  addressId      Int
+  addressId      Int?
 }
 
 enum Role {
