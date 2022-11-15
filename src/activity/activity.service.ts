@@ -7,7 +7,11 @@ const prisma = new PrismaClient();
 @Injectable()
 export class ActivityService {
   async getAll() {
-    return await prisma.activity.findMany();
+    return await prisma.activity.findMany({
+      include: {
+        medias: true,
+      },
+    });
   }
 
   async getById(id: string) {
@@ -26,6 +30,9 @@ export class ActivityService {
           search: name,
         },
       },
+      include:{
+        medias: true,
+      }
     });
   }
 
@@ -36,6 +43,9 @@ export class ActivityService {
           placeTypeId: Number(categoryId),
         },
       },
+      include:{
+        medias: true,
+      }
     });
   }
 
@@ -43,12 +53,15 @@ export class ActivityService {
     return await prisma.activity.update({
       where: { id: Number(id) },
       data: body,
+      include:{
+        medias: true,
+      }
     });
   }
 
-    async delete(id: string) {
-        return await prisma.activity.delete({
-            where: { id: Number(id) },
-        });
-        }
+  async delete(id: string) {
+    return await prisma.activity.delete({
+      where: { id: Number(id) },
+    });
+  }
 }

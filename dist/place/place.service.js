@@ -18,6 +18,7 @@ let PlaceService = class PlaceService {
         return await prisma.place.findMany({
             include: {
                 address: true,
+                medias: true,
             },
         });
     }
@@ -27,6 +28,7 @@ let PlaceService = class PlaceService {
             include: {
                 activities: {
                     include: {
+                        address: true,
                         medias: true,
                     },
                 },
@@ -41,12 +43,20 @@ let PlaceService = class PlaceService {
                     search: name,
                 },
             },
+            include: {
+                address: true,
+                medias: true,
+            },
         });
     }
     async getByCategory(categoryId) {
         return await prisma.place.findMany({
             where: {
                 placeTypeId: Number(categoryId),
+            },
+            include: {
+                address: true,
+                medias: true,
             },
         });
     }

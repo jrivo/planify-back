@@ -13,6 +13,7 @@ export class PlaceService {
     return await prisma.place.findMany({
       include: {
         address: true,
+        medias: true,
       },
     });
   }
@@ -23,6 +24,7 @@ export class PlaceService {
       include: {
         activities: {
           include: {
+            address:true,
             medias: true,
           },
         },
@@ -38,6 +40,10 @@ export class PlaceService {
           search: name,
         },
       },
+      include: {
+        address: true,
+        medias: true,
+      },
     });
   }
 
@@ -45,6 +51,10 @@ export class PlaceService {
     return await prisma.place.findMany({
       where: {
         placeTypeId: Number(categoryId),
+      },
+      include: {
+        address: true,
+        medias: true,
       },
     });
   }
