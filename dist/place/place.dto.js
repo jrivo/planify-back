@@ -76,7 +76,7 @@ __decorate([
 ], createPlaceDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
-    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsString)(),
     __metadata("design:type", Number)
 ], createPlaceDto.prototype, "placeTypeId", void 0);
 __decorate([

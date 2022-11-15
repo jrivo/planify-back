@@ -28,7 +28,6 @@ let PlaceService = class PlaceService {
             include: {
                 activities: {
                     include: {
-                        address: true,
                         medias: true,
                     },
                 },

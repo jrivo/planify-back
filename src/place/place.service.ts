@@ -24,7 +24,6 @@ export class PlaceService {
       include: {
         activities: {
           include: {
-            address:true,
             medias: true,
           },
         },

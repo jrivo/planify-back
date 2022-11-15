@@ -51,7 +51,7 @@ export class createPlaceDto {
     email?: string;
 
     @IsNotEmpty()
-    @IsNumber()
+    @IsString()
     placeTypeId: number;
 
     @IsOptional()

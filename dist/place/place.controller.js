@@ -42,11 +42,13 @@ let PlaceController = class PlaceController {
         this.placeService
             .getById(id)
             .then((place) => {
+            console.log(place);
             place
                 ? res.status(200).send(place)
                 : res.status(404).send("Place not found");
         })
             .catch((err) => {
+            console.log(err);
             res.status(500).send(err);
         });
     }
