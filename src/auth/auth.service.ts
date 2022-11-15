@@ -36,6 +36,7 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
     if (!user) {
+      console.log("oops");
       throw new UnauthorizedException("Invalid credentials");
     }
     //Here we add whatever we want to the token (in req.user)
@@ -43,7 +44,9 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      access_token: this.jwtService.sign(payload,{secret: jwtConstants.secret}),
+      access_token: this.jwtService.sign(payload, {
+        secret: jwtConstants.secret,
+      }),
     };
   }
 
@@ -52,16 +55,19 @@ export class AuthService {
     if (user) {
       throw new UnauthorizedException("User already exists");
     }
-    let address = await prisma.address.create({
-      data: {
-        street: body.street,
-        streetNumber: body.streetNumber,
-        city: body.city,
-        postalCode: body.postalCode,
-        country: body.country,
-        region: body.region && body.region,
-      },
-    });
+    const isAddress = body.street && body.streetNumber && body.city;
+    let address = isAddress
+      ? await prisma.address.create({
+          data: {
+            street: body.street,
+            streetNumber: body.streetNumber,
+            city: body.city,
+            postalCode: body.postalCode,
+            country: body.country,
+            region: body.region && body.region,
+          },
+        })
+      : null;
     let newUser = await prisma.user.create({
       data: {
         email: body.email,
@@ -69,7 +75,7 @@ export class AuthService {
         firstName: body.firstName,
         lastName: body.lastName,
         phone: body.phoneNumber && body.phoneNumber,
-        address: { connect: { id: address.id } },
+        address: address ? { connect: { id: address.id } } : null,
         role: Role[body.role],
       },
       include: {
@@ -104,7 +110,9 @@ export class AuthService {
     return {
       id: newUser.id,
       email: newUser.email,
-      access_token: this.jwtService.sign(payload,{secret: jwtConstants.secret}),
+      access_token: this.jwtService.sign(payload, {
+        secret: jwtConstants.secret,
+      }),
     };
   }
 }

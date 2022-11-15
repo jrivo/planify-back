@@ -8,12 +8,12 @@ export declare class RegisterDto {
     password: string;
     firstName: string;
     lastName: string;
-    phoneNumber: string;
-    street: string;
-    streetNumber: string;
-    city: string;
-    postalCode: string;
-    country: string;
+    phoneNumber?: string;
+    street?: string;
+    streetNumber?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
     region?: string;
     role?: Role;
 }

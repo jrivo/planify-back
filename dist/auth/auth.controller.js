@@ -20,7 +20,6 @@ const cdn_service_1 = require("../cdn/cdn.service");
 const auth_dto_1 = require("./auth.dto");
 const auth_service_1 = require("./auth.service");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
-const local_auth_guard_1 = require("./local-auth.guard");
 let AuthController = class AuthController {
     constructor(authService, cdnService) {
         this.authService = authService;
@@ -38,7 +37,6 @@ let AuthController = class AuthController {
     }
 };
 __decorate([
-    (0, common_1.UseGuards)(local_auth_guard_1.LocalAuthGuard),
     (0, common_1.Post)("login"),
     openapi.ApiResponse({ status: 201 }),
     __param(0, (0, common_1.Body)()),

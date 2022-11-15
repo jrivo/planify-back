@@ -48,13 +48,16 @@ let AuthService = class AuthService {
     async login(email, password) {
         const user = await this.validateUser(email, password);
         if (!user) {
+            console.log("oops");
             throw new common_1.UnauthorizedException("Invalid credentials");
         }
         const payload = { sub: user.id, email: user.email };
         return {
             id: user.id,
             email: user.email,
-            access_token: this.jwtService.sign(payload, { secret: constants_1.jwtConstants.secret }),
+            access_token: this.jwtService.sign(payload, {
+                secret: constants_1.jwtConstants.secret,
+            }),
         };
     }
     async register(req, body) {
@@ -62,16 +65,19 @@ let AuthService = class AuthService {
         if (user) {
             throw new common_1.UnauthorizedException("User already exists");
         }
-        let address = await prisma.address.create({
-            data: {
-                street: body.street,
-                streetNumber: body.streetNumber,
-                city: body.city,
-                postalCode: body.postalCode,
-                country: body.country,
-                region: body.region && body.region,
-            },
-        });
+        const isAddress = body.street && body.streetNumber && body.city;
+        let address = isAddress
+            ? await prisma.address.create({
+                data: {
+                    street: body.street,
+                    streetNumber: body.streetNumber,
+                    city: body.city,
+                    postalCode: body.postalCode,
+                    country: body.country,
+                    region: body.region && body.region,
+                },
+            })
+            : null;
         let newUser = await prisma.user.create({
             data: {
                 email: body.email,
@@ -79,7 +85,7 @@ let AuthService = class AuthService {
                 firstName: body.firstName,
                 lastName: body.lastName,
                 phone: body.phoneNumber && body.phoneNumber,
-                address: { connect: { id: address.id } },
+                address: address ? { connect: { id: address.id } } : null,
                 role: client_1.Role[body.role],
             },
             include: {
@@ -114,7 +120,9 @@ let AuthService = class AuthService {
         return {
             id: newUser.id,
             email: newUser.email,
-            access_token: this.jwtService.sign(payload, { secret: constants_1.jwtConstants.secret }),
+            access_token: this.jwtService.sign(payload, {
+                secret: constants_1.jwtConstants.secret,
+            }),
         };
     }
 };

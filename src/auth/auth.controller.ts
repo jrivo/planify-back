@@ -14,14 +14,12 @@ import { LoginDto, RegisterDto } from "./auth.dto";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 import { LocalAuthGuard } from "./local-auth.guard";
-import { Roles } from "./roles.decorator";
-import { RolesGuard } from "./roles.guard";
 
 @Controller()
 export class AuthController {
   constructor(private authService: AuthService,private cdnService: CdnService) {}
 
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)
   @Post("login")
   async login(@Body() body: LoginDto) {
     return this.authService.login(body.email, body.password);

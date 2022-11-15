@@ -1,5 +1,13 @@
-import { Address, Role } from "@prisma/client";
-import { IsAlphanumeric, IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { Role } from "@prisma/client";
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  MaxLength,
+  MinLength,
+} from "class-validator";
 
 export class LoginDto {
   @IsNotEmpty()
@@ -30,27 +38,32 @@ export class RegisterDto {
 
   @IsOptional()
   @IsPhoneNumber()
-  phoneNumber: string;
+  phoneNumber?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  street: string;
+  street?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  streetNumber: string;
+  streetNumber?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  city: string;
+  city?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  postalCode: string;
+  postalCode?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  country: string;
+  country?: string;
 
   @IsOptional()
   @IsString()
@@ -58,8 +71,6 @@ export class RegisterDto {
 
   @IsOptional()
   @IsString()
-
-  role?:Role;
+  role?: Role;
   // address : Address
-
 }
