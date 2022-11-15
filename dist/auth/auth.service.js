@@ -28,6 +28,7 @@ const const_1 = require("../const");
 const bcrypt = require("bcrypt");
 const utils_1 = require("../utils");
 const users_service_1 = require("../user/users.service");
+const constants_1 = require("./constants");
 const prisma = new client_1.PrismaClient();
 let AuthService = class AuthService {
     constructor(usersService, jwtService) {
@@ -53,7 +54,7 @@ let AuthService = class AuthService {
         return {
             id: user.id,
             email: user.email,
-            access_token: this.jwtService.sign(payload),
+            access_token: this.jwtService.sign(payload, { secret: constants_1.jwtConstants.secret }),
         };
     }
     async register(req, body) {
@@ -113,7 +114,7 @@ let AuthService = class AuthService {
         return {
             id: newUser.id,
             email: newUser.email,
-            access_token: this.jwtService.sign(payload),
+            access_token: this.jwtService.sign(payload, { secret: constants_1.jwtConstants.secret }),
         };
     }
 };

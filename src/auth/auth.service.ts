@@ -10,6 +10,7 @@ import {
 import * as bcrypt from "bcrypt";
 import { sanitizeFileName } from "src/utils";
 import { UsersService } from "src/user/users.service";
+import { jwtConstants } from "./constants";
 
 const prisma = new PrismaClient();
 
@@ -42,7 +43,7 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload,{secret: jwtConstants.secret}),
     };
   }
 
@@ -103,7 +104,7 @@ export class AuthService {
     return {
       id: newUser.id,
       email: newUser.email,
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload,{secret: jwtConstants.secret}),
     };
   }
 }
