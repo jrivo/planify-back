@@ -9,6 +9,8 @@ import {
   Res,
   Delete,
   Put,
+  UseInterceptors,
+  UploadedFiles,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { prismaErrorHandler } from "src/prisma/errorsHandler";
@@ -16,10 +18,12 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { ActivityService } from "./activity.service";
 import { updateActivityDto } from "./activity.dto";
+import { AnyFilesInterceptor } from "@nestjs/platform-express";
+import { CdnService } from "src/cdn/cdn.service";
 
 @Controller("activities")
 export class ActivityController {
-  constructor(private activityService: ActivityService) {}
+  constructor(private activityService: ActivityService,private cdnService: CdnService) {}
 
   @Get()
   async getAll(@Res() res) {
@@ -74,6 +78,7 @@ export class ActivityController {
   }
 
   @Put(":id")
+  @UseInterceptors(AnyFilesInterceptor())
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MERCHANT")
   //add owner or admin guard
@@ -81,10 +86,12 @@ export class ActivityController {
     @Param("id") id: string,
     @Body() body: updateActivityDto,
     @Request() req: any,
-    @Res() res
+    @Res() res,
+    @UploadedFiles() files: Array<Express.Multer.File>
   ) {
+    files ? req = await this.cdnService.upload(req,files) : null
     this.activityService
-      .update(id, body)
+      .update(id,req, body)
       .then((activity) => {
         res.status(202).send(activity);
       })

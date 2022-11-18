@@ -1,6 +1,7 @@
 import { createActivityDto, createPlaceDto, updatePlaceDto } from "./place.dto";
 export declare class PlaceService {
     getAll(): Promise<any>;
+    getMerchantPlaces(id: string): Promise<any>;
     getById(id: string): Promise<any>;
     getByName(name: string): Promise<any>;
     getByCategory(categoryId: string): Promise<any>;

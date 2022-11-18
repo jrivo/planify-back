@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActivityService = void 0;
 const common_1 = require("@nestjs/common");
+const client_1 = require("@prisma/client");
+const const_1 = require("../const");
+const utils_1 = require("../utils");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let ActivityService = class ActivityService {
@@ -35,7 +38,7 @@ let ActivityService = class ActivityService {
             },
             include: {
                 medias: true,
-            }
+            },
         });
     }
     async getByCategory(categoryId) {
@@ -47,17 +50,48 @@ let ActivityService = class ActivityService {
             },
             include: {
                 medias: true,
-            }
+            },
         });
     }
-    async update(id, body) {
-        return await prisma.activity.update({
+    async update(id, req, body) {
+        const activity = await prisma.activity.update({
             where: { id: Number(id) },
             data: body,
             include: {
                 medias: true,
-            }
+            },
         });
+        if (req.files) {
+            try {
+                req.files.forEach(async (file) => {
+                    let type = "";
+                    switch (file.fieldname) {
+                        case "images":
+                            type = client_1.MediaType.IMAGE;
+                            break;
+                        case "documents":
+                            type = client_1.MediaType.DOCUMENT;
+                            break;
+                    }
+                    await prisma.media.create({
+                        data: {
+                            name: (0, utils_1.sanitizeFileName)(file.originalname),
+                            url: "https://" +
+                                const_1.CDN_STORAGE_ZONE +
+                                ".b-cdn.net/" +
+                                const_1.CDN_STORAGE_PATH +
+                                "/" +
+                                file.uploadName,
+                            type: type,
+                            activity: { connect: { id: Number(activity.id) } },
+                        },
+                    });
+                });
+            }
+            catch (err) {
+                throw err;
+            }
+        }
     }
     async delete(id) {
         return await prisma.activity.delete({

@@ -22,9 +22,20 @@ export class TripController {
   constructor(private tripService: TripService) {}
 
   @Get()
-  async getAll(@Res() res) {
-    this.tripService
-      .getAll()
+  @UseGuards(JwtAuthGuard)
+  async getAll(@Request() req,@Res() res) {
+    //TODO: use roles to define if the user is an admin or not
+    // this.tripService
+    //   .getAll()
+    //   .then((trips) => {
+    //     res.status(200).send(trips);
+    //   })
+    //   .catch((err) => {
+    //     res.status(500).send(err);
+    //   });
+
+      this.tripService
+      .getUserAll(req.user.id)
       .then((trips) => {
         res.status(200).send(trips);
       })
@@ -43,7 +54,7 @@ export class TripController {
           : res.status(404).send("Trip not found");
       })
       .catch((err) => {
-        res.status(500).send(err);
+        res.status(500).send(prismaErrorHandler(err));
       });
   }
 
@@ -69,7 +80,7 @@ export class TripController {
         res.status(201).send(trip);
       })
       .catch((err) => {
-        res.status(500).send(err);
+        res.status(500).send(prismaErrorHandler(err));
       });
   }
 
@@ -83,7 +94,7 @@ export class TripController {
         res.status(200).send(trip);
       })
       .catch((err) => {
-        res.status(500).send(err);
+        res.status(500).send(prismaErrorHandler(err));
       });
   }
 

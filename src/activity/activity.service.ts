@@ -1,4 +1,7 @@
 import { Injectable } from "@nestjs/common";
+import { MediaType } from "@prisma/client";
+import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
+import { sanitizeFileName } from "src/utils";
 import { updateActivityDto } from "./activity.dto";
 const { PrismaClient } = require("@prisma/client");
 
@@ -30,9 +33,9 @@ export class ActivityService {
           search: name,
         },
       },
-      include:{
+      include: {
         medias: true,
-      }
+      },
     });
   }
 
@@ -43,20 +46,53 @@ export class ActivityService {
           placeTypeId: Number(categoryId),
         },
       },
-      include:{
+      include: {
         medias: true,
-      }
+      },
     });
   }
 
-  async update(id: string, body: updateActivityDto) {
-    return await prisma.activity.update({
+  async update(id: string, req:any,body: updateActivityDto) {
+    const activity = await prisma.activity.update({
       where: { id: Number(id) },
       data: body,
-      include:{
+      include: {
         medias: true,
-      }
+      },
     });
+
+    if (req.files) {
+      try {
+        req.files.forEach(async (file) => {
+          let type = "";
+          switch (file.fieldname) {
+            case "images":
+              type = MediaType.IMAGE;
+              break;
+            case "documents":
+              type = MediaType.DOCUMENT;
+              break;
+          }
+          //TODO: add mainImage ID to place
+          await prisma.media.create({
+            data: {
+              name: sanitizeFileName(file.originalname),
+              url:
+                "https://" +
+                CDN_STORAGE_ZONE +
+                ".b-cdn.net/" +
+                CDN_STORAGE_PATH +
+                "/" +
+                file.uploadName,
+              type: type,
+              activity: { connect: { id: Number(activity.id) } },
+            },
+          });
+        });
+      } catch (err) {
+        throw err;
+      }
+    }
   }
 
   async delete(id: string) {

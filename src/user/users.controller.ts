@@ -9,13 +9,16 @@ import {
   Res,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { Roles } from "src/auth/roles.decorator";
+import { RolesGuard } from "src/auth/roles.guard";
 import { UsersService } from "./users.service";
 
 @Controller("users")
 export class UsersController {
   constructor(private userService: UsersService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles("ADMIN")
   @Get(":id")
   getById(@Param("id") id: string, @Res() res) {
     this.userService

@@ -3,7 +3,7 @@ import { createTripDto, updateTripDto } from "./trip.dto";
 export declare class TripController {
     private tripService;
     constructor(tripService: TripService);
-    getAll(res: any): Promise<void>;
+    getAll(req: any, res: any): Promise<void>;
     getById(id: string, res: any): Promise<void>;
     getByName(name: string, res: any): Promise<void>;
     create(req: any, body: createTripDto, res: any): Promise<void>;

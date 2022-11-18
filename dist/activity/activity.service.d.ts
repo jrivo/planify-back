@@ -4,6 +4,6 @@ export declare class ActivityService {
     getById(id: string): Promise<any>;
     getByName(name: string): Promise<any>;
     getByCategory(categoryId: string): Promise<any>;
-    update(id: string, body: updateActivityDto): Promise<any>;
+    update(id: string, req: any, body: updateActivityDto): Promise<void>;
     delete(id: string): Promise<any>;
 }

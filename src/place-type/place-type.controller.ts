@@ -9,6 +9,8 @@ import {
   Res,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { Roles } from "src/auth/roles.decorator";
+import { RolesGuard } from "src/auth/roles.guard";
 import { createPlaceTypeDto } from "./place-type.dto";
 import { PlaceTypeService } from "./place-type.service";
 
@@ -39,6 +41,8 @@ export class PlaceTypeController {
       });
   }
 
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles("ADMIN")
   async delete(@Param("id") id: string, @Res() res) {
     this.placeTypeService
       .delete(id)
@@ -50,7 +54,8 @@ export class PlaceTypeController {
       });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles("ADMIN")
   @Post()
   async create(@Body() body: createPlaceTypeDto, @Request() req: any) {
     return this.placeTypeService.create(req, body);

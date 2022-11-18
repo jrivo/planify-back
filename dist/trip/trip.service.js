@@ -12,13 +12,35 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let TripService = class TripService {
     async getAll() {
-        return await prisma.trip.findMany();
+        return await prisma.trip.findMany({
+            include: {
+                activities: {
+                    include: {
+                        medias: true,
+                    },
+                },
+            },
+        });
+    }
+    async getUserAll(id) {
+        return await prisma.trip.findMany({
+            where: {
+                userId: Number(id),
+            },
+            include: {
+                activities: true,
+            },
+        });
     }
     async getById(id) {
         return await prisma.trip.findUnique({
             where: { id: Number(id) },
             include: {
-                medias: true,
+                activities: {
+                    include: {
+                        medias: true,
+                    },
+                },
             },
         });
     }

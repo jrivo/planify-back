@@ -16,6 +16,7 @@ exports.TripController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const errorsHandler_1 = require("../prisma/errorsHandler");
 const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
 const trip_service_1 = require("./trip.service");
@@ -24,9 +25,9 @@ let TripController = class TripController {
     constructor(tripService) {
         this.tripService = tripService;
     }
-    async getAll(res) {
+    async getAll(req, res) {
         this.tripService
-            .getAll()
+            .getUserAll(req.user.id)
             .then((trips) => {
             res.status(200).send(trips);
         })
@@ -43,7 +44,7 @@ let TripController = class TripController {
                 : res.status(404).send("Trip not found");
         })
             .catch((err) => {
-            res.status(500).send(err);
+            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
     async getByName(name, res) {
@@ -63,7 +64,7 @@ let TripController = class TripController {
             res.status(201).send(trip);
         })
             .catch((err) => {
-            res.status(500).send(err);
+            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
     async addActivity(id, body, res) {
@@ -73,7 +74,7 @@ let TripController = class TripController {
             res.status(200).send(trip);
         })
             .catch((err) => {
-            res.status(500).send(err);
+            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
     async update(id, body, res) {
@@ -99,10 +100,12 @@ let TripController = class TripController {
 };
 __decorate([
     (0, common_1.Get)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Res)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], TripController.prototype, "getAll", null);
 __decorate([

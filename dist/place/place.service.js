@@ -22,6 +22,13 @@ let PlaceService = class PlaceService {
             },
         });
     }
+    async getMerchantPlaces(id) {
+        return await prisma.place.findMany({
+            where: {
+                ownerId: Number(id),
+            },
+        });
+    }
     async getById(id) {
         return await prisma.place.findUnique({
             where: { id: Number(id) },
@@ -92,13 +99,10 @@ let PlaceService = class PlaceService {
                     req.files.forEach(async (file) => {
                         let type = "";
                         switch (file.fieldname) {
-                            case "mainImage":
-                                type = client_1.MediaType.MAIN_IMAGE;
-                                break;
-                            case "image":
+                            case "images":
                                 type = client_1.MediaType.IMAGE;
                                 break;
-                            case "document":
+                            case "documents":
                                 type = client_1.MediaType.DOCUMENT;
                                 break;
                         }
@@ -141,13 +145,10 @@ let PlaceService = class PlaceService {
                 req.files.forEach(async (file) => {
                     let type = "";
                     switch (file.fieldname) {
-                        case "mainImage":
-                            type = client_1.MediaType.MAIN_IMAGE;
-                            break;
-                        case "image":
+                        case "images":
                             type = client_1.MediaType.IMAGE;
                             break;
-                        case "document":
+                        case "documents":
                             type = client_1.MediaType.DOCUMENT;
                             break;
                     }
@@ -185,7 +186,6 @@ let PlaceService = class PlaceService {
         });
     }
     async createActivity(id, req, body) {
-        console.log(body);
         const activity = await prisma.activity.create({
             data: {
                 name: body.name,
@@ -203,13 +203,10 @@ let PlaceService = class PlaceService {
                 req.files.forEach(async (file) => {
                     let type = "";
                     switch (file.fieldname) {
-                        case "mainImage":
-                            type = client_1.MediaType.MAIN_IMAGE;
-                            break;
-                        case "image":
+                        case "images":
                             type = client_1.MediaType.IMAGE;
                             break;
-                        case "document":
+                        case "documents":
                             type = client_1.MediaType.DOCUMENT;
                             break;
                     }

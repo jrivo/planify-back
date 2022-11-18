@@ -7,6 +7,7 @@ export declare class PlaceController {
     private cdnService;
     constructor(placeService: PlaceService, cdnService: CdnService);
     getAll(res: any): Promise<void>;
+    getMerchantPlaces(id: string, res: any): Promise<void>;
     getById(id: string, res: any): Promise<void>;
     getByCategory(categoryId: string, res: any): Promise<void>;
     getByName(name: string, res: any): Promise<void>;

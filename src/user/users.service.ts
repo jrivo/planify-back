@@ -74,6 +74,7 @@ export class UsersService {
     });
     return user.role;
   }
+
 }
 
 function exclude<User, Key extends keyof User>(

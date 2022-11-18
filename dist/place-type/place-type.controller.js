@@ -16,6 +16,8 @@ exports.PlaceTypeController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const roles_decorator_1 = require("../auth/roles.decorator");
+const roles_guard_1 = require("../auth/roles.guard");
 const place_type_dto_1 = require("./place-type.dto");
 const place_type_service_1 = require("./place-type.service");
 let PlaceTypeController = class PlaceTypeController {
@@ -73,6 +75,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PlaceTypeController.prototype, "getById", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN"),
+    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -80,7 +85,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PlaceTypeController.prototype, "delete", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN"),
     (0, common_1.Post)(),
     openapi.ApiResponse({ status: 201, type: Object }),
     __param(0, (0, common_1.Body)()),

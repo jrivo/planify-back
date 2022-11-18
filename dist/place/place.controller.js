@@ -38,6 +38,18 @@ let PlaceController = class PlaceController {
             res.status(500).send(err);
         });
     }
+    async getMerchantPlaces(id, res) {
+        this.placeService
+            .getMerchantPlaces(id)
+            .then((places) => {
+            res.status(200).send(places);
+        })
+            .catch((err) => {
+            res
+                .status(500)
+                .send((0, errorsHandler_1.prismaErrorHandler)(err));
+        });
+    }
     async getById(id, res) {
         this.placeService
             .getById(id)
@@ -136,6 +148,15 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "getAll", null);
+__decorate([
+    (0, common_1.Get)("/merchant/:id"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PlaceController.prototype, "getMerchantPlaces", null);
 __decorate([
     (0, common_1.Get)(":id"),
     openapi.ApiResponse({ status: 200 }),

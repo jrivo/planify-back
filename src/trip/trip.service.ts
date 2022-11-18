@@ -7,14 +7,37 @@ const prisma = new PrismaClient();
 @Injectable()
 export class TripService {
   async getAll() {
-    return await prisma.trip.findMany();
+    return await prisma.trip.findMany({
+      include: {
+        activities: {
+          include: {
+            medias: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getUserAll(id: string) {
+    return await prisma.trip.findMany({
+      where: {
+        userId: Number(id),
+      },
+      include: {
+        activities: true,
+      },
+    });
   }
 
   async getById(id: string) {
     return await prisma.trip.findUnique({
       where: { id: Number(id) },
       include: {
-        medias: true,
+        activities: {
+          include: {
+            medias: true,
+          },
+        },
       },
     });
   }
@@ -41,30 +64,30 @@ export class TripService {
     return trip;
   }
 
-    async update(id: string, body: updateTripDto) {
-        return await prisma.trip.update({
-            where: { id: Number(id) },
-            data: body,
-        });
-    }
+  async update(id: string, body: updateTripDto) {
+    return await prisma.trip.update({
+      where: { id: Number(id) },
+      data: body,
+    });
+  }
 
-    async delete(id: string) {
-        return await prisma.trip.delete({
-            where: { id: Number(id) },
-        });
-        }
+  async delete(id: string) {
+    return await prisma.trip.delete({
+      where: { id: Number(id) },
+    });
+  }
 
-    async addActivity(tripId: string, activityId: string) {
-        return await prisma.trip.update({
-            where: { id: Number(tripId) },
-            data: {
-                activities: {
-                    connect: { id: Number(activityId) },
-                },
-            },
-            include: {
-                activities: true,
-            },
-        });
-    }
+  async addActivity(tripId: string, activityId: string) {
+    return await prisma.trip.update({
+      where: { id: Number(tripId) },
+      data: {
+        activities: {
+          connect: { id: Number(activityId) },
+        },
+      },
+      include: {
+        activities: true,
+      },
+    });
+  }
 }

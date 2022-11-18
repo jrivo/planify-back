@@ -11,6 +11,7 @@ import fetch from "cross-fetch";
 @Injectable()
 export class CdnService {
   async upload(req: any, files: any) {
+    console.log("UPLOAD")
     files.forEach((file) => {
       const uploadName = generateRandomFileName(
         file.originalname.split(".")[1],
@@ -30,7 +31,7 @@ export class CdnService {
         },
         body: file.buffer,
       };
-
+      console.log(url)
       fetch(url, options)
         .then((res) => {
           console.log(res)

@@ -37,6 +37,22 @@ export class PlaceController {
       });
   }
 
+
+  //TODO: not use prefix /places for the route
+  @Get("/merchant/:id")
+  async getMerchantPlaces(@Param("id") id: string, @Res() res) {
+    this.placeService
+      .getMerchantPlaces(id)
+      .then((places) => {
+        res.status(200).send(places);
+      })
+      .catch((err) => {
+        res
+          .status(500)
+          .send(prismaErrorHandler(err));
+      });
+  }
+
   @Get(":id")
   async getById(@Param("id") id: string, @Res() res) {
     this.placeService

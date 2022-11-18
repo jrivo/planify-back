@@ -18,6 +18,14 @@ export class PlaceService {
     });
   }
 
+  async getMerchantPlaces(id: string) {
+    return await prisma.place.findMany({
+      where: {
+        ownerId: Number(id),
+      },
+    });
+  }
+  
   async getById(id: string) {
     return await prisma.place.findUnique({
       where: { id: Number(id) },
@@ -94,16 +102,17 @@ export class PlaceService {
           req.files.forEach(async (file) => {
             let type = "";
             switch (file.fieldname) {
-              case "mainImage":
-                type = MediaType.MAIN_IMAGE;
-                break;
-              case "image":
+              // case "mainImage":
+              //   type = MediaType.MAIN_IMAGE;
+              //   break;
+              case "images":
                 type = MediaType.IMAGE;
                 break;
-              case "document":
+              case "documents":
                 type = MediaType.DOCUMENT;
                 break;
             }
+            //TODO: add mainImage ID to place
             await prisma.media.create({
               data: {
                 name: sanitizeFileName(file.originalname),
@@ -145,16 +154,17 @@ export class PlaceService {
         req.files.forEach(async (file) => {
           let type = "";
           switch (file.fieldname) {
-            case "mainImage":
-              type = MediaType.MAIN_IMAGE;
-              break;
-            case "image":
-              type = MediaType.IMAGE;
-              break;
-            case "document":
-              type = MediaType.DOCUMENT;
-              break;
-          }
+            // case "mainImage":
+            //   type = MediaType.MAIN_IMAGE;
+            //   break;
+            case "images":
+                type = MediaType.IMAGE;
+                break;
+              case "documents":
+                type = MediaType.DOCUMENT;
+                break;
+            }
+            //TODO: add mainImage ID to place
           await prisma.media.create({
             data: {
               name: sanitizeFileName(file.originalname),
@@ -192,7 +202,6 @@ export class PlaceService {
   }
 
   async createActivity(id: string, req: any, body: createActivityDto) {
-    console.log(body);
     const activity = await prisma.activity.create({
       data: {
         name: body.name,
@@ -211,16 +220,17 @@ export class PlaceService {
         req.files.forEach(async (file) => {
           let type = "";
           switch (file.fieldname) {
-            case "mainImage":
-              type = MediaType.MAIN_IMAGE;
-              break;
-            case "image":
+            // case "mainImage":
+            //   type = MediaType.MAIN_IMAGE;
+            //   break;
+            case "images":
               type = MediaType.IMAGE;
               break;
-            case "document":
+            case "documents":
               type = MediaType.DOCUMENT;
               break;
           }
+          //TODO: add mainImage ID to place
           await prisma.media.create({
             data: {
               name: sanitizeFileName(file.originalname),

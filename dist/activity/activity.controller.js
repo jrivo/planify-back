@@ -20,9 +20,12 @@ const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
 const activity_service_1 = require("./activity.service");
 const activity_dto_1 = require("./activity.dto");
+const platform_express_1 = require("@nestjs/platform-express");
+const cdn_service_1 = require("../cdn/cdn.service");
 let ActivityController = class ActivityController {
-    constructor(activityService) {
+    constructor(activityService, cdnService) {
         this.activityService = activityService;
+        this.cdnService = cdnService;
     }
     async getAll(res) {
         this.activityService
@@ -68,9 +71,10 @@ let ActivityController = class ActivityController {
             res.status(500).send(err);
         });
     }
-    async update(id, body, req, res) {
+    async update(id, body, req, res, files) {
+        files ? req = await this.cdnService.upload(req, files) : null;
         this.activityService
-            .update(id, body)
+            .update(id, req, body)
             .then((activity) => {
             res.status(202).send(activity);
         })
@@ -126,6 +130,7 @@ __decorate([
 ], ActivityController.prototype, "getByName", null);
 __decorate([
     (0, common_1.Put)(":id"),
+    (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
     openapi.ApiResponse({ status: 200 }),
@@ -133,8 +138,9 @@ __decorate([
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Request)()),
     __param(3, (0, common_1.Res)()),
+    __param(4, (0, common_1.UploadedFiles)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, activity_dto_1.updateActivityDto, Object, Object]),
+    __metadata("design:paramtypes", [String, activity_dto_1.updateActivityDto, Object, Object, Array]),
     __metadata("design:returntype", Promise)
 ], ActivityController.prototype, "update", null);
 __decorate([
@@ -150,7 +156,7 @@ __decorate([
 ], ActivityController.prototype, "delete", null);
 ActivityController = __decorate([
     (0, common_1.Controller)("activities"),
-    __metadata("design:paramtypes", [activity_service_1.ActivityService])
+    __metadata("design:paramtypes", [activity_service_1.ActivityService, cdn_service_1.CdnService])
 ], ActivityController);
 exports.ActivityController = ActivityController;
 //# sourceMappingURL=activity.controller.js.map
