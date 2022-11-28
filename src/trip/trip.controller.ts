@@ -84,6 +84,22 @@ export class TripController {
       });
   }
 
+  @Get(":id/activities")
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles("ADMIN","USER")
+  async getActivities(@Param("id") id: string, @Res() res) {
+    this.tripService
+      .getActivities(id)
+      .then((activities) => {
+        res.status(200).send(activities);
+      })
+      .catch((err) => {
+        res
+          .status(500)
+          .send(prismaErrorHandler(err));
+      });
+  }
+
   @Post(":id/activities")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "USER")

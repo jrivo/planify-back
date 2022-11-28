@@ -74,6 +74,13 @@ let TripService = class TripService {
             where: { id: Number(id) },
         });
     }
+    async getActivities(tripId) {
+        return await prisma.trip
+            .findUnique({
+            where: { id: Number(tripId) },
+        })
+            .activities();
+    }
     async addActivity(tripId, activityId) {
         return await prisma.trip.update({
             where: { id: Number(tripId) },

@@ -77,6 +77,14 @@ export class TripService {
     });
   }
 
+  async getActivities(tripId: string) {
+    return await prisma.trip
+      .findUnique({
+        where: { id: Number(tripId) },
+      })
+      .activities();
+  }
+
   async addActivity(tripId: string, activityId: string) {
     return await prisma.trip.update({
       where: { id: Number(tripId) },

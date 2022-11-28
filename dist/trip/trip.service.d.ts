@@ -7,6 +7,7 @@ export declare class TripService {
     create(req: any, body: createTripDto): Promise<any>;
     update(id: string, body: updateTripDto): Promise<any>;
     delete(id: string): Promise<any>;
+    getActivities(tripId: string): Promise<any>;
     addActivity(tripId: string, activityId: string): Promise<any>;
     removeActivity(tripId: string, activityId: string): Promise<any>;
 }
