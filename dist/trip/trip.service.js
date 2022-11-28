@@ -87,6 +87,19 @@ let TripService = class TripService {
             },
         });
     }
+    async removeActivity(tripId, activityId) {
+        return await prisma.trip.update({
+            where: { id: Number(tripId) },
+            data: {
+                activities: {
+                    disconnect: { id: Number(activityId) },
+                },
+            },
+            include: {
+                activities: true,
+            },
+        });
+    }
 };
 TripService = __decorate([
     (0, common_1.Injectable)()

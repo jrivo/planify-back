@@ -96,7 +96,7 @@ let AuthService = class AuthService {
         if (req.files) {
             try {
                 req.files.forEach(async (file) => {
-                    let type = client_1.MediaType.PROFILE_PICTURE;
+                    let type = client_1.MediaType.IMAGE;
                     await prisma.media.create({
                         data: {
                             name: (0, utils_1.sanitizeFileName)(file.originalname),

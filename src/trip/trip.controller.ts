@@ -98,6 +98,20 @@ export class TripController {
       });
   }
 
+  @Put(":id/activities")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "USER")
+  async removeActivity(@Param("id") id: string,@Body() body, @Res() res) {
+    this.tripService
+      .removeActivity(id,body.activityId)
+      .then((trip) => {
+        res.status(200).send(trip);
+      })
+      .catch((err) => {
+        res.status(500).send(err);
+      });
+  }
+
   @Put(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "USER")

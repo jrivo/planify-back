@@ -8,6 +8,7 @@ export declare class TripController {
     getByName(name: string, res: any): Promise<void>;
     create(req: any, body: createTripDto, res: any): Promise<void>;
     addActivity(id: string, body: any, res: any): Promise<void>;
+    removeActivity(id: string, body: any, res: any): Promise<void>;
     update(id: string, body: updateTripDto, res: any): Promise<void>;
     delete(id: string, res: any): Promise<void>;
 }

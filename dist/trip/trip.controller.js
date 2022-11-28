@@ -77,6 +77,16 @@ let TripController = class TripController {
             res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
+    async removeActivity(id, body, res) {
+        this.tripService
+            .removeActivity(id, body.activityId)
+            .then((trip) => {
+            res.status(200).send(trip);
+        })
+            .catch((err) => {
+            res.status(500).send(err);
+        });
+    }
     async update(id, body, res) {
         this.tripService
             .update(id, body)
@@ -150,6 +160,18 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, Object]),
     __metadata("design:returntype", Promise)
 ], TripController.prototype, "addActivity", null);
+__decorate([
+    (0, common_1.Put)(":id/activities"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "USER"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], TripController.prototype, "removeActivity", null);
 __decorate([
     (0, common_1.Put)(":id"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

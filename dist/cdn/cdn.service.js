@@ -13,7 +13,6 @@ const utils_1 = require("../utils");
 const cross_fetch_1 = require("cross-fetch");
 let CdnService = class CdnService {
     async upload(req, files) {
-        console.log("UPLOAD");
         files.forEach((file) => {
             const uploadName = (0, utils_1.generateRandomFileName)(file.originalname.split(".")[1], 20);
             file.uploadName = uploadName;

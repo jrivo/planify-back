@@ -90,4 +90,18 @@ export class TripService {
       },
     });
   }
+
+  async removeActivity(tripId: string, activityId: string) {
+    return await prisma.trip.update({
+      where: { id: Number(tripId) },
+      data: {
+        activities: {
+          disconnect: { id: Number(activityId) },
+        },
+      },
+      include: {
+        activities: true,
+      },
+    });
+  }
 }
