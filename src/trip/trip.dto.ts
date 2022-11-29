@@ -5,9 +5,10 @@ export class createTripDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description: string;
+  description?: string;
 }
 
 export class updateTripDto {

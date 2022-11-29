@@ -24,7 +24,11 @@ export class TripService {
         userId: Number(id),
       },
       include: {
-        activities: true,
+        activities: {
+          include: {
+            medias: true,
+          },
+        }
       },
     });
   }
@@ -49,6 +53,13 @@ export class TripService {
           search: name,
         },
       },
+      include: {
+        activities: {
+          include: {
+            medias: true,
+          },
+        },
+      }
     });
   }
 
