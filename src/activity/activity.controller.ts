@@ -65,6 +65,20 @@ export class ActivityController {
       });
   }
 
+  @Get(":id/subscribers")
+  @UseGuards(JwtAuthGuard,RolesGuard)
+  @Roles("ADMIN","MERCHANT")
+  async getActivitySubscribers(@Param("id") id: string, @Res() res) {
+    this.activityService
+      .getActivitySubscribers(id)
+      .then((subscribers) => {
+        res.status(200).send(subscribers);
+      })
+      .catch((err) => {
+        res.status(500).send(err);
+      });
+  }
+
   @Get("category/:id")
   async getByCategory(@Param("id") categoryId: string, @Res() res) {
     this.activityService

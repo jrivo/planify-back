@@ -219,8 +219,20 @@ export class PlaceService {
       },
       include: {
         medias: true,
+        address: true,
       },
     });
+    if (!activity.address) 
+    {
+      let originPlaceAddressId = await prisma.place.findUnique({
+        where: { id: Number(id) },
+      }).addressId;
+      await prisma.activity.update({
+        data:{
+          address: { connect: { id: Number(originPlaceAddressId) } },
+        }
+      })
+    }
 
     if (req.files) {
       try {

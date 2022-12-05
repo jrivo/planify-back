@@ -62,6 +62,16 @@ let ActivityController = class ActivityController {
                 .send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
+    async getActivitySubscribers(id, res) {
+        this.activityService
+            .getActivitySubscribers(id)
+            .then((subscribers) => {
+            res.status(200).send(subscribers);
+        })
+            .catch((err) => {
+            res.status(500).send(err);
+        });
+    }
     async getByCategory(categoryId, res) {
         this.activityService
             .getByCategory(categoryId)
@@ -132,6 +142,17 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ActivityController.prototype, "getMerchantPlaces", null);
+__decorate([
+    (0, common_1.Get)(":id/subscribers"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], ActivityController.prototype, "getActivitySubscribers", null);
 __decorate([
     (0, common_1.Get)("category/:id"),
     openapi.ApiResponse({ status: 200 }),

@@ -55,14 +55,26 @@ export class ActivityService {
   async getMerchantActivities(id: string) {
     return await prisma.activity.findMany({
       where: {
-        place:{
+        place: {
           ownerId: Number(id),
-        }
+        },
       },
     });
   }
 
-  async update(id: string, req:any,body: updateActivityDto) {
+  async getActivitySubscribers(id: string) {
+    const trips = await prisma.activity
+      .findUnique({
+        where: { id: Number(id) },
+      }).trips({
+        include: {
+          user: true,
+        }
+      });
+    return trips.map((trip) => exclude(trip.user, "password"));
+  }
+
+  async update(id: string, req: any, body: updateActivityDto) {
     const activity = await prisma.activity.update({
       where: { id: Number(id) },
       data: body,
@@ -110,4 +122,14 @@ export class ActivityService {
       where: { id: Number(id) },
     });
   }
+}
+
+function exclude<User, Key extends keyof User>(
+  user: User,
+  ...keys: Key[]
+): Omit<User, Key> {
+  for (let key of keys) {
+    delete user[key];
+  }
+  return user;
 }

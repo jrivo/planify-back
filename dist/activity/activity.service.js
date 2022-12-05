@@ -58,9 +58,20 @@ let ActivityService = class ActivityService {
             where: {
                 place: {
                     ownerId: Number(id),
-                }
+                },
             },
         });
+    }
+    async getActivitySubscribers(id) {
+        const trips = await prisma.activity
+            .findUnique({
+            where: { id: Number(id) },
+        }).trips({
+            include: {
+                user: true,
+            }
+        });
+        return trips.map((trip) => exclude(trip.user, "password"));
     }
     async update(id, req, body) {
         const activity = await prisma.activity.update({
@@ -112,4 +123,10 @@ ActivityService = __decorate([
     (0, common_1.Injectable)()
 ], ActivityService);
 exports.ActivityService = ActivityService;
+function exclude(user, ...keys) {
+    for (let key of keys) {
+        delete user[key];
+    }
+    return user;
+}
 //# sourceMappingURL=activity.service.js.map
