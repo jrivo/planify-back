@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
-import { CDN_STORAGE_PATH,CDN_STORAGE_ZONE } from "src/const";
+import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
 import { sanitizeFileName } from "src/utils";
 import { createActivityDto, createPlaceDto, updatePlaceDto } from "./place.dto";
 const { PrismaClient } = require("@prisma/client");
@@ -10,10 +10,17 @@ const prisma = new PrismaClient();
 @Injectable()
 export class PlaceService {
   async getAll() {
+    //replace place.placeTypeId with placeType.name
     return await prisma.place.findMany({
       include: {
         address: true,
         medias: true,
+        type: {
+          select: {
+            id:true,
+            name: true,
+          },
+        },
       },
     });
   }
@@ -25,7 +32,7 @@ export class PlaceService {
       },
     });
   }
-  
+
   async getById(id: string) {
     return await prisma.place.findUnique({
       where: { id: Number(id) },
@@ -139,12 +146,12 @@ export class PlaceService {
     }
   }
 
-  async update(id: string, req:any,body: updatePlaceDto) {
+  async update(id: string, req: any, body: updatePlaceDto) {
     const place = await prisma.place.update({
       where: { id: Number(id) },
       data: body,
       include: {
-        address:true,
+        address: true,
         medias: true,
       },
     });
@@ -158,13 +165,13 @@ export class PlaceService {
             //   type = MediaType.MAIN_IMAGE;
             //   break;
             case "images":
-                type = MediaType.IMAGE;
-                break;
-              case "documents":
-                type = MediaType.DOCUMENT;
-                break;
-            }
-            //TODO: add mainImage ID to place
+              type = MediaType.IMAGE;
+              break;
+            case "documents":
+              type = MediaType.DOCUMENT;
+              break;
+          }
+          //TODO: add mainImage ID to place
           await prisma.media.create({
             data: {
               name: sanitizeFileName(file.originalname),
@@ -207,7 +214,7 @@ export class PlaceService {
         name: body.name,
         description: body.description,
         place: { connect: { id: Number(id) } },
-        price: body.price && body.price,
+        price: body.price && Number(body.price),
         date: body.date && body.date,
       },
       include: {

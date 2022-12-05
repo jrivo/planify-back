@@ -53,6 +53,15 @@ let ActivityService = class ActivityService {
             },
         });
     }
+    async getMerchantActivities(id) {
+        return await prisma.activity.findMany({
+            where: {
+                place: {
+                    ownerId: Number(id),
+                }
+            },
+        });
+    }
     async update(id, req, body) {
         const activity = await prisma.activity.update({
             where: { id: Number(id) },

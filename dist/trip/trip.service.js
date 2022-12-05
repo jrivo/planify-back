@@ -28,7 +28,11 @@ let TripService = class TripService {
                 userId: Number(id),
             },
             include: {
-                activities: true,
+                activities: {
+                    include: {
+                        medias: true,
+                    },
+                }
             },
         });
     }
@@ -51,6 +55,13 @@ let TripService = class TripService {
                     search: name,
                 },
             },
+            include: {
+                activities: {
+                    include: {
+                        medias: true,
+                    },
+                },
+            }
         });
     }
     async create(req, body) {

@@ -51,6 +51,20 @@ export class ActivityController {
       });
   }
 
+  @Get("/merchant/:id")
+  async getMerchantPlaces(@Param("id") id: string, @Res() res) {
+    this.activityService
+      .getMerchantActivities(id)
+      .then((activities) => {
+        res.status(200).send(activities);
+      })
+      .catch((err) => {
+        res
+          .status(500)
+          .send(prismaErrorHandler(err));
+      });
+  }
+
   @Get("category/:id")
   async getByCategory(@Param("id") categoryId: string, @Res() res) {
     this.activityService

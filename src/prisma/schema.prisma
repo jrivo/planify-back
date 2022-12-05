@@ -162,7 +162,7 @@ model Activity {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   placeId     Int
-  price       Int?
+  price       Float?
   address     Address?  @relation(fields: [addressId], references: [id])
   addressId   Int?
 }

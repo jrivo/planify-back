@@ -38,7 +38,7 @@ export declare class updatePlaceDto {
 export declare class createActivityDto {
     name: string;
     description: string;
-    price?: number;
+    price?: string;
     date?: Date;
     mainImage?: any;
     images?: any;

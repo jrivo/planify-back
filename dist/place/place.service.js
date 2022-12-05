@@ -19,6 +19,12 @@ let PlaceService = class PlaceService {
             include: {
                 address: true,
                 medias: true,
+                type: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
             },
         });
     }
@@ -191,7 +197,7 @@ let PlaceService = class PlaceService {
                 name: body.name,
                 description: body.description,
                 place: { connect: { id: Number(id) } },
-                price: body.price && body.price,
+                price: body.price && Number(body.price),
                 date: body.date && body.date,
             },
             include: {

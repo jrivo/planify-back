@@ -52,6 +52,16 @@ export class ActivityService {
     });
   }
 
+  async getMerchantActivities(id: string) {
+    return await prisma.activity.findMany({
+      where: {
+        place:{
+          ownerId: Number(id),
+        }
+      },
+    });
+  }
+
   async update(id: string, req:any,body: updateActivityDto) {
     const activity = await prisma.activity.update({
       where: { id: Number(id) },

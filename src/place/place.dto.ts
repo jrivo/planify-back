@@ -150,8 +150,8 @@ export class createActivityDto {
     description: string;
 
     @IsOptional()
-    @IsNumber()
-    price?: number;
+    @IsString()
+    price?: string;
 
     @IsOptional()
     @IsDateString()

@@ -14,7 +14,7 @@ const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class createTripDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { name: { required: true, type: () => String }, description: { required: true, type: () => String } };
+        return { name: { required: true, type: () => String }, description: { required: false, type: () => String } };
     }
 }
 __decorate([
@@ -23,6 +23,7 @@ __decorate([
     __metadata("design:type", String)
 ], createTripDto.prototype, "name", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
