@@ -327,7 +327,7 @@ export class PlaceService {
         description: body.description,
         place: { connect: { id: Number(id) } },
         price: body.price && Number(body.price),
-        date: body.date && new Date(body.date),
+        date: body.date && body.date,
         ...(isAddress && { address: { connect: { id: address.id } } }),
       },
       include: {
