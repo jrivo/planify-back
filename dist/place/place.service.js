@@ -21,8 +21,8 @@ let PlaceService = class PlaceService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
                 type: {
                     select: {
@@ -43,8 +43,8 @@ let PlaceService = class PlaceService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
             },
         });
@@ -58,8 +58,8 @@ let PlaceService = class PlaceService {
                         medias: {
                             select: {
                                 id: true,
-                                url: true
-                            }
+                                url: true,
+                            },
                         },
                     },
                 },
@@ -117,6 +117,9 @@ let PlaceService = class PlaceService {
                     postalCode: body.postalCode,
                     country: body.country,
                     region: body.region && body.region,
+                    googleAddressId: body.googleAddressId && body.googleAddressId,
+                    latitude: body.latitude && parseFloat(body.latitude),
+                    longitude: body.longitude && parseFloat(body.longitude),
                 },
             });
             const place = await prisma.place.create({
@@ -135,8 +138,8 @@ let PlaceService = class PlaceService {
                     medias: {
                         select: {
                             id: true,
-                            url: true
-                        }
+                            url: true,
+                        },
                     },
                 },
             });
@@ -204,6 +207,9 @@ let PlaceService = class PlaceService {
                         postalCode: body.postalCode && body.postalCode,
                         country: body.country && body.country,
                         region: body.region && body.region,
+                        googleAddressId: body.googleAddressId && body.googleAddressId,
+                        latitude: body.latitude && parseFloat(body.latitude),
+                        longitude: body.longitude && parseFloat(body.longitude),
                     },
                 });
             }
@@ -246,8 +252,8 @@ let PlaceService = class PlaceService {
                     medias: {
                         select: {
                             id: true,
-                            url: true
-                        }
+                            url: true,
+                        },
                     },
                 },
             });
@@ -289,6 +295,9 @@ let PlaceService = class PlaceService {
                     postalCode: body.postalCode,
                     country: body.country,
                     region: body.region,
+                    googleAddressId: body.googleAddressId && body.googleAddressId,
+                    latitude: body.latitude && parseFloat(body.latitude),
+                    longitude: body.longitude && parseFloat(body.longitude)
                 },
             });
         }
@@ -298,8 +307,8 @@ let PlaceService = class PlaceService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
                 address: true,
             },

@@ -39,6 +39,7 @@ let ActivityService = class ActivityService {
                 address: true,
                 place: {
                     select: {
+                        ownerId: true,
                         type: {
                             select: {
                                 name: true,

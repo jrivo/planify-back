@@ -39,6 +39,21 @@ export class createPlaceDto {
     region?: string;
 
     @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    googleAddressId?: string
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    latitude?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    longitude?: string;
+
+    @IsOptional()
     @IsString()
     website?: string;
 
@@ -109,6 +124,21 @@ export class updatePlaceDto {
     @IsNotEmpty()
     @IsString()
     region?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    googleAddressId?: string
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    latitude?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    longitude?: string;
 
     @IsOptional()
     @IsString()
@@ -196,4 +226,19 @@ export class createActivityDto {
     @IsNotEmpty()
     @IsString()
     region?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    googleAddressId?: string
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    latitude?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    longitude?: string;
 }

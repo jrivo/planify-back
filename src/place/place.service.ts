@@ -17,8 +17,8 @@ export class PlaceService {
         medias: {
           select: {
             id: true,
-            url:true
-          }
+            url: true,
+          },
         },
         type: {
           select: {
@@ -40,8 +40,8 @@ export class PlaceService {
         medias: {
           select: {
             id: true,
-            url:true
-          }
+            url: true,
+          },
         },
       },
     });
@@ -55,11 +55,11 @@ export class PlaceService {
           include: {
             //TODO: add address to activity
             medias: {
-          select: {
-            id: true,
-            url:true
-          }
-        },
+              select: {
+                id: true,
+                url: true,
+              },
+            },
           },
         },
         medias: {
@@ -119,6 +119,9 @@ export class PlaceService {
           postalCode: body.postalCode,
           country: body.country,
           region: body.region && body.region,
+          googleAddressId: body.googleAddressId && body.googleAddressId,
+          latitude: body.latitude && parseFloat(body.latitude),
+          longitude: body.longitude && parseFloat(body.longitude),
         },
       });
 
@@ -136,11 +139,11 @@ export class PlaceService {
         include: {
           address: true,
           medias: {
-          select: {
-            id: true,
-            url:true
-          }
-        },
+            select: {
+              id: true,
+              url: true,
+            },
+          },
         },
       });
 
@@ -224,6 +227,9 @@ export class PlaceService {
             postalCode: body.postalCode && body.postalCode,
             country: body.country && body.country,
             region: body.region && body.region,
+            googleAddressId: body.googleAddressId && body.googleAddressId,
+            latitude: body.latitude && parseFloat(body.latitude),
+            longitude: body.longitude && parseFloat(body.longitude),
           },
         });
       }
@@ -269,11 +275,11 @@ export class PlaceService {
         include: {
           address: true,
           medias: {
-          select: {
-            id: true,
-            url:true
-          }
-        },
+            select: {
+              id: true,
+              url: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -318,6 +324,9 @@ export class PlaceService {
           postalCode: body.postalCode,
           country: body.country,
           region: body.region,
+          googleAddressId: body.googleAddressId && body.googleAddressId,
+          latitude: body.latitude && parseFloat(body.latitude),
+          longitude: body.longitude && parseFloat(body.longitude)
         },
       });
     }
@@ -334,8 +343,8 @@ export class PlaceService {
         medias: {
           select: {
             id: true,
-            url:true
-          }
+            url: true,
+          },
         },
         address: true,
       },

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sanitizeFileName = exports.generateRandomFileName = void 0;
+exports.redeserialize = exports.sanitizeFileName = exports.generateRandomFileName = void 0;
 const generateRandomFileName = function (extension, length = 8) {
     var result = "";
     var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -15,4 +15,12 @@ const sanitizeFileName = (fileName) => {
     return fileName.replace(/ /g, "_").replace(/[^a-zA-Z0-9.]/g, "");
 };
 exports.sanitizeFileName = sanitizeFileName;
+const redeserialize = function (object, elements, keysToDelete) {
+    elements.forEach((element) => {
+        object[element.newKey] = element.data;
+    });
+    keysToDelete.forEach((key) => delete object[key]);
+    return object;
+};
+exports.redeserialize = redeserialize;
 //# sourceMappingURL=utils.js.map

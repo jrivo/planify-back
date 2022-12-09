@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
-import { sanitizeFileName } from "src/utils";
+import { redeserialize, sanitizeFileName } from "src/utils";
 import { updateActivityDto } from "./activity.dto";
 const { PrismaClient } = require("@prisma/client");
 
@@ -35,6 +35,7 @@ export class ActivityService {
         address: true,
         place: {
           select: {
+            ownerId: true,
             type: {
               select: {
                 name: true,
@@ -44,6 +45,15 @@ export class ActivityService {
         },
       },
     });
+    // return redeserialize(activity, [
+    //   {
+    //     data: activity.place.ownerId,
+    //     newKey: "ownerId",
+    //   },
+    //   {
+    //     data:activity.place.type.name,newKey:"placeType"
+    //   }
+    // ]);
   }
 
   async getByName(name: string) {

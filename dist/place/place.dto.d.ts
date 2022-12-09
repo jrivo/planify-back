@@ -8,6 +8,9 @@ export declare class createPlaceDto {
     postalCode: string;
     country: string;
     region?: string;
+    googleAddressId?: string;
+    latitude?: string;
+    longitude?: string;
     website?: string;
     phone?: string;
     email?: string;
@@ -26,6 +29,9 @@ export declare class updatePlaceDto {
     postalCode?: string;
     country?: string;
     region?: string;
+    googleAddressId?: string;
+    latitude?: string;
+    longitude?: string;
     website?: string;
     phone?: string;
     email?: string;
@@ -49,4 +55,7 @@ export declare class createActivityDto {
     postalCode?: string;
     country?: string;
     region?: string;
+    googleAddressId?: string;
+    latitude?: string;
+    longitude?: string;
 }

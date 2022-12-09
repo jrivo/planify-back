@@ -20,6 +20,7 @@ import { ActivityService } from "./activity.service";
 import { updateActivityDto } from "./activity.dto";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
+import { redeserialize } from "src/utils";
 
 @Controller("activities")
 export class ActivityController {
@@ -29,8 +30,8 @@ export class ActivityController {
   async getAll(@Res() res) {
     this.activityService
       .getAll()
-      .then((actiities) => {
-        res.status(200).send(actiities);
+      .then((activities) => {
+        res.status(200).send(activities);
       })
       .catch((err) => {
         res.status(500).send(err);
@@ -42,6 +43,16 @@ export class ActivityController {
     this.activityService
       .getById(id)
       .then((activity) => {
+        //update activity to move activity.place.ownerId to activity.ownerId
+        activity = redeserialize(activity, [
+          {
+            data: activity.place.ownerId,
+            newKey: "ownerId",
+          },
+          {
+            data:activity.place.type.name,newKey:"placeType"
+          }
+        ],["place"]);
         activity
           ? res.status(200).send(activity)
           : res.status(404).send("Activity not found");
