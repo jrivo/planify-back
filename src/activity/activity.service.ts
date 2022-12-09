@@ -12,7 +12,12 @@ export class ActivityService {
   async getAll() {
     return await prisma.activity.findMany({
       include: {
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
       },
     });
   }
@@ -21,7 +26,22 @@ export class ActivityService {
     return await prisma.activity.findUnique({
       where: { id: Number(id) },
       include: {
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
+        address:true,
+        place:{
+          select:{
+            type:{
+              select:{
+                name:true
+              }
+            }
+          }
+        }
       },
     });
   }
@@ -34,7 +54,12 @@ export class ActivityService {
         },
       },
       include: {
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
       },
     });
   }
@@ -47,7 +72,12 @@ export class ActivityService {
         },
       },
       include: {
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
       },
     });
   }
@@ -59,6 +89,15 @@ export class ActivityService {
           ownerId: Number(id),
         },
       },
+      include: {
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
+        address:true
+      }
     });
   }
 
@@ -79,7 +118,12 @@ export class ActivityService {
       where: { id: Number(id) },
       data: body,
       include: {
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
       },
     });
 

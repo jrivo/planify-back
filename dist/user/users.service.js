@@ -9,6 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
+const const_1 = require("../const");
+const utils_1 = require("../utils");
 const prisma = new client_1.PrismaClient();
 let UsersService = class UsersService {
     async findById(id, params = null) {
@@ -17,7 +19,7 @@ let UsersService = class UsersService {
             }, include: {
                 profilePicture: true,
             } }, params));
-        return exclude(user, 'password');
+        return exclude(user, "password");
     }
     async findByEmail(email, params = null) {
         const user = await prisma.user.findUnique(Object.assign({ where: {
@@ -34,7 +36,39 @@ let UsersService = class UsersService {
                 role: client_1.Role[role],
             },
         });
-        return exclude(user, 'password');
+        return exclude(user, "password");
+    }
+    async update(id, req, body) {
+        const user = await prisma.user.update({
+            where: {
+                id: Number(id),
+            },
+            data: body,
+        });
+        if (req.files && req.files.length > 0) {
+            console.log("entered");
+            try {
+                const file = req.files[0];
+                await prisma.media.create({
+                    data: {
+                        name: (0, utils_1.sanitizeFileName)(file.originalname),
+                        url: "https://" +
+                            const_1.CDN_STORAGE_ZONE +
+                            ".b-cdn.net/" +
+                            const_1.CDN_STORAGE_PATH +
+                            "/" +
+                            file.uploadName,
+                        type: client_1.MediaType.IMAGE,
+                        user: { connect: { id: Number(id) } },
+                    },
+                });
+            }
+            catch (err) {
+                throw err;
+            }
+        }
+        console.log("will return");
+        return exclude(user, "password");
     }
     async delete(id) {
         const user = await prisma.user.update({
@@ -42,11 +76,11 @@ let UsersService = class UsersService {
                 id: Number(id),
             },
             data: {
-                email: '',
-                password: '',
-                firstName: '',
-                lastName: '',
-                phone: '',
+                email: "",
+                password: "",
+                firstName: "",
+                lastName: "",
+                phone: "",
                 role: client_1.Role.DELETED,
                 profilePicture: {
                     disconnect: true,
@@ -54,7 +88,7 @@ let UsersService = class UsersService {
                 deletedAt: new Date(),
             },
         });
-        return exclude(user, 'password');
+        return exclude(user, "password");
     }
     async getRole(id) {
         const user = await prisma.user.findUnique({

@@ -16,7 +16,12 @@ let TripService = class TripService {
             include: {
                 activities: {
                     include: {
-                        medias: true,
+                        medias: {
+                            select: {
+                                id: true,
+                                url: true
+                            }
+                        },
                     },
                 },
             },
@@ -30,7 +35,12 @@ let TripService = class TripService {
             include: {
                 activities: {
                     include: {
-                        medias: true,
+                        medias: {
+                            select: {
+                                id: true,
+                                url: true
+                            }
+                        },
                     },
                 }
             },
@@ -42,7 +52,12 @@ let TripService = class TripService {
             include: {
                 activities: {
                     include: {
-                        medias: true,
+                        medias: {
+                            select: {
+                                id: true,
+                                url: true
+                            }
+                        },
                     },
                 },
             },
@@ -58,7 +73,12 @@ let TripService = class TripService {
             include: {
                 activities: {
                     include: {
-                        medias: true,
+                        medias: {
+                            select: {
+                                id: true,
+                                url: true
+                            }
+                        },
                     },
                 },
             }

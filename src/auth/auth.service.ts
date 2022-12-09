@@ -44,10 +44,16 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
+      role: user.role,
       access_token: this.jwtService.sign(payload, {
         secret: jwtConstants.secret,
       }),
     };
+  }
+
+  async getUser(id: string) {
+    const user = await this.usersService.findById(id);
+    return exclude(user, "password");
   }
 
   async register(req: any, body: RegisterDto) {
@@ -76,14 +82,14 @@ export class AuthService {
         lastName: body.lastName,
         phone: body.phoneNumber && body.phoneNumber,
         address: address ? { connect: { id: address.id } } : undefined,
-        role: Role[body.role],
+        // role: Role[body.role],
       },
       include: {
         profilePicture: true,
         address: true,
       },
     });
-    if (req.files) {
+    if (req.files && req.files.length > 0) {
       try {
         req.files.forEach(async (file) => {
           let type = MediaType.IMAGE;
@@ -115,4 +121,14 @@ export class AuthService {
       }),
     };
   }
+}
+
+function exclude<User, Key extends keyof User>(
+  user: User,
+  ...keys: Key[]
+): Omit<User, Key> {
+  for (let key of keys) {
+    delete user[key];
+  }
+  return user;
 }

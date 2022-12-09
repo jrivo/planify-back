@@ -55,10 +55,15 @@ let AuthService = class AuthService {
         return {
             id: user.id,
             email: user.email,
+            role: user.role,
             access_token: this.jwtService.sign(payload, {
                 secret: constants_1.jwtConstants.secret,
             }),
         };
+    }
+    async getUser(id) {
+        const user = await this.usersService.findById(id);
+        return exclude(user, "password");
     }
     async register(req, body) {
         const user = await this.usersService.findByEmail(body.email);
@@ -86,14 +91,13 @@ let AuthService = class AuthService {
                 lastName: body.lastName,
                 phone: body.phoneNumber && body.phoneNumber,
                 address: address ? { connect: { id: address.id } } : undefined,
-                role: client_1.Role[body.role],
             },
             include: {
                 profilePicture: true,
                 address: true,
             },
         });
-        if (req.files) {
+        if (req.files && req.files.length > 0) {
             try {
                 req.files.forEach(async (file) => {
                     let type = client_1.MediaType.IMAGE;
@@ -132,4 +136,10 @@ AuthService = __decorate([
         jwt_1.JwtService])
 ], AuthService);
 exports.AuthService = AuthService;
+function exclude(user, ...keys) {
+    for (let key of keys) {
+        delete user[key];
+    }
+    return user;
+}
 //# sourceMappingURL=auth.service.js.map

@@ -1,5 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient, Role } from '@prisma/client';
+import { Injectable } from "@nestjs/common";
+import { MediaType, PrismaClient, Role } from "@prisma/client";
+import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
+import { sanitizeFileName } from "src/utils";
+import { updateUserDto } from "./user.dto";
 
 const prisma = new PrismaClient();
 @Injectable()
@@ -14,11 +17,11 @@ export class UsersService {
       },
       ...params,
     });
-    return exclude(user, 'password');
+    return exclude(user, "password");
   }
   async findByEmail(
     email: string,
-    params: object = null,
+    params: object = null
   ): Promise<any | undefined> {
     const user = await prisma.user.findUnique({
       where: {
@@ -39,7 +42,40 @@ export class UsersService {
         role: Role[role],
       },
     });
-    return exclude(user, 'password');
+    return exclude(user, "password");
+  }
+
+  async update(id: string, req: any, body: updateUserDto) {
+    const user = await prisma.user.update({
+      where: {
+        id: Number(id),
+      },
+      data: body,
+    });
+    if (req.files && req.files.length > 0) {
+      console.log("entered")
+      try {
+        const file = req.files[0];
+        await prisma.media.create({
+          data: {
+            name: sanitizeFileName(file.originalname),
+            url:
+              "https://" +
+              CDN_STORAGE_ZONE +
+              ".b-cdn.net/" +
+              CDN_STORAGE_PATH +
+              "/" +
+              file.uploadName,
+            type: MediaType.IMAGE,
+            user: { connect: { id: Number(id) } },
+          },
+        });
+      } catch (err) {
+        throw err;
+      }
+    }
+    console.log("will return")
+    return exclude(user, "password");
   }
 
   async delete(id: string) {
@@ -48,11 +84,11 @@ export class UsersService {
         id: Number(id),
       },
       data: {
-        email: '',
-        password: '',
-        firstName: '',
-        lastName: '',
-        phone: '',
+        email: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+        phone: "",
         role: Role.DELETED,
         profilePicture: {
           disconnect: true,
@@ -60,10 +96,10 @@ export class UsersService {
         deletedAt: new Date(),
       },
     });
-    return exclude(user, 'password');
+    return exclude(user, "password");
   }
 
-  async getRole(id: string){
+  async getRole(id: string) {
     const user = await prisma.user.findUnique({
       where: {
         id: Number(id),
@@ -74,7 +110,6 @@ export class UsersService {
     });
     return user.role;
   }
-
 }
 
 function exclude<User, Key extends keyof User>(

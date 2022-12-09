@@ -11,7 +11,7 @@ export declare class createPlaceDto {
     website?: string;
     phone?: string;
     email?: string;
-    placeTypeId: number;
+    placeTypeId: string;
     activities?: Activity[];
     mainImage?: any;
     images?: any;
@@ -29,7 +29,7 @@ export declare class updatePlaceDto {
     website?: string;
     phone?: string;
     email?: string;
-    placeTypeId?: number;
+    placeTypeId?: string;
     activities?: Activity[];
     mainImage?: any;
     images?: any;
@@ -43,4 +43,10 @@ export declare class createActivityDto {
     mainImage?: any;
     images?: any;
     documents?: any;
+    street?: string;
+    streetNumber?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+    region?: string;
 }

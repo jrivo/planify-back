@@ -20,6 +20,8 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { AnyFilesInterceptor, FileInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
+import { SelfGuard } from "src/auth/self.guard";
+import { Self } from "src/auth/self.decorator";
 
 @Controller("places")
 export class PlaceController {
@@ -129,7 +131,8 @@ export class PlaceController {
   }
 
   @Post(":id/activities")
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard,SelfGuard)
+  @Self({userIdParam:"id",allowAdmins:false})
   @Roles("ADMIN", "MERCHANT")
   @UseInterceptors(AnyFilesInterceptor())
   //add owner or admin guard

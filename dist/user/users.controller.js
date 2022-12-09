@@ -15,13 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
+const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
+const self_decorator_1 = require("../auth/self.decorator");
+const self_guard_1 = require("../auth/self.guard");
+const cdn_service_1 = require("../cdn/cdn.service");
+const user_dto_1 = require("./user.dto");
 const users_service_1 = require("./users.service");
 let UsersController = class UsersController {
-    constructor(userService) {
+    constructor(userService, cdnService) {
         this.userService = userService;
+        this.cdnService = cdnService;
     }
     getById(id, res) {
         this.userService
@@ -35,11 +41,24 @@ let UsersController = class UsersController {
             res.status(500).send(err);
         });
     }
+    async updateUser(id, req, body, res, files) {
+        files ? req = await this.cdnService.upload(req, files) : null;
+        this.userService
+            .update(id, req, body)
+            .then((user) => {
+            user
+                ? res.status(200).send(user)
+                : res.status(404).send("User not found");
+        })
+            .catch((err) => {
+            res.status(500).send;
+        });
+    }
 };
 __decorate([
+    (0, common_1.Get)(":id"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)("ADMIN"),
-    (0, common_1.Get)(":id"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
@@ -47,9 +66,24 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getById", null);
+__decorate([
+    (0, common_1.Put)(":id"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, self_guard_1.SelfGuard),
+    (0, self_decorator_1.Self)({ userIdParam: "id", allowAdmins: true }),
+    (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Body)()),
+    __param(3, (0, common_1.Res)()),
+    __param(4, (0, common_1.UploadedFiles)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, user_dto_1.updateUserDto, Object, Array]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateUser", null);
 UsersController = __decorate([
     (0, common_1.Controller)("users"),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService, cdn_service_1.CdnService])
 ], UsersController);
 exports.UsersController = UsersController;
 //# sourceMappingURL=users.controller.js.map

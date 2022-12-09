@@ -50,27 +50,26 @@ enum UserStatus {
   BANNED
 }
 
-model Review {
-  id             Int          @id @default(autoincrement())
-  author         User         @relation(fields: [userId], references: [id])
-  place          Place        @relation(fields: [placeId], references: [id])
-  rating         Int
-  description    String?
-  medias         Media[]
-  status         ReviewStatus @relation(fields: [reviewStatusId], references: [id])
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  userId         Int
-  placeId        Int
-  reviewStatusId Int
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
-model ReviewStatus {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Review    Review[]
+model Review {
+  id             Int          @id @default(autoincrement())
+  author         User?         @relation(fields: [userId], references: [id])
+  googleAuthor  String?
+  place          Place        @relation(fields: [placeId], references: [id])
+  rating         Int?
+  description    String?
+  medias         Media[]
+  status         ReviewStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  userId         Int?
+  placeId        Int
+  reviewStatusId Int
 }
 
 // model Message {
@@ -122,6 +121,8 @@ model Place {
   placeTypeId Int?
   ownerId     Int
   addressId   Int
+  rating      Float?
+  googlePlaceId String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -138,6 +139,9 @@ model Address {
   updatedAt    DateTime   @updatedAt
   places       Place[]
   users        User[]
+  latitude  Float?
+  longitude  Float?
+  googleAddressId String?
   activities   Activity[]
 }
 
@@ -157,7 +161,8 @@ model Activity {
   medias      Media[]
   mainImageId Int?
   description String
-  date        DateTime?
+  startDate        DateTime @default(now())
+  endDate          DateTime? @default(now())
   trips       Trip[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

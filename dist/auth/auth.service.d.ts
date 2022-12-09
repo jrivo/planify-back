@@ -9,8 +9,10 @@ export declare class AuthService {
     login(email: string, password: string): Promise<{
         id: any;
         email: any;
+        role: any;
         access_token: string;
     }>;
+    getUser(id: string): Promise<Omit<any, "password">>;
     register(req: any, body: RegisterDto): Promise<{
         id: number;
         email: string;

@@ -15,9 +15,13 @@ export class updateActivityDto {
     @IsNumber()
     price?: number;
 
-    @IsOptional()
     @IsDateString()
-    date?: Date;
+    @IsNotEmpty()
+    startDate: Date;
+
+    @IsDateString()
+    @IsNotEmpty()
+    endDate: Date;
 
     @IsOptional()
     mainImage? : any;

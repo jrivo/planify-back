@@ -52,7 +52,7 @@ export class createPlaceDto {
 
     @IsNotEmpty()
     @IsString()
-    placeTypeId: number;
+    placeTypeId: string;
 
     @IsOptional()
     activities?: Activity[];
@@ -124,8 +124,8 @@ export class updatePlaceDto {
 
     @IsOptional()
     @IsNotEmpty()
-    @IsNumber()
-    placeTypeId?: number;
+    @IsString()
+    placeTypeId?: string;
 
     @IsOptional()
     activities?: Activity[];
@@ -153,9 +153,13 @@ export class createActivityDto {
     @IsString()
     price?: string;
 
-    @IsOptional()
     @IsDateString()
-    date?: Date;
+    @IsNotEmpty()
+    startDate: Date;
+
+    @IsDateString()
+    @IsNotEmpty()
+    endDate: Date;
 
     @IsOptional()
     mainImage? : any;
@@ -165,4 +169,35 @@ export class createActivityDto {
 
     @IsOptional()
     documents? : any;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    street?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    streetNumber?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    city?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    postalCode?: string;
+
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    country?: string;
+
+    @IsOptional()
+    @IsNotEmpty()
+    @IsString()
+    region?: string;
 }

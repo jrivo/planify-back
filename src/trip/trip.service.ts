@@ -11,7 +11,12 @@ export class TripService {
       include: {
         activities: {
           include: {
-            medias: true,
+            medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
           },
         },
       },
@@ -26,7 +31,12 @@ export class TripService {
       include: {
         activities: {
           include: {
-            medias: true,
+            medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
           },
         }
       },
@@ -39,7 +49,12 @@ export class TripService {
       include: {
         activities: {
           include: {
-            medias: true,
+            medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
           },
         },
       },
@@ -56,7 +71,12 @@ export class TripService {
       include: {
         activities: {
           include: {
-            medias: true,
+            medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
           },
         },
       }

@@ -69,8 +69,8 @@ export class RegisterDto {
   @IsString()
   region?: string;
 
-  @IsOptional()
-  @IsString()
-  role?: Role;
+  // @IsOptional()
+  // @IsString()
+  // role?: Role;
   // address : Address
 }

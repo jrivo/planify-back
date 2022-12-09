@@ -23,6 +23,8 @@ const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
 const platform_express_1 = require("@nestjs/platform-express");
 const cdn_service_1 = require("../cdn/cdn.service");
+const self_guard_1 = require("../auth/self.guard");
+const self_decorator_1 = require("../auth/self.decorator");
 let PlaceController = class PlaceController {
     constructor(placeService, cdnService) {
         this.placeService = placeService;
@@ -209,7 +211,8 @@ __decorate([
 ], PlaceController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)(":id/activities"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, self_guard_1.SelfGuard),
+    (0, self_decorator_1.Self)({ userIdParam: "id", allowAdmins: false }),
     (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     openapi.ApiResponse({ status: 201 }),

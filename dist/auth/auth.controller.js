@@ -29,11 +29,17 @@ let AuthController = class AuthController {
         return this.authService.login(body.email, body.password);
     }
     async register(body, req, files) {
-        files ? req = await this.cdnService.upload(req, files) : null;
+        files ? (req = await this.cdnService.upload(req, files)) : null;
         return this.authService.register(req, body);
     }
-    getProfile(req) {
-        return req.user;
+    getProfile(req, res) {
+        if (!req.user)
+            return res.status(401).send("Unauthorized");
+        this.authService.getUser(req.user.id).then((user) => {
+            user
+                ? res.status(200).send(user)
+                : res.status(404).send({ message: "User not found" });
+        });
     }
 };
 __decorate([
@@ -60,13 +66,15 @@ __decorate([
     (0, common_1.Get)("me"),
     openapi.ApiResponse({ status: 200, type: Object }),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getProfile", null);
 AuthController = __decorate([
     (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [auth_service_1.AuthService, cdn_service_1.CdnService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        cdn_service_1.CdnService])
 ], AuthController);
 exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

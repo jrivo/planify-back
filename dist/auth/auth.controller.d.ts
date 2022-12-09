@@ -9,6 +9,7 @@ export declare class AuthController {
     login(body: LoginDto): Promise<{
         id: any;
         email: any;
+        role: any;
         access_token: string;
     }>;
     register(body: RegisterDto, req: any, files: Array<Express.Multer.File>): Promise<{
@@ -16,5 +17,5 @@ export declare class AuthController {
         email: string;
         access_token: string;
     }>;
-    getProfile(req: any): any;
+    getProfile(req: any, res: any): any;
 }

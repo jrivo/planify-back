@@ -9,42 +9,39 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OwnerAdminGuard = void 0;
+exports.SelfGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
-let OwnerAdminGuard = class OwnerAdminGuard {
+const client_2 = require("@prisma/client");
+const prisma = new client_2.PrismaClient();
+let SelfGuard = class SelfGuard {
     constructor(reflector) {
         this.reflector = reflector;
     }
     async canActivate(context) {
-        let entity = this.reflector.get("entity", context.getHandler());
-        switch (entity) {
-            case "User":
-                entity = prisma.user;
-                break;
-            case "Place":
-                entity = prisma.place;
-                break;
-        }
-        const data = entity.findUnique({
-            where: { id: entity.id },
-        });
         const request = context.switchToHttp().getRequest();
-        if (request === null || request === void 0 ? void 0 : request.user) {
-            console.log("USER", request.user);
-            if (request.user.role === "ADMIN")
-                return true;
-            if (request.user.id === data.userId)
-                return true;
-        }
-        return false;
+        const user = await prisma.user.findUnique({
+            where: { id: request.user.id },
+        });
+        let selfParams = this.reflector.get('selfParams', context.getHandler());
+        if (!selfParams)
+            selfParams = this.reflector.get('selfParams', context.getClass());
+        if (!selfParams)
+            return true;
+        let allowAdmins = selfParams.allowAdmins || true;
+        let userIdParam = selfParams.userIdParam;
+        if (!user)
+            return false;
+        if (request.params[userIdParam] == user.id)
+            return true;
+        if (allowAdmins && user.role == client_1.Role.ADMIN)
+            return true;
     }
 };
-OwnerAdminGuard = __decorate([
+SelfGuard = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [core_1.Reflector])
-], OwnerAdminGuard);
-exports.OwnerAdminGuard = OwnerAdminGuard;
-//# sourceMappingURL=owner-admin.guard.js.map
+], SelfGuard);
+exports.SelfGuard = SelfGuard;
+//# sourceMappingURL=self.guard.js.map

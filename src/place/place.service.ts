@@ -14,10 +14,15 @@ export class PlaceService {
     return await prisma.place.findMany({
       include: {
         address: true,
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
         type: {
           select: {
-            id:true,
+            id: true,
             name: true,
           },
         },
@@ -30,6 +35,15 @@ export class PlaceService {
       where: {
         ownerId: Number(id),
       },
+      include: {
+        address: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
+      },
     });
   }
 
@@ -40,10 +54,21 @@ export class PlaceService {
         activities: {
           include: {
             //TODO: add address to activity
-            medias: true,
+            medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
           },
         },
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
+        address: true,
       },
     });
   }
@@ -57,7 +82,12 @@ export class PlaceService {
       },
       include: {
         address: true,
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
       },
     });
   }
@@ -69,7 +99,12 @@ export class PlaceService {
       },
       include: {
         address: true,
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
       },
     });
   }
@@ -100,7 +135,12 @@ export class PlaceService {
         },
         include: {
           address: true,
-          medias: true,
+          medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
         },
       });
 
@@ -147,51 +187,100 @@ export class PlaceService {
   }
 
   async update(id: string, req: any, body: updatePlaceDto) {
-    const place = await prisma.place.update({
-      where: { id: Number(id) },
-      data: body,
-      include: {
-        address: true,
-        medias: true,
-      },
-    });
+    //isAddress = true if any address field is not null
+    try {
+      const isAddress =
+        body.street ||
+        body.streetNumber ||
+        body.city ||
+        body.postalCode ||
+        body.country ||
+        body.region;
+      const place = await prisma.place.update({
+        where: { id: Number(id) },
+        data: {
+          name: body.name && body.name,
+          description: body.description && body.description,
+          website: body.website && body.website,
+          phone: body.phone && body.phone,
+          email: body.email && body.email,
+          //add type:{ connect: { id: Number(body.placeTypeId) } } if placeTypeId is not null
+          ...(body.placeTypeId && {
+            type: { connect: { id: Number(body.placeTypeId) } },
+          }),
+        },
+        include: {
+          address: true,
+        },
+      });
 
-    if (req.files) {
-      try {
-        req.files.forEach(async (file) => {
-          let type = "";
-          switch (file.fieldname) {
-            // case "mainImage":
-            //   type = MediaType.MAIN_IMAGE;
-            //   break;
-            case "images":
-              type = MediaType.IMAGE;
-              break;
-            case "documents":
-              type = MediaType.DOCUMENT;
-              break;
-          }
-          //TODO: add mainImage ID to place
-          await prisma.media.create({
-            data: {
-              name: sanitizeFileName(file.originalname),
-              url:
-                "https://" +
-                CDN_STORAGE_ZONE +
-                ".b-cdn.net/" +
-                CDN_STORAGE_PATH +
-                "/" +
-                file.uploadName,
-              type: type,
-              place: { connect: { id: Number(place.id) } },
-            },
-          });
+      if (isAddress) {
+        await prisma.address.update({
+          where: { id: place.address.id },
+          data: {
+            street: body.street && body.street,
+            streetNumber: body.streetNumber && body.streetNumber,
+            city: body.city && body.city,
+            postalCode: body.postalCode && body.postalCode,
+            country: body.country && body.country,
+            region: body.region && body.region,
+          },
         });
-      } catch (err) {
-        throw err;
       }
+
+      console.log("FILES", req.files);
+      if (req.files && req.files.length > 0) {
+        try {
+          req.files.forEach(async (file) => {
+            let type = "";
+            switch (file.fieldname) {
+              // case "mainImage":
+              //   type = MediaType.MAIN_IMAGE;
+              //   break;
+              case "images":
+                type = MediaType.IMAGE;
+                break;
+              case "documents":
+                type = MediaType.DOCUMENT;
+                break;
+            }
+            //TODO: add mainImage ID to place
+            await prisma.media.create({
+              data: {
+                name: sanitizeFileName(file.originalname),
+                url:
+                  "https://" +
+                  CDN_STORAGE_ZONE +
+                  ".b-cdn.net/" +
+                  CDN_STORAGE_PATH +
+                  "/" +
+                  file.uploadName,
+                type: type,
+                place: { connect: { id: Number(place.id) } },
+              },
+            });
+          });
+        } catch (err) {
+          throw err;
+        }
+      }
+      return await prisma.place.findUnique({
+        where: { id: Number(id) },
+        include: {
+          address: true,
+          medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
     }
-    return place;
+    // return place;
   }
 
   async delete(id: string) {
@@ -205,33 +294,63 @@ export class PlaceService {
       where: {
         placeId: Number(id),
       },
+      include: {
+        address: true,
+      },
     });
   }
 
   async createActivity(id: string, req: any, body: createActivityDto) {
+    const isAddress =
+      body.street ||
+      body.streetNumber ||
+      body.city ||
+      body.postalCode ||
+      body.country ||
+      body.region;
+    let address = null;
+    if (isAddress) {
+      address = await prisma.address.create({
+        data: {
+          street: body.street,
+          streetNumber: body.streetNumber,
+          city: body.city,
+          postalCode: body.postalCode,
+          country: body.country,
+          region: body.region,
+        },
+      });
+    }
     const activity = await prisma.activity.create({
       data: {
         name: body.name,
         description: body.description,
         place: { connect: { id: Number(id) } },
         price: body.price && Number(body.price),
-        date: body.date && body.date,
+        startDate: body.startDate && new Date(body.startDate),
+        endDate: body.endDate && new Date(body.endDate),
+        ...(isAddress && { address: { connect: { id: address.id } } }),
       },
       include: {
-        medias: true,
+        medias: {
+          select: {
+            id: true,
+            url:true
+          }
+        },
         address: true,
       },
     });
-    if (!activity.address) 
-    {
-      let originPlaceAddressId = await prisma.place.findUnique({
+    if (!activity.address) {
+      let activityPlace = await prisma.place.findUnique({
         where: { id: Number(id) },
-      }).addressId;
+      });
       await prisma.activity.update({
-        data:{
-          address: { connect: { id: Number(originPlaceAddressId) } },
-        }
-      })
+        where: { id: Number(activity.id) },
+        data: {
+          address: { connect: { id: Number(activityPlace.addressId) } },
+        },
+      });
     }
 
     if (req.files) {
