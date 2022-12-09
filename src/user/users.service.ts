@@ -7,13 +7,32 @@ import { updateUserDto } from "./user.dto";
 const prisma = new PrismaClient();
 @Injectable()
 export class UsersService {
+
+  async getAll() {
+    const users = await prisma.user.findMany({
+      include: {
+        profilePicture: {
+          select: {
+            id: true,
+            url: true,
+          }
+        },
+      },
+    });
+    return users.map((user) => exclude(user, "password"));
+  }
   async findById(id: string, params: object = null): Promise<any | undefined> {
     const user = await prisma.user.findUnique({
       where: {
         id: Number(id),
       },
       include: {
-        profilePicture: true,
+        profilePicture: {
+          select: {
+            id: true,
+            url: true,
+          }
+        },
       },
       ...params,
     });

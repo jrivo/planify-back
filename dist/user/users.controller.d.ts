@@ -6,6 +6,7 @@ export declare class UsersController {
     private userService;
     private cdnService;
     constructor(userService: UsersService, cdnService: CdnService);
+    getAll(res: any): Promise<void>;
     getById(id: string, res: any): void;
     updateUser(id: string, req: any, body: updateUserDto, res: any, files: Array<Express.Multer.File>): Promise<void>;
 }

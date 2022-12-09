@@ -29,6 +29,16 @@ let UsersController = class UsersController {
         this.userService = userService;
         this.cdnService = cdnService;
     }
+    async getAll(res) {
+        this.userService
+            .getAll()
+            .then((users) => {
+            res.status(200).send(users);
+        })
+            .catch((err) => {
+            res.status(500).send;
+        });
+    }
     getById(id, res) {
         this.userService
             .findById(id)
@@ -42,7 +52,7 @@ let UsersController = class UsersController {
         });
     }
     async updateUser(id, req, body, res, files) {
-        files ? req = await this.cdnService.upload(req, files) : null;
+        files ? (req = await this.cdnService.upload(req, files)) : null;
         this.userService
             .update(id, req, body)
             .then((user) => {
@@ -56,9 +66,19 @@ let UsersController = class UsersController {
     }
 };
 __decorate([
+    (0, common_1.Get)(),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MODERATOR"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getAll", null);
+__decorate([
     (0, common_1.Get)(":id"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN"),
+    (0, roles_decorator_1.Roles)("ADMIN", "MODERATOR"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
@@ -83,7 +103,8 @@ __decorate([
 ], UsersController.prototype, "updateUser", null);
 UsersController = __decorate([
     (0, common_1.Controller)("users"),
-    __metadata("design:paramtypes", [users_service_1.UsersService, cdn_service_1.CdnService])
+    __metadata("design:paramtypes", [users_service_1.UsersService,
+        cdn_service_1.CdnService])
 ], UsersController);
 exports.UsersController = UsersController;
 //# sourceMappingURL=users.controller.js.map

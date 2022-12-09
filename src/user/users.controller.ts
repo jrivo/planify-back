@@ -24,11 +24,28 @@ import { UsersService } from "./users.service";
 
 @Controller("users")
 export class UsersController {
-  constructor(private userService: UsersService,private cdnService: CdnService) {}
+  constructor(
+    private userService: UsersService,
+    private cdnService: CdnService
+  ) {}
+
+  @Get()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN", "MODERATOR")
+  async getAll(@Res() res) {
+    this.userService
+      .getAll()
+      .then((users) => {
+        res.status(200).send(users);
+      })
+      .catch((err) => {
+        res.status(500).send;
+      });
+  }
 
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN")
+  @Roles("ADMIN","MODERATOR")
   getById(@Param("id") id: string, @Res() res) {
     this.userService
       .findById(id)
@@ -53,7 +70,7 @@ export class UsersController {
     @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
-    files ? req = await this.cdnService.upload(req,files) : null
+    files ? (req = await this.cdnService.upload(req, files)) : null;
     this.userService
       .update(id, req, body)
       .then((user) => {

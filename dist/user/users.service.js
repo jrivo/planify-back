@@ -13,11 +13,29 @@ const const_1 = require("../const");
 const utils_1 = require("../utils");
 const prisma = new client_1.PrismaClient();
 let UsersService = class UsersService {
+    async getAll() {
+        const users = await prisma.user.findMany({
+            include: {
+                profilePicture: {
+                    select: {
+                        id: true,
+                        url: true,
+                    }
+                },
+            },
+        });
+        return users.map((user) => exclude(user, "password"));
+    }
     async findById(id, params = null) {
         const user = await prisma.user.findUnique(Object.assign({ where: {
                 id: Number(id),
             }, include: {
-                profilePicture: true,
+                profilePicture: {
+                    select: {
+                        id: true,
+                        url: true,
+                    }
+                },
             } }, params));
         return exclude(user, "password");
     }
