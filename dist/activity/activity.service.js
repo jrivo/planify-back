@@ -20,8 +20,8 @@ let ActivityService = class ActivityService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
             },
         });
@@ -33,19 +33,19 @@ let ActivityService = class ActivityService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
                 address: true,
                 place: {
                     select: {
                         type: {
                             select: {
-                                name: true
-                            }
-                        }
-                    }
-                }
+                                name: true,
+                            },
+                        },
+                    },
+                },
             },
         });
     }
@@ -60,8 +60,8 @@ let ActivityService = class ActivityService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
             },
         });
@@ -77,8 +77,8 @@ let ActivityService = class ActivityService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
             },
         });
@@ -94,21 +94,31 @@ let ActivityService = class ActivityService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
-                address: true
-            }
+                address: true,
+            },
         });
     }
     async getActivitySubscribers(id) {
         const trips = await prisma.activity
             .findUnique({
             where: { id: Number(id) },
-        }).trips({
+        })
+            .trips({
             include: {
-                user: true,
-            }
+                user: {
+                    include: {
+                        profilePicture: {
+                            select: {
+                                id: true,
+                                url: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
         return trips.map((trip) => exclude(trip.user, "password"));
     }
@@ -120,8 +130,8 @@ let ActivityService = class ActivityService {
                 medias: {
                     select: {
                         id: true,
-                        url: true
-                    }
+                        url: true,
+                    },
                 },
             },
         });

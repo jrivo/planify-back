@@ -14,7 +14,7 @@ const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class updateActivityDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { name: { required: false, type: () => String }, description: { required: false, type: () => String }, price: { required: false, type: () => Number }, date: { required: false, type: () => Date }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object } };
+        return { name: { required: false, type: () => String }, description: { required: false, type: () => String }, price: { required: false, type: () => String }, date: { required: false, type: () => Date }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object } };
     }
 }
 __decorate([
@@ -31,8 +31,8 @@ __decorate([
 ], updateActivityDto.prototype, "description", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.IsNumber)(),
-    __metadata("design:type", Number)
+    (0, class_validator_1.IsString)(),
+    __metadata("design:type", String)
 ], updateActivityDto.prototype, "price", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),

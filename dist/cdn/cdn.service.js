@@ -26,14 +26,12 @@ let CdnService = class CdnService {
                 },
                 body: file.buffer,
             };
-            console.log(url);
             (0, cross_fetch_1.default)(url, options)
                 .then((res) => {
                 console.log(res);
                 res.json();
             })
                 .then((json) => {
-                console.log(json);
                 req.files.push(file);
             })
                 .catch((err) => console.error("error:" + err));

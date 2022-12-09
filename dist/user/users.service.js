@@ -43,7 +43,12 @@ let UsersService = class UsersService {
             where: {
                 id: Number(id),
             },
-            data: body,
+            data: {
+                firstName: body.firstName && body.firstName,
+                lastName: body.lastName && body.lastName,
+                phone: body.phoneNumber && body.phoneNumber,
+                email: body.email && body.email,
+            },
         });
         if (req.files && req.files.length > 0) {
             console.log("entered");

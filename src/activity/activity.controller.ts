@@ -66,8 +66,7 @@ export class ActivityController {
   }
 
   @Get(":id/subscribers")
-  @UseGuards(JwtAuthGuard,RolesGuard)
-  @Roles("ADMIN","MERCHANT")
+  @UseGuards(JwtAuthGuard)
   async getActivitySubscribers(@Param("id") id: string, @Res() res) {
     this.activityService
       .getActivitySubscribers(id)

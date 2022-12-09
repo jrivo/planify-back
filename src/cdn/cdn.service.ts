@@ -30,14 +30,12 @@ export class CdnService {
         },
         body: file.buffer,
       };
-      console.log(url)
       fetch(url, options)
         .then((res) => {
           console.log(res)
           res.json();
         })
         .then((json) => {
-          console.log(json);
           req.files.push(file);
         })
         .catch((err) => console.error("error:" + err));
