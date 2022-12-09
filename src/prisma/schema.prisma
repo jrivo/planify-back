@@ -161,8 +161,7 @@ model Activity {
   medias      Media[]
   mainImageId Int?
   description String
-  startDate        DateTime @default(now())
-  endDate          DateTime? @default(now())
+  date        DateTime? @default(now())
   trips       Trip[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

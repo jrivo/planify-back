@@ -293,7 +293,7 @@ let PlaceService = class PlaceService {
             });
         }
         const activity = await prisma.activity.create({
-            data: Object.assign({ name: body.name, description: body.description, place: { connect: { id: Number(id) } }, price: body.price && Number(body.price), date: body.date && body.date }, (isAddress && { address: { connect: { id: address.id } } })),
+            data: Object.assign({ name: body.name, description: body.description, place: { connect: { id: Number(id) } }, price: body.price && Number(body.price), date: body.date && new Date(body.date) }, (isAddress && { address: { connect: { id: address.id } } })),
             include: {
                 medias: {
                     select: {

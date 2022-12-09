@@ -155,11 +155,7 @@ export class createActivityDto {
 
     @IsDateString()
     @IsNotEmpty()
-    startDate: Date;
-
-    @IsDateString()
-    @IsNotEmpty()
-    endDate: Date;
+    date: Date;
 
     @IsOptional()
     mainImage? : any;

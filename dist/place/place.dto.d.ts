@@ -39,7 +39,7 @@ export declare class createActivityDto {
     name: string;
     description: string;
     price?: string;
-    date?: Date;
+    date: Date;
     mainImage?: any;
     images?: any;
     documents?: any;

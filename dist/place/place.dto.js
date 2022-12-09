@@ -189,7 +189,7 @@ __decorate([
 exports.updatePlaceDto = updatePlaceDto;
 class createActivityDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { name: { required: true, type: () => String }, description: { required: true, type: () => String }, price: { required: false, type: () => String }, date: { required: false, type: () => Date }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object }, street: { required: false, type: () => String }, streetNumber: { required: false, type: () => String }, city: { required: false, type: () => String }, postalCode: { required: false, type: () => String }, country: { required: false, type: () => String }, region: { required: false, type: () => String } };
+        return { name: { required: true, type: () => String }, description: { required: true, type: () => String }, price: { required: false, type: () => String }, date: { required: true, type: () => Date }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object }, street: { required: false, type: () => String }, streetNumber: { required: false, type: () => String }, city: { required: false, type: () => String }, postalCode: { required: false, type: () => String }, country: { required: false, type: () => String }, region: { required: false, type: () => String } };
     }
 }
 __decorate([
@@ -208,8 +208,8 @@ __decorate([
     __metadata("design:type", String)
 ], createActivityDto.prototype, "price", void 0);
 __decorate([
-    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Date)
 ], createActivityDto.prototype, "date", void 0);
 __decorate([

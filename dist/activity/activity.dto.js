@@ -37,6 +37,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsDateString)(),
+    (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Date)
 ], updateActivityDto.prototype, "date", void 0);
 __decorate([
