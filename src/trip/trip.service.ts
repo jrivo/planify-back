@@ -55,6 +55,7 @@ export class TripService {
             url:true
           }
         },
+        address:true
           },
         },
       },

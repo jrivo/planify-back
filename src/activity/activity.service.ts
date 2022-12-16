@@ -18,6 +18,17 @@ export class ActivityService {
             url: true,
           },
         },
+        place: {
+          select: {
+            owner: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
       },
     });
   }
@@ -35,7 +46,13 @@ export class ActivityService {
         address: true,
         place: {
           select: {
-            ownerId: true,
+            owner: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
             type: {
               select: {
                 name: true,

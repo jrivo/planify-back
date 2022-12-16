@@ -58,6 +58,7 @@ let TripService = class TripService {
                                 url: true
                             }
                         },
+                        address: true
                     },
                 },
             },

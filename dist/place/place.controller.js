@@ -25,6 +25,7 @@ const platform_express_1 = require("@nestjs/platform-express");
 const cdn_service_1 = require("../cdn/cdn.service");
 const self_guard_1 = require("../auth/self.guard");
 const self_decorator_1 = require("../auth/self.decorator");
+const utils_1 = require("../utils");
 let PlaceController = class PlaceController {
     constructor(placeService, cdnService) {
         this.placeService = placeService;
@@ -47,9 +48,7 @@ let PlaceController = class PlaceController {
             res.status(200).send(places);
         })
             .catch((err) => {
-            res
-                .status(500)
-                .send((0, errorsHandler_1.prismaErrorHandler)(err));
+            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
     async getById(id, res) {
@@ -76,13 +75,22 @@ let PlaceController = class PlaceController {
             res.status(500).send(err);
         });
     }
-    async getByName(name, res) {
+    async searchPlaces(name, res) {
         this.placeService
-            .getByName(name)
-            .then((place) => {
-            place
-                ? res.status(200).send(place)
-                : res.status(404).send("Place not found");
+            .searchPlaces(name)
+            .then((places) => {
+            if (!places) {
+                res.status(404).send("Place not found");
+            }
+            places = places.map((place) => {
+                return (0, utils_1.redeserialize)(place, [
+                    {
+                        data: place.type.name,
+                        newKey: "placeType",
+                    }
+                ], ["type"]);
+            });
+            res.status(200).send(places);
         })
             .catch((err) => {
             res.status(500).send(err);
@@ -99,7 +107,7 @@ let PlaceController = class PlaceController {
         });
     }
     async create(body, req, res, files) {
-        files ? req = await this.cdnService.upload(req, files) : null;
+        files ? (req = await this.cdnService.upload(req, files)) : null;
         this.placeService
             .create(req, body)
             .then((place) => {
@@ -110,7 +118,7 @@ let PlaceController = class PlaceController {
         });
     }
     async createActivity(id, body, req, res, files) {
-        files ? req = await this.cdnService.upload(req, files) : null;
+        files ? (req = await this.cdnService.upload(req, files)) : null;
         this.placeService
             .createActivity(id, req, body)
             .then((activity) => {
@@ -121,7 +129,7 @@ let PlaceController = class PlaceController {
         });
     }
     async update(id, body, req, res, files) {
-        files ? req = await this.cdnService.upload(req, files) : null;
+        files ? (req = await this.cdnService.upload(req, files)) : null;
         this.placeService
             .update(id, req, body)
             .then((place) => {
@@ -185,7 +193,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
-], PlaceController.prototype, "getByName", null);
+], PlaceController.prototype, "searchPlaces", null);
 __decorate([
     (0, common_1.Get)(":id/activities"),
     openapi.ApiResponse({ status: 200 }),
@@ -253,7 +261,8 @@ __decorate([
 ], PlaceController.prototype, "delete", null);
 PlaceController = __decorate([
     (0, common_1.Controller)("places"),
-    __metadata("design:paramtypes", [place_service_1.PlaceService, cdn_service_1.CdnService])
+    __metadata("design:paramtypes", [place_service_1.PlaceService,
+        cdn_service_1.CdnService])
 ], PlaceController);
 exports.PlaceController = PlaceController;
 //# sourceMappingURL=place.controller.js.map

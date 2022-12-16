@@ -33,6 +33,22 @@ let ActivityController = class ActivityController {
         this.activityService
             .getAll()
             .then((activities) => {
+            activities = activities.map((activity) => {
+                return (0, utils_1.redeserialize)(activity, [
+                    {
+                        data: activity.place.owner.firstName,
+                        newKey: "ownerFirstName",
+                    },
+                    {
+                        data: activity.place.owner.lastName,
+                        newKey: "ownerLastName",
+                    },
+                    {
+                        data: activity.place.owner.id,
+                        newKey: "ownerId",
+                    },
+                ], ["place"]);
+            });
             res.status(200).send(activities);
         })
             .catch((err) => {
@@ -45,11 +61,16 @@ let ActivityController = class ActivityController {
             .then((activity) => {
             activity = (0, utils_1.redeserialize)(activity, [
                 {
-                    data: activity.place.ownerId,
-                    newKey: "ownerId",
+                    data: activity.place.owner.firstName,
+                    newKey: "ownerFirstName",
                 },
                 {
-                    data: activity.place.type.name, newKey: "placeType"
+                    data: activity.place.owner.lastName,
+                    newKey: "ownerLastName",
+                },
+                {
+                    data: activity.place.owner.id,
+                    newKey: "ownerId",
                 }
             ], ["place"]);
             activity
@@ -67,9 +88,7 @@ let ActivityController = class ActivityController {
             res.status(200).send(activities);
         })
             .catch((err) => {
-            res
-                .status(500)
-                .send((0, errorsHandler_1.prismaErrorHandler)(err));
+            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
         });
     }
     async getActivitySubscribers(id, res) {
@@ -105,7 +124,7 @@ let ActivityController = class ActivityController {
         });
     }
     async update(id, body, req, res, files) {
-        files ? req = await this.cdnService.upload(req, files) : null;
+        files ? (req = await this.cdnService.upload(req, files)) : null;
         this.activityService
             .update(id, req, body)
             .then((activity) => {
@@ -208,7 +227,8 @@ __decorate([
 ], ActivityController.prototype, "delete", null);
 ActivityController = __decorate([
     (0, common_1.Controller)("activities"),
-    __metadata("design:paramtypes", [activity_service_1.ActivityService, cdn_service_1.CdnService])
+    __metadata("design:paramtypes", [activity_service_1.ActivityService,
+        cdn_service_1.CdnService])
 ], ActivityController);
 exports.ActivityController = ActivityController;
 //# sourceMappingURL=activity.controller.js.map

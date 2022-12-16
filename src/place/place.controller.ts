@@ -22,10 +22,15 @@ import { AnyFilesInterceptor, FileInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
 import { SelfGuard } from "src/auth/self.guard";
 import { Self } from "src/auth/self.decorator";
+import { deserialize } from "v8";
+import { redeserialize } from "src/utils";
 
 @Controller("places")
 export class PlaceController {
-  constructor(private placeService: PlaceService,private cdnService: CdnService) {}
+  constructor(
+    private placeService: PlaceService,
+    private cdnService: CdnService
+  ) {}
 
   @Get()
   async getAll(@Res() res) {
@@ -39,7 +44,6 @@ export class PlaceController {
       });
   }
 
-
   //TODO: not use prefix /places for the route
   @Get("/merchant/:id")
   async getMerchantPlaces(@Param("id") id: string, @Res() res) {
@@ -49,9 +53,7 @@ export class PlaceController {
         res.status(200).send(places);
       })
       .catch((err) => {
-        res
-          .status(500)
-          .send(prismaErrorHandler(err));
+        res.status(500).send(prismaErrorHandler(err));
       });
   }
 
@@ -60,13 +62,13 @@ export class PlaceController {
     this.placeService
       .getById(id)
       .then((place) => {
-        console.log(place)
+        console.log(place);
         place
           ? res.status(200).send(place)
           : res.status(404).send("Place not found");
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
         res.status(500).send(err);
       });
   }
@@ -84,13 +86,26 @@ export class PlaceController {
   }
 
   @Get("search/:name")
-  async getByName(@Param("name") name: string, @Res() res) {
+  async searchPlaces(@Param("name") name: string, @Res() res) {
     this.placeService
-      .getByName(name)
-      .then((place) => {
-        place
-          ? res.status(200).send(place)
-          : res.status(404).send("Place not found");
+      .searchPlaces(name)
+      .then((places) => {
+        if(!places){
+          res.status(404).send("Place not found");
+        }
+        places = places.map((place) => {
+          return redeserialize(
+            place,
+            [
+              {
+                data: place.type.name,
+                newKey: "placeType",
+              }
+            ],
+            ["type"]
+          );
+        });
+        res.status(200).send(places);
       })
       .catch((err) => {
         res.status(500).send(err);
@@ -119,7 +134,7 @@ export class PlaceController {
     @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
-    files ? req = await this.cdnService.upload(req,files) : null
+    files ? (req = await this.cdnService.upload(req, files)) : null;
     this.placeService
       .create(req, body)
       .then((place) => {
@@ -131,8 +146,8 @@ export class PlaceController {
   }
 
   @Post(":id/activities")
-  @UseGuards(JwtAuthGuard, RolesGuard,SelfGuard)
-  @Self({userIdParam:"id",allowAdmins:false})
+  @UseGuards(JwtAuthGuard, RolesGuard, SelfGuard)
+  @Self({ userIdParam: "id", allowAdmins: false })
   @Roles("ADMIN", "MERCHANT")
   @UseInterceptors(AnyFilesInterceptor())
   //add owner or admin guard
@@ -143,7 +158,7 @@ export class PlaceController {
     @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
-    files ? req = await this.cdnService.upload(req,files) : null
+    files ? (req = await this.cdnService.upload(req, files)) : null;
     this.placeService
       .createActivity(id, req, body)
       .then((activity) => {
@@ -166,9 +181,9 @@ export class PlaceController {
     @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
-    files ? req = await this.cdnService.upload(req,files) : null
+    files ? (req = await this.cdnService.upload(req, files)) : null;
     this.placeService
-      .update(id, req,body)
+      .update(id, req, body)
       .then((place) => {
         res.status(202).send(place);
       })

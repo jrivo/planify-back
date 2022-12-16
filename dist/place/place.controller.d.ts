@@ -10,7 +10,7 @@ export declare class PlaceController {
     getMerchantPlaces(id: string, res: any): Promise<void>;
     getById(id: string, res: any): Promise<void>;
     getByCategory(categoryId: string, res: any): Promise<void>;
-    getByName(name: string, res: any): Promise<void>;
+    searchPlaces(name: string, res: any): Promise<void>;
     getActivities(id: string, res: any): Promise<void>;
     create(body: createPlaceDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;
     createActivity(id: string, body: createActivityDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;

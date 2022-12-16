@@ -24,13 +24,36 @@ import { redeserialize } from "src/utils";
 
 @Controller("activities")
 export class ActivityController {
-  constructor(private activityService: ActivityService,private cdnService: CdnService) {}
+  constructor(
+    private activityService: ActivityService,
+    private cdnService: CdnService
+  ) {}
 
   @Get()
   async getAll(@Res() res) {
     this.activityService
       .getAll()
       .then((activities) => {
+        activities = activities.map((activity) => {
+          return redeserialize(
+            activity,
+            [
+              {
+                data: activity.place.owner.firstName,
+                newKey: "ownerFirstName",
+              },
+              {
+                data: activity.place.owner.lastName,
+                newKey: "ownerLastName",
+              },
+              {
+                data: activity.place.owner.id,
+                newKey: "ownerId",
+              },
+            ],
+            ["place"]
+          );
+        });
         res.status(200).send(activities);
       })
       .catch((err) => {
@@ -43,16 +66,24 @@ export class ActivityController {
     this.activityService
       .getById(id)
       .then((activity) => {
-        //update activity to move activity.place.ownerId to activity.ownerId
-        activity = redeserialize(activity, [
-          {
-            data: activity.place.ownerId,
-            newKey: "ownerId",
-          },
-          {
-            data:activity.place.type.name,newKey:"placeType"
-          }
-        ],["place"]);
+        activity = redeserialize(
+          activity,
+          [
+            {
+              data: activity.place.owner.firstName,
+              newKey: "ownerFirstName",
+            },
+            {
+              data: activity.place.owner.lastName,
+              newKey: "ownerLastName",
+            },
+            {
+              data:activity.place.owner.id,
+              newKey: "ownerId",
+            }
+          ],
+          ["place"]
+        );
         activity
           ? res.status(200).send(activity)
           : res.status(404).send("Activity not found");
@@ -70,9 +101,7 @@ export class ActivityController {
         res.status(200).send(activities);
       })
       .catch((err) => {
-        res
-          .status(500)
-          .send(prismaErrorHandler(err));
+        res.status(500).send(prismaErrorHandler(err));
       });
   }
 
@@ -127,9 +156,9 @@ export class ActivityController {
     @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
-    files ? req = await this.cdnService.upload(req,files) : null
+    files ? (req = await this.cdnService.upload(req, files)) : null;
     this.activityService
-      .update(id,req, body)
+      .update(id, req, body)
       .then((activity) => {
         res.status(202).send(activity);
       })

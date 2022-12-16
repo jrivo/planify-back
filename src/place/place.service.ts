@@ -73,15 +73,20 @@ export class PlaceService {
     });
   }
 
-  async getByName(name: string) {
+  async searchPlaces(searchString: string) {
     return await prisma.place.findMany({
       where: {
         name: {
-          search: name,
+          search: searchString,
         },
       },
       include: {
         address: true,
+        type:{
+          select:{
+            name:true
+          }
+        },
         medias: {
           select: {
             id: true,
