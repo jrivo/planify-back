@@ -14,9 +14,11 @@ const utils_1 = require("../utils");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let PlaceService = class PlaceService {
-    async getAll() {
-        return await prisma.place.findMany({
-            include: {
+    async getAll(categoryId, page, limit, defaultLimit) {
+        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
+        limit = limit ? limit : defaultLimit;
+        const totalPages = Math.ceil((await prisma.place.count()) / limit);
+        let places = await prisma.place.findMany(Object.assign(Object.assign(Object.assign({}, (categoryId ? { where: { placeTypeId: Number(categoryId) } } : "")), { include: {
                 address: true,
                 medias: {
                     select: {
@@ -30,15 +32,20 @@ let PlaceService = class PlaceService {
                         name: true,
                     },
                 },
-            },
-        });
+            }, orderBy: {
+                createdAt: "desc",
+            } }), (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return { places, totalPages };
     }
-    async getMerchantPlaces(id) {
-        return await prisma.place.findMany({
-            where: {
-                ownerId: Number(id),
-            },
-            include: {
+    async getMerchantPlaces(id, categoryId, page, limit, defaultLimit) {
+        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
+        limit = limit ? limit : defaultLimit;
+        const totalPages = Math.ceil((await prisma.place.count({
+            where: Object.assign({ ownerId: Number(id) }, (categoryId ? { placeTypeId: Number(categoryId) } : "")),
+        })) / limit);
+        const places = await prisma.place.findMany(Object.assign({ where: Object.assign({ ownerId: Number(id) }, (categoryId ? { placeTypeId: Number(categoryId) } : "")), include: {
                 address: true,
                 medias: {
                     select: {
@@ -46,8 +53,12 @@ let PlaceService = class PlaceService {
                         url: true,
                     },
                 },
-            },
-        });
+            }, orderBy: {
+                createdAt: "desc",
+            } }, (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return { places, totalPages };
     }
     async getById(id) {
         return await prisma.place.findUnique({
@@ -73,19 +84,22 @@ let PlaceService = class PlaceService {
             },
         });
     }
-    async searchPlaces(searchString) {
-        return await prisma.place.findMany({
-            where: {
-                name: {
+    async searchPlaces(searchString, categoryId, page, limit, defaultLimit) {
+        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
+        limit = limit ? limit : defaultLimit;
+        const totalPages = Math.ceil((await prisma.place.count({
+            where: Object.assign({ name: {
                     search: searchString,
-                },
-            },
-            include: {
+                } }, (categoryId ? { placeTypeId: Number(categoryId) } : "")),
+        })) / limit);
+        const places = await prisma.place.findMany(Object.assign({ where: Object.assign({ name: {
+                    search: searchString,
+                } }, (categoryId ? { placeTypeId: Number(categoryId) } : "")), include: {
                 address: true,
                 type: {
                     select: {
-                        name: true
-                    }
+                        name: true,
+                    },
                 },
                 medias: {
                     select: {
@@ -93,8 +107,12 @@ let PlaceService = class PlaceService {
                         url: true,
                     },
                 },
-            },
-        });
+            }, orderBy: {
+                createdAt: "desc",
+            } }, (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return { places, totalPages };
     }
     async getByCategory(categoryId) {
         return await prisma.place.findMany({
@@ -302,7 +320,7 @@ let PlaceService = class PlaceService {
                     region: body.region,
                     googleAddressId: body.googleAddressId && body.googleAddressId,
                     latitude: body.latitude && parseFloat(body.latitude),
-                    longitude: body.longitude && parseFloat(body.longitude)
+                    longitude: body.longitude && parseFloat(body.longitude),
                 },
             });
         }
@@ -361,6 +379,14 @@ let PlaceService = class PlaceService {
             }
         }
         return activity;
+    }
+    async getOwnerId(id) {
+        return (await prisma.place.findUnique({
+            where: { id: Number(id) },
+            select: {
+                owner: true,
+            },
+        })).owner.id;
     }
 };
 PlaceService = __decorate([

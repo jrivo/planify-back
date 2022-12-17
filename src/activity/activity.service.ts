@@ -153,7 +153,12 @@ export class ActivityService {
   async update(id: string, req: any, body: updateActivityDto) {
     const activity = await prisma.activity.update({
       where: { id: Number(id) },
-      data: body,
+      data: {
+        name: body.name && body.name,
+        description: body.description && body.description,
+        price: body.price && Number(body.price),
+        date: body.date && body.date,
+      },
       include: {
         medias: {
           select: {
@@ -196,12 +201,27 @@ export class ActivityService {
         throw err;
       }
     }
+    return activity;
   }
 
   async delete(id: string) {
     return await prisma.activity.delete({
       where: { id: Number(id) },
     });
+  }
+  async getOwnerId(id: string) {
+    return (
+      await prisma.activity.findUnique({
+        where: { id: Number(id) },
+        select: {
+          place: {
+            select: {
+              ownerId: true,
+            },
+          },
+        },
+      })
+    ).place.ownerId;
   }
 }
 

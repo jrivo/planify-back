@@ -11,19 +11,24 @@ import {
   Put,
   UseInterceptors,
   UploadedFiles,
+  Query,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { createActivityDto, createPlaceDto, updatePlaceDto } from "./place.dto";
+import {
+  createActivityDto,
+  createPlaceDto,
+  getPlacesParamsDto,
+  updatePlaceDto,
+} from "./place.dto";
 import { PlaceService } from "./place.service";
 import { prismaErrorHandler } from "src/prisma/errorsHandler";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { AnyFilesInterceptor, FileInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
-import { SelfGuard } from "src/auth/self.guard";
-import { Self } from "src/auth/self.decorator";
-import { deserialize } from "v8";
 import { redeserialize } from "src/utils";
+import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
+import { Entity } from "src/auth/ownerOrAdmin.decorator";
 
 @Controller("places")
 export class PlaceController {
@@ -33,22 +38,34 @@ export class PlaceController {
   ) {}
 
   @Get()
-  async getAll(@Res() res) {
-    this.placeService
-      .getAll()
-      .then((places) => {
-        res.status(200).send(places);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
+  //TODO: combine search with merchant
+  async getMutiple(@Res() res, @Query() queries: getPlacesParamsDto) {
+    const page = queries.page ? queries.page : null;
+    const limit = queries.limit ? queries.limit : null;
+    const merchantId = queries.merchant ? queries.merchant : null;
+    const search = queries.search ? queries.search : null;
+    const categoryId = queries.category ? queries.category : null;
+    if (merchantId) {
+      return this.getMerchantPlaces(merchantId.toString(), categoryId,res, page, limit);
+    } else if (search) {
+      return this.searchPlaces(search,categoryId, res, page, limit);
+    } else {
+      this.placeService
+        .getAll(categoryId,page, limit, 10)
+        .then((places) => {
+          res.status(200).send(places);
+        })
+        .catch((err) => {
+          res.status(500).send(prismaErrorHandler(err));
+        });
+    }
   }
 
   //TODO: not use prefix /places for the route
-  @Get("/merchant/:id")
-  async getMerchantPlaces(@Param("id") id: string, @Res() res) {
+  // @Get("/merchant/:id")
+  async getMerchantPlaces(id: string, categoryId:string,res, page: number, limit: number) {
     this.placeService
-      .getMerchantPlaces(id)
+      .getMerchantPlaces(id, categoryId,page, limit, 10)
       .then((places) => {
         res.status(200).send(places);
       })
@@ -73,7 +90,7 @@ export class PlaceController {
       });
   }
 
-  @Get("category/:id")
+  // @Get("category/:id")
   async getByCategory(@Param("id") categoryId: string, @Res() res) {
     this.placeService
       .getByCategory(categoryId)
@@ -85,22 +102,22 @@ export class PlaceController {
       });
   }
 
-  @Get("search/:name")
-  async searchPlaces(@Param("name") name: string, @Res() res) {
+  // @Get("search/:name")
+  async searchPlaces(name: string, categoryId:string,res, page: number, limit: number) {
     this.placeService
-      .searchPlaces(name)
+      .searchPlaces(name, categoryId,page, limit, 10)
       .then((places) => {
-        if(!places){
+        if (!places) {
           res.status(404).send("Place not found");
         }
-        places = places.map((place) => {
+        places.places = places.places.map((place) => {
           return redeserialize(
             place,
             [
               {
                 data: place.type.name,
                 newKey: "placeType",
-              }
+              },
             ],
             ["type"]
           );
@@ -146,10 +163,9 @@ export class PlaceController {
   }
 
   @Post(":id/activities")
-  @UseGuards(JwtAuthGuard, RolesGuard, SelfGuard)
-  @Self({ userIdParam: "id", allowAdmins: false })
-  @Roles("ADMIN", "MERCHANT")
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
   @UseInterceptors(AnyFilesInterceptor())
+  @Entity("place")
   //add owner or admin guard
   async createActivity(
     @Param("id") id: string,
@@ -170,8 +186,8 @@ export class PlaceController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MERCHANT")
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @Entity("place")
   @UseInterceptors(AnyFilesInterceptor())
   //add owner or admin guard
   async update(
@@ -192,8 +208,8 @@ export class PlaceController {
       });
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MERCHANT")
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @Entity("place")
   //add owner or admin guard
   @Delete(":id")
   async delete(@Param("id") id: string, @Res() res) {

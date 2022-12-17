@@ -59,3 +59,10 @@ export declare class createActivityDto {
     latitude?: string;
     longitude?: string;
 }
+export declare class getPlacesParamsDto {
+    page: number;
+    limit: number;
+    merchant: number;
+    search: string;
+    category: string;
+}

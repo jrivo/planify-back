@@ -23,27 +23,40 @@ const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
 const platform_express_1 = require("@nestjs/platform-express");
 const cdn_service_1 = require("../cdn/cdn.service");
-const self_guard_1 = require("../auth/self.guard");
-const self_decorator_1 = require("../auth/self.decorator");
 const utils_1 = require("../utils");
+const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
+const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
 let PlaceController = class PlaceController {
     constructor(placeService, cdnService) {
         this.placeService = placeService;
         this.cdnService = cdnService;
     }
-    async getAll(res) {
-        this.placeService
-            .getAll()
-            .then((places) => {
-            res.status(200).send(places);
-        })
-            .catch((err) => {
-            res.status(500).send(err);
-        });
+    async getMutiple(res, queries) {
+        const page = queries.page ? queries.page : null;
+        const limit = queries.limit ? queries.limit : null;
+        const merchantId = queries.merchant ? queries.merchant : null;
+        const search = queries.search ? queries.search : null;
+        const categoryId = queries.category ? queries.category : null;
+        if (merchantId) {
+            return this.getMerchantPlaces(merchantId.toString(), categoryId, res, page, limit);
+        }
+        else if (search) {
+            return this.searchPlaces(search, categoryId, res, page, limit);
+        }
+        else {
+            this.placeService
+                .getAll(categoryId, page, limit, 10)
+                .then((places) => {
+                res.status(200).send(places);
+            })
+                .catch((err) => {
+                res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
+            });
+        }
     }
-    async getMerchantPlaces(id, res) {
+    async getMerchantPlaces(id, categoryId, res, page, limit) {
         this.placeService
-            .getMerchantPlaces(id)
+            .getMerchantPlaces(id, categoryId, page, limit, 10)
             .then((places) => {
             res.status(200).send(places);
         })
@@ -75,19 +88,19 @@ let PlaceController = class PlaceController {
             res.status(500).send(err);
         });
     }
-    async searchPlaces(name, res) {
+    async searchPlaces(name, categoryId, res, page, limit) {
         this.placeService
-            .searchPlaces(name)
+            .searchPlaces(name, categoryId, page, limit, 10)
             .then((places) => {
             if (!places) {
                 res.status(404).send("Place not found");
             }
-            places = places.map((place) => {
+            places.places = places.places.map((place) => {
                 return (0, utils_1.redeserialize)(place, [
                     {
                         data: place.type.name,
                         newKey: "placeType",
-                    }
+                    },
                 ], ["type"]);
             });
             res.status(200).send(places);
@@ -154,19 +167,11 @@ __decorate([
     (0, common_1.Get)(),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, place_dto_1.getPlacesParamsDto]),
     __metadata("design:returntype", Promise)
-], PlaceController.prototype, "getAll", null);
-__decorate([
-    (0, common_1.Get)("/merchant/:id"),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)("id")),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], PlaceController.prototype, "getMerchantPlaces", null);
+], PlaceController.prototype, "getMutiple", null);
 __decorate([
     (0, common_1.Get)(":id"),
     openapi.ApiResponse({ status: 200 }),
@@ -177,23 +182,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "getById", null);
 __decorate([
-    (0, common_1.Get)("category/:id"),
-    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "getByCategory", null);
-__decorate([
-    (0, common_1.Get)("search/:name"),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)("name")),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], PlaceController.prototype, "searchPlaces", null);
 __decorate([
     (0, common_1.Get)(":id/activities"),
     openapi.ApiResponse({ status: 200 }),
@@ -219,10 +213,9 @@ __decorate([
 ], PlaceController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)(":id/activities"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, self_guard_1.SelfGuard),
-    (0, self_decorator_1.Self)({ userIdParam: "id", allowAdmins: false }),
-    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
+    (0, ownerOrAdmin_decorator_1.Entity)("place"),
     openapi.ApiResponse({ status: 201 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
@@ -235,8 +228,8 @@ __decorate([
 ], PlaceController.prototype, "createActivity", null);
 __decorate([
     (0, common_1.Put)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("place"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
@@ -249,8 +242,8 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("place"),
     (0, common_1.Delete)(":id"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),

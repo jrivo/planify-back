@@ -17,13 +17,13 @@ const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 const errorsHandler_1 = require("../prisma/errorsHandler");
-const roles_decorator_1 = require("../auth/roles.decorator");
-const roles_guard_1 = require("../auth/roles.guard");
 const activity_service_1 = require("./activity.service");
 const activity_dto_1 = require("./activity.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const cdn_service_1 = require("../cdn/cdn.service");
 const utils_1 = require("../utils");
+const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
+const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
 let ActivityController = class ActivityController {
     constructor(activityService, cdnService) {
         this.activityService = activityService;
@@ -202,8 +202,8 @@ __decorate([
 __decorate([
     (0, common_1.Put)(":id"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("activity"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
@@ -215,9 +215,9 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ActivityController.prototype, "update", null);
 __decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
     (0, common_1.Delete)(":id"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("activity"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),

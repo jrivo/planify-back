@@ -21,6 +21,8 @@ import { updateActivityDto } from "./activity.dto";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
 import { redeserialize } from "src/utils";
+import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
+import { Entity } from "src/auth/ownerOrAdmin.decorator";
 
 @Controller("activities")
 export class ActivityController {
@@ -146,8 +148,8 @@ export class ActivityController {
 
   @Put(":id")
   @UseInterceptors(AnyFilesInterceptor())
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MERCHANT")
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @Entity("activity")
   //add owner or admin guard
   async update(
     @Param("id") id: string,
@@ -167,10 +169,10 @@ export class ActivityController {
       });
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "MERCHANT")
-  //add owner or admin guard
+  
   @Delete(":id")
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @Entity("activity")
   async delete(@Param("id") id: string, @Res() res) {
     this.activityService
       .delete(id)

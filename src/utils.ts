@@ -25,3 +25,12 @@ export const redeserialize = function (
   keysToDelete.forEach((key) => delete object[key]);
   return object;
 };
+
+export const getPagination = function (page:number,limit:number,defaultLimit:number){
+  let pagination = {};
+    if (page) {
+      limit ? (pagination["take"] = Number(limit)) : (pagination["take"] = defaultLimit);
+      pagination["skip"] = Number((page - 1) * pagination["take"])
+    }
+    return pagination;
+}

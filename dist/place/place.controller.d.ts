@@ -1,16 +1,16 @@
 /// <reference types="multer" />
-import { createActivityDto, createPlaceDto, updatePlaceDto } from "./place.dto";
+import { createActivityDto, createPlaceDto, getPlacesParamsDto, updatePlaceDto } from "./place.dto";
 import { PlaceService } from "./place.service";
 import { CdnService } from "src/cdn/cdn.service";
 export declare class PlaceController {
     private placeService;
     private cdnService;
     constructor(placeService: PlaceService, cdnService: CdnService);
-    getAll(res: any): Promise<void>;
-    getMerchantPlaces(id: string, res: any): Promise<void>;
+    getMutiple(res: any, queries: getPlacesParamsDto): Promise<void>;
+    getMerchantPlaces(id: string, categoryId: string, res: any, page: number, limit: number): Promise<void>;
     getById(id: string, res: any): Promise<void>;
     getByCategory(categoryId: string, res: any): Promise<void>;
-    searchPlaces(name: string, res: any): Promise<void>;
+    searchPlaces(name: string, categoryId: string, res: any, page: number, limit: number): Promise<void>;
     getActivities(id: string, res: any): Promise<void>;
     create(body: createPlaceDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;
     createActivity(id: string, body: createActivityDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;

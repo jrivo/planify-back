@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.redeserialize = exports.sanitizeFileName = exports.generateRandomFileName = void 0;
+exports.getPagination = exports.redeserialize = exports.sanitizeFileName = exports.generateRandomFileName = void 0;
 const generateRandomFileName = function (extension, length = 8) {
     var result = "";
     var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -23,4 +23,13 @@ const redeserialize = function (object, elements, keysToDelete) {
     return object;
 };
 exports.redeserialize = redeserialize;
+const getPagination = function (page, limit, defaultLimit) {
+    let pagination = {};
+    if (page) {
+        limit ? (pagination["take"] = Number(limit)) : (pagination["take"] = defaultLimit);
+        pagination["skip"] = Number((page - 1) * pagination["take"]);
+    }
+    return pagination;
+};
+exports.getPagination = getPagination;
 //# sourceMappingURL=utils.js.map

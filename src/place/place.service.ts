@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
-import { sanitizeFileName } from "src/utils";
+import { getPagination, sanitizeFileName } from "src/utils";
 import { createActivityDto, createPlaceDto, updatePlaceDto } from "./place.dto";
 const { PrismaClient } = require("@prisma/client");
 
@@ -9,9 +9,17 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class PlaceService {
-  async getAll() {
-    //replace place.placeTypeId with placeType.name
-    return await prisma.place.findMany({
+  async getAll(
+    categoryId: string,
+    page: number,
+    limit: number,
+    defaultLimit: number
+  ) {
+    let pagination = getPagination(page, limit, defaultLimit);
+    limit = limit ? limit : defaultLimit;
+    const totalPages = Math.ceil((await prisma.place.count()) / limit);
+    let places = await prisma.place.findMany({
+      ...(categoryId ? { where: { placeTypeId: Number(categoryId) } } : ""),
       include: {
         address: true,
         medias: {
@@ -27,13 +35,37 @@ export class PlaceService {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
+    return { places, totalPages };
   }
 
-  async getMerchantPlaces(id: string) {
-    return await prisma.place.findMany({
+  async getMerchantPlaces(
+    id: string,
+    categoryId: string,
+    page: number,
+    limit: number,
+    defaultLimit: number
+  ) {
+    let pagination = getPagination(page, limit, defaultLimit);
+    limit = limit ? limit : defaultLimit;
+    const totalPages = Math.ceil(
+      (await prisma.place.count({
+        where: {
+          ownerId: Number(id),
+          ...(categoryId ? { placeTypeId: Number(categoryId) } : ""),
+        },
+      })) / limit
+    );
+    const places = await prisma.place.findMany({
       where: {
         ownerId: Number(id),
+        ...(categoryId ? { placeTypeId: Number(categoryId) } : ""),
       },
       include: {
         address: true,
@@ -44,7 +76,14 @@ export class PlaceService {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
+    return { places, totalPages };
   }
 
   async getById(id: string) {
@@ -73,19 +112,38 @@ export class PlaceService {
     });
   }
 
-  async searchPlaces(searchString: string) {
-    return await prisma.place.findMany({
+  async searchPlaces(
+    searchString: string,
+    categoryId: string,
+    page: number,
+    limit: number,
+    defaultLimit: number
+  ) {
+    let pagination = getPagination(page, limit, defaultLimit);
+    limit = limit ? limit : defaultLimit;
+    const totalPages = Math.ceil(
+      (await prisma.place.count({
+        where: {
+          name: {
+            search: searchString,
+          },
+          ...(categoryId ? { placeTypeId: Number(categoryId) } : ""),
+        },
+      })) / limit
+    );
+    const places = await prisma.place.findMany({
       where: {
         name: {
           search: searchString,
         },
+        ...(categoryId ? { placeTypeId: Number(categoryId) } : ""),
       },
       include: {
         address: true,
-        type:{
-          select:{
-            name:true
-          }
+        type: {
+          select: {
+            name: true,
+          },
         },
         medias: {
           select: {
@@ -94,7 +152,14 @@ export class PlaceService {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
+    return { places, totalPages };
   }
 
   async getByCategory(categoryId: string) {
@@ -331,7 +396,7 @@ export class PlaceService {
           region: body.region,
           googleAddressId: body.googleAddressId && body.googleAddressId,
           latitude: body.latitude && parseFloat(body.latitude),
-          longitude: body.longitude && parseFloat(body.longitude)
+          longitude: body.longitude && parseFloat(body.longitude),
         },
       });
     }
@@ -402,5 +467,16 @@ export class PlaceService {
       }
     }
     return activity;
+  }
+
+  async getOwnerId(id: string) {
+    return (
+      await prisma.place.findUnique({
+        where: { id: Number(id) },
+        select: {
+          owner: true,
+        },
+      })
+    ).owner.id;
   }
 }
