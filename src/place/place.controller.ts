@@ -25,7 +25,7 @@ import { PlaceService } from "./place.service";
 import { prismaErrorHandler } from "src/prisma/errorsHandler";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
-import { AnyFilesInterceptor, FileInterceptor } from "@nestjs/platform-express";
+import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
 import { redeserialize } from "src/utils";
 import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";

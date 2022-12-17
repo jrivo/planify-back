@@ -17,8 +17,6 @@ import { UsersController } from "./user/users.controller";
 import { UsersService } from "./user/users.service";
 import { PlaceTypeController } from "./place-type/place-type.controller";
 import { PlaceTypeService } from "./place-type/place-type.service";
-import { APP_GUARD } from "@nestjs/core";
-import { RolesGuard } from "./auth/roles.guard";
 import { ActivityController } from "./activity/activity.controller";
 import { ActivityService } from "./activity/activity.service";
 import { TripService } from "./trip/trip.service";

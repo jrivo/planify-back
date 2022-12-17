@@ -1,11 +1,9 @@
 import { Injectable, CanActivate, ExecutionContext } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { Role, PrismaClient } from "@prisma/client";
+import { Role } from "@prisma/client";
 import { ActivityService } from "src/activity/activity.service";
 import { PlaceService } from "src/place/place.service";
 import { UsersService } from "src/user/users.service";
-
-const prisma = new PrismaClient();
 
 @Injectable()
 export class OwnerOrAdminGuard implements CanActivate {
