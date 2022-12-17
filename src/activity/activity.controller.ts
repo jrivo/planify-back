@@ -11,13 +11,12 @@ import {
   Put,
   UseInterceptors,
   UploadedFiles,
+  Query,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { prismaErrorHandler } from "src/prisma/errorsHandler";
-import { Roles } from "src/auth/roles.decorator";
-import { RolesGuard } from "src/auth/roles.guard";
 import { ActivityService } from "./activity.service";
-import { updateActivityDto } from "./activity.dto";
+import { getActivitiesParamsDto, updateActivityDto } from "./activity.dto";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
 import { redeserialize } from "src/utils";
@@ -32,35 +31,46 @@ export class ActivityController {
   ) {}
 
   @Get()
-  async getAll(@Res() res) {
-    this.activityService
-      .getAll()
-      .then((activities) => {
-        activities = activities.map((activity) => {
-          return redeserialize(
-            activity,
-            [
-              {
-                data: activity.place.owner.firstName,
-                newKey: "ownerFirstName",
-              },
-              {
-                data: activity.place.owner.lastName,
-                newKey: "ownerLastName",
-              },
-              {
-                data: activity.place.owner.id,
-                newKey: "ownerId",
-              },
-            ],
-            ["place"]
-          );
+  async getMultiple(@Res() res, @Query() queries: getActivitiesParamsDto) {
+    const page = queries.page ? queries.page : null;
+    const limit = queries.limit ? queries.limit : null;
+    const merchantId = queries.merchant ? queries.merchant : null;
+    const categoryId = queries.category ? queries.category : null;
+    const search = queries.search ? queries.search : null;
+    if (merchantId) {
+      return this.getMerchantActivities(merchantId.toString(), categoryId,res, page, limit);
+    } else if (search) {
+      return this.searchActivities(search,categoryId, res, page, limit);
+    }else {
+      this.activityService
+        .getAll(categoryId,page, limit, 10)
+        .then((activities) => {
+          activities.activities = activities.activities.map((activity) => {
+            return redeserialize(
+              activity,
+              [
+                {
+                  data: activity.place.owner.firstName,
+                  newKey: "ownerFirstName",
+                },
+                {
+                  data: activity.place.owner.lastName,
+                  newKey: "ownerLastName",
+                },
+                {
+                  data: activity.place.owner.id,
+                  newKey: "ownerId",
+                },
+              ],
+              ["place"]
+            );
+          });
+          res.status(200).send(activities);
+        })
+        .catch((err) => {
+          res.status(500).send(err);
         });
-        res.status(200).send(activities);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
+    }
   }
 
   @Get(":id")
@@ -80,9 +90,9 @@ export class ActivityController {
               newKey: "ownerLastName",
             },
             {
-              data:activity.place.owner.id,
+              data: activity.place.owner.id,
               newKey: "ownerId",
-            }
+            },
           ],
           ["place"]
         );
@@ -95,10 +105,10 @@ export class ActivityController {
       });
   }
 
-  @Get("/merchant/:id")
-  async getMerchantPlaces(@Param("id") id: string, @Res() res) {
+  // @Get("/merchant/:id")
+  async getMerchantActivities(id:string,categoryId:string,res,page:number,limit:number) {
     this.activityService
-      .getMerchantActivities(id)
+      .getMerchantActivities(id,categoryId,page,limit,10)
       .then((activities) => {
         res.status(200).send(activities);
       })
@@ -120,7 +130,7 @@ export class ActivityController {
       });
   }
 
-  @Get("category/:id")
+  // @Get("category/:id")
   async getByCategory(@Param("id") categoryId: string, @Res() res) {
     this.activityService
       .getByCategory(categoryId)
@@ -132,10 +142,10 @@ export class ActivityController {
       });
   }
 
-  @Get("search/:name")
-  async getByName(@Param("name") name: string, @Res() res) {
+  // @Get("search/:name")
+  async searchActivities(name:string, catgeoryId:string,res,page:number,limit:number) {
     this.activityService
-      .getByName(name)
+      .searchActivities(name, catgeoryId,page,limit,10)
       .then((activity) => {
         activity
           ? res.status(200).send(activity)
@@ -169,7 +179,6 @@ export class ActivityController {
       });
   }
 
-  
   @Delete(":id")
   @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
   @Entity("activity")

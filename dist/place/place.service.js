@@ -291,15 +291,20 @@ let PlaceService = class PlaceService {
             where: { id: Number(id) },
         });
     }
-    async getActivities(id) {
-        return await prisma.activity.findMany({
-            where: {
-                placeId: Number(id),
-            },
-            include: {
+    async getActivities(id, search, page, limit, defaultLimit) {
+        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
+        limit = limit ? limit : defaultLimit;
+        const totalPages = Math.ceil((await prisma.activity.count({
+            where: Object.assign({ placeId: Number(id) }, (search ? { name: search } : "")),
+        })) / limit);
+        const activities = await prisma.activity.findMany(Object.assign({ where: Object.assign({ placeId: Number(id) }, (search ? { name: search } : "")), include: {
                 address: true,
-            },
-        });
+            }, orderBy: {
+                createdAt: "desc",
+            } }, (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return { activities, totalPages };
     }
     async createActivity(id, req, body) {
         const isAddress = body.street ||

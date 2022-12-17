@@ -365,15 +365,39 @@ export class PlaceService {
     });
   }
 
-  async getActivities(id: string) {
-    return await prisma.activity.findMany({
+  async getActivities(
+    id: string,
+    search: string,
+    page: number,
+    limit: number,
+    defaultLimit: number
+  ) {
+    let pagination = getPagination(page, limit, defaultLimit);
+    limit = limit ? limit : defaultLimit;
+    const totalPages = Math.ceil(
+      (await prisma.activity.count({
+        where: {
+          placeId: Number(id),
+          ...(search ? { name: search } : ""),
+        },
+      })) / limit
+    );
+    const activities = await prisma.activity.findMany({
       where: {
         placeId: Number(id),
+        ...(search ? { name: search } : ""),
       },
       include: {
         address: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
+    return { activities, totalPages };
   }
 
   async createActivity(id: string, req: any, body: createActivityDto) {

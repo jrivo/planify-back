@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
-import { redeserialize, sanitizeFileName } from "src/utils";
+import { getPagination, redeserialize, sanitizeFileName } from "src/utils";
 import { updateActivityDto } from "./activity.dto";
 const { PrismaClient } = require("@prisma/client");
 
@@ -9,8 +9,17 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class ActivityService {
-  async getAll() {
-    return await prisma.activity.findMany({
+  async getAll(
+    categoryId: string,
+    page: number,
+    limit: number,
+    defaultLimit: number
+  ) {
+    let pagination = getPagination(page, limit, defaultLimit);
+    limit = limit ? limit : defaultLimit;
+    const totalPages = Math.ceil((await prisma.place.count()) / limit);
+    let activities = await prisma.activity.findMany({
+      ...(categoryId ? { where: { placeTypeId: Number(categoryId) } } : ""),
       include: {
         medias: {
           select: {
@@ -30,7 +39,14 @@ export class ActivityService {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
+    return { activities, totalPages };
   }
 
   async getById(id: string) {
@@ -62,23 +78,45 @@ export class ActivityService {
         },
       },
     });
-    // return redeserialize(activity, [
-    //   {
-    //     data: activity.place.ownerId,
-    //     newKey: "ownerId",
-    //   },
-    //   {
-    //     data:activity.place.type.name,newKey:"placeType"
-    //   }
-    // ]);
   }
 
-  async getByName(name: string) {
-    return await prisma.activity.findMany({
+  async searchActivities(
+    searchString: string,
+    categoryId: string,
+    page: number,
+    limit: number,
+    defaultLimit: number
+  ) {
+    let pagination = getPagination(page, limit, defaultLimit);
+    limit = limit ? limit : defaultLimit;
+    const totalPages = Math.ceil(
+      (await prisma.activity.count({
+        where: {
+          name: {
+            search: searchString,
+          },
+          ...(categoryId
+            ? {
+                place: {
+                  placeTypeId: Number(categoryId),
+                },
+              }
+            : ""),
+        },
+      })) / limit
+    );
+    const activities = await prisma.activity.findMany({
       where: {
         name: {
-          search: name,
+          search: searchString,
         },
+        ...(categoryId
+          ? {
+              place: {
+                placeTypeId: Number(categoryId),
+              },
+            }
+          : ""),
       },
       include: {
         medias: {
@@ -88,7 +126,14 @@ export class ActivityService {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
+    return { activities, totalPages };
   }
 
   async getByCategory(categoryId: string) {
@@ -109,12 +154,43 @@ export class ActivityService {
     });
   }
 
-  async getMerchantActivities(id: string) {
-    return await prisma.activity.findMany({
+  async getMerchantActivities(
+    id: string,
+    categoryId: string,
+    page: number,
+    limit: number,
+    defaultLimit: number
+  ) {
+    let pagination = getPagination(page, limit, defaultLimit);
+    limit = limit ? limit : defaultLimit;
+    const totalPages = Math.ceil(
+      (await prisma.activity.count({
+        where: {
+          place: {
+            ownerId: Number(id),
+          },
+          ...(categoryId
+            ? {
+                place: {
+                  placeTypeId: Number(categoryId),
+                },
+              }
+            : ""),
+        },
+      })) / limit
+    );
+    const activities = await prisma.activity.findMany({
       where: {
         place: {
           ownerId: Number(id),
         },
+        ...(categoryId
+          ? {
+              place: {
+                placeTypeId: Number(categoryId),
+              },
+            }
+          : ""),
       },
       include: {
         medias: {
@@ -125,7 +201,14 @@ export class ActivityService {
         },
         address: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
+    return { activities, totalPages };
   }
 
   async getActivitySubscribers(id: string) {

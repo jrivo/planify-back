@@ -66,3 +66,8 @@ export declare class getPlacesParamsDto {
     search: string;
     category: string;
 }
+export declare class getPlaceActivitiesParamsDto {
+    page: number;
+    limit: number;
+    search: string;
+}

@@ -9,8 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateActivityDto = void 0;
+exports.getActivitiesParamsDto = exports.updateActivityDto = void 0;
 const openapi = require("@nestjs/swagger");
+const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class updateActivityDto {
     static _OPENAPI_METADATA_FACTORY() {
@@ -53,4 +54,30 @@ __decorate([
     __metadata("design:type", Object)
 ], updateActivityDto.prototype, "documents", void 0);
 exports.updateActivityDto = updateActivityDto;
+class getActivitiesParamsDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { page: { required: true, type: () => Number }, limit: { required: true, type: () => Number }, merchant: { required: true, type: () => Number }, category: { required: true, type: () => String }, search: { required: true, type: () => String } };
+    }
+}
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", Number)
+], getActivitiesParamsDto.prototype, "page", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", Number)
+], getActivitiesParamsDto.prototype, "limit", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", Number)
+], getActivitiesParamsDto.prototype, "merchant", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", String)
+], getActivitiesParamsDto.prototype, "category", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", String)
+], getActivitiesParamsDto.prototype, "search", void 0);
+exports.getActivitiesParamsDto = getActivitiesParamsDto;
 //# sourceMappingURL=activity.dto.js.map

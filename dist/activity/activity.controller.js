@@ -29,31 +29,44 @@ let ActivityController = class ActivityController {
         this.activityService = activityService;
         this.cdnService = cdnService;
     }
-    async getAll(res) {
-        this.activityService
-            .getAll()
-            .then((activities) => {
-            activities = activities.map((activity) => {
-                return (0, utils_1.redeserialize)(activity, [
-                    {
-                        data: activity.place.owner.firstName,
-                        newKey: "ownerFirstName",
-                    },
-                    {
-                        data: activity.place.owner.lastName,
-                        newKey: "ownerLastName",
-                    },
-                    {
-                        data: activity.place.owner.id,
-                        newKey: "ownerId",
-                    },
-                ], ["place"]);
+    async getMultiple(res, queries) {
+        const page = queries.page ? queries.page : null;
+        const limit = queries.limit ? queries.limit : null;
+        const merchantId = queries.merchant ? queries.merchant : null;
+        const categoryId = queries.category ? queries.category : null;
+        const search = queries.search ? queries.search : null;
+        if (merchantId) {
+            return this.getMerchantActivities(merchantId.toString(), categoryId, res, page, limit);
+        }
+        else if (search) {
+            return this.searchActivities(search, categoryId, res, page, limit);
+        }
+        else {
+            this.activityService
+                .getAll(categoryId, page, limit, 10)
+                .then((activities) => {
+                activities.activities = activities.activities.map((activity) => {
+                    return (0, utils_1.redeserialize)(activity, [
+                        {
+                            data: activity.place.owner.firstName,
+                            newKey: "ownerFirstName",
+                        },
+                        {
+                            data: activity.place.owner.lastName,
+                            newKey: "ownerLastName",
+                        },
+                        {
+                            data: activity.place.owner.id,
+                            newKey: "ownerId",
+                        },
+                    ], ["place"]);
+                });
+                res.status(200).send(activities);
+            })
+                .catch((err) => {
+                res.status(500).send(err);
             });
-            res.status(200).send(activities);
-        })
-            .catch((err) => {
-            res.status(500).send(err);
-        });
+        }
     }
     async getById(id, res) {
         this.activityService
@@ -71,7 +84,7 @@ let ActivityController = class ActivityController {
                 {
                     data: activity.place.owner.id,
                     newKey: "ownerId",
-                }
+                },
             ], ["place"]);
             activity
                 ? res.status(200).send(activity)
@@ -81,9 +94,9 @@ let ActivityController = class ActivityController {
             res.status(500).send(err);
         });
     }
-    async getMerchantPlaces(id, res) {
+    async getMerchantActivities(id, categoryId, res, page, limit) {
         this.activityService
-            .getMerchantActivities(id)
+            .getMerchantActivities(id, categoryId, page, limit, 10)
             .then((activities) => {
             res.status(200).send(activities);
         })
@@ -111,9 +124,9 @@ let ActivityController = class ActivityController {
             res.status(500).send(err);
         });
     }
-    async getByName(name, res) {
+    async searchActivities(name, catgeoryId, res, page, limit) {
         this.activityService
-            .getByName(name)
+            .searchActivities(name, catgeoryId, page, limit, 10)
             .then((activity) => {
             activity
                 ? res.status(200).send(activity)
@@ -149,10 +162,11 @@ __decorate([
     (0, common_1.Get)(),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, activity_dto_1.getActivitiesParamsDto]),
     __metadata("design:returntype", Promise)
-], ActivityController.prototype, "getAll", null);
+], ActivityController.prototype, "getMultiple", null);
 __decorate([
     (0, common_1.Get)(":id"),
     openapi.ApiResponse({ status: 200 }),
@@ -162,15 +176,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ActivityController.prototype, "getById", null);
-__decorate([
-    (0, common_1.Get)("/merchant/:id"),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)("id")),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], ActivityController.prototype, "getMerchantPlaces", null);
 __decorate([
     (0, common_1.Get)(":id/subscribers"),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
@@ -182,23 +187,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], ActivityController.prototype, "getActivitySubscribers", null);
 __decorate([
-    (0, common_1.Get)("category/:id"),
-    openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], ActivityController.prototype, "getByCategory", null);
-__decorate([
-    (0, common_1.Get)("search/:name"),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)("name")),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], ActivityController.prototype, "getByName", null);
 __decorate([
     (0, common_1.Put)(":id"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),

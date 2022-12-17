@@ -17,6 +17,7 @@ import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import {
   createActivityDto,
   createPlaceDto,
+  getPlaceActivitiesParamsDto,
   getPlacesParamsDto,
   updatePlaceDto,
 } from "./place.dto";
@@ -130,9 +131,12 @@ export class PlaceController {
   }
 
   @Get(":id/activities")
-  async getActivities(@Param("id") id: string, @Res() res) {
+  async getActivities(@Param("id") id: string, @Res() res,@Query() queries: getPlaceActivitiesParamsDto) {
+    const page = queries.page ? queries.page : null;
+    const limit = queries.limit ? queries.limit : null;
+    const search = queries.search ? queries.search : null;
     this.placeService
-      .getActivities(id)
+      .getActivities(id,search,page, limit, 10)
       .then((activities) => {
         res.status(200).send(activities);
       })

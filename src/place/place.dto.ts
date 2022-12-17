@@ -263,3 +263,14 @@ export class getPlacesParamsDto {
   @ApiPropertyOptional()
   category: string;
 }
+
+export class getPlaceActivitiesParamsDto {
+  @ApiPropertyOptional()
+  page: number;
+
+  @ApiPropertyOptional()
+  limit: number;
+
+  @ApiPropertyOptional()
+  search: string;
+}

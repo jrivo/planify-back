@@ -109,9 +109,12 @@ let PlaceController = class PlaceController {
             res.status(500).send(err);
         });
     }
-    async getActivities(id, res) {
+    async getActivities(id, res, queries) {
+        const page = queries.page ? queries.page : null;
+        const limit = queries.limit ? queries.limit : null;
+        const search = queries.search ? queries.search : null;
         this.placeService
-            .getActivities(id)
+            .getActivities(id, search, page, limit, 10)
             .then((activities) => {
             res.status(200).send(activities);
         })
@@ -193,8 +196,9 @@ __decorate([
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),
+    __param(2, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:paramtypes", [String, Object, place_dto_1.getPlaceActivitiesParamsDto]),
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "getActivities", null);
 __decorate([

@@ -17,7 +17,10 @@ export declare class PlaceService {
     create(req: any, body: createPlaceDto): Promise<any>;
     update(id: string, req: any, body: updatePlaceDto): Promise<any>;
     delete(id: string): Promise<any>;
-    getActivities(id: string): Promise<any>;
+    getActivities(id: string, search: string, page: number, limit: number, defaultLimit: number): Promise<{
+        activities: any;
+        totalPages: number;
+    }>;
     createActivity(id: string, req: any, body: createActivityDto): Promise<any>;
     getOwnerId(id: string): Promise<any>;
 }

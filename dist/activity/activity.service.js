@@ -14,9 +14,11 @@ const utils_1 = require("../utils");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 let ActivityService = class ActivityService {
-    async getAll() {
-        return await prisma.activity.findMany({
-            include: {
+    async getAll(categoryId, page, limit, defaultLimit) {
+        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
+        limit = limit ? limit : defaultLimit;
+        const totalPages = Math.ceil((await prisma.place.count()) / limit);
+        let activities = await prisma.activity.findMany(Object.assign(Object.assign(Object.assign({}, (categoryId ? { where: { placeTypeId: Number(categoryId) } } : "")), { include: {
                 medias: {
                     select: {
                         id: true,
@@ -34,8 +36,12 @@ let ActivityService = class ActivityService {
                         },
                     },
                 },
-            },
-        });
+            }, orderBy: {
+                createdAt: "desc",
+            } }), (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return { activities, totalPages };
     }
     async getById(id) {
         return await prisma.activity.findUnique({
@@ -67,22 +73,41 @@ let ActivityService = class ActivityService {
             },
         });
     }
-    async getByName(name) {
-        return await prisma.activity.findMany({
-            where: {
-                name: {
-                    search: name,
-                },
-            },
-            include: {
+    async searchActivities(searchString, categoryId, page, limit, defaultLimit) {
+        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
+        limit = limit ? limit : defaultLimit;
+        const totalPages = Math.ceil((await prisma.activity.count({
+            where: Object.assign({ name: {
+                    search: searchString,
+                } }, (categoryId
+                ? {
+                    place: {
+                        placeTypeId: Number(categoryId),
+                    },
+                }
+                : "")),
+        })) / limit);
+        const activities = await prisma.activity.findMany(Object.assign({ where: Object.assign({ name: {
+                    search: searchString,
+                } }, (categoryId
+                ? {
+                    place: {
+                        placeTypeId: Number(categoryId),
+                    },
+                }
+                : "")), include: {
                 medias: {
                     select: {
                         id: true,
                         url: true,
                     },
                 },
-            },
-        });
+            }, orderBy: {
+                createdAt: "desc",
+            } }, (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return { activities, totalPages };
     }
     async getByCategory(categoryId) {
         return await prisma.activity.findMany({
@@ -101,14 +126,29 @@ let ActivityService = class ActivityService {
             },
         });
     }
-    async getMerchantActivities(id) {
-        return await prisma.activity.findMany({
-            where: {
-                place: {
+    async getMerchantActivities(id, categoryId, page, limit, defaultLimit) {
+        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
+        limit = limit ? limit : defaultLimit;
+        const totalPages = Math.ceil((await prisma.activity.count({
+            where: Object.assign({ place: {
                     ownerId: Number(id),
-                },
-            },
-            include: {
+                } }, (categoryId
+                ? {
+                    place: {
+                        placeTypeId: Number(categoryId),
+                    },
+                }
+                : "")),
+        })) / limit);
+        const activities = await prisma.activity.findMany(Object.assign({ where: Object.assign({ place: {
+                    ownerId: Number(id),
+                } }, (categoryId
+                ? {
+                    place: {
+                        placeTypeId: Number(categoryId),
+                    },
+                }
+                : "")), include: {
                 medias: {
                     select: {
                         id: true,
@@ -116,8 +156,12 @@ let ActivityService = class ActivityService {
                     },
                 },
                 address: true,
-            },
-        });
+            }, orderBy: {
+                createdAt: "desc",
+            } }, (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return { activities, totalPages };
     }
     async getActivitySubscribers(id) {
         const trips = await prisma.activity

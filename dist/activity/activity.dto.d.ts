@@ -7,3 +7,10 @@ export declare class updateActivityDto {
     images?: any;
     documents?: any;
 }
+export declare class getActivitiesParamsDto {
+    page: number;
+    limit: number;
+    merchant: number;
+    category: string;
+    search: string;
+}
