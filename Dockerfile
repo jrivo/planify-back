@@ -10,11 +10,10 @@ RUN yarn
 
 COPY . .
 
-RUN cd app; \
-    npx prisma generate --schema=./src/prisma/schema.prisma; \
+RUN npx prisma generate --schema=./src/prisma/schema.prisma; \
     cd ..
     
-# RUN yarn build
+RUN yarn build
 
 
 EXPOSE 5000
