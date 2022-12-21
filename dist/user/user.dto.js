@@ -9,8 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUserDto = void 0;
+exports.GetUsersParamsDto = exports.updateUserDto = void 0;
 const openapi = require("@nestjs/swagger");
+const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class updateUserDto {
     static _OPENAPI_METADATA_FACTORY() {
@@ -82,4 +83,28 @@ __decorate([
     __metadata("design:type", String)
 ], updateUserDto.prototype, "region", void 0);
 exports.updateUserDto = updateUserDto;
+class GetUsersParamsDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { page: { required: true, type: () => Number }, limit: { required: true, type: () => Number }, search: { required: true, type: () => String }, role: { required: true, type: () => String, enum: ["admin", "user", "moderator"] } };
+    }
+}
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", Number)
+], GetUsersParamsDto.prototype, "page", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", Number)
+], GetUsersParamsDto.prototype, "limit", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    __metadata("design:type", String)
+], GetUsersParamsDto.prototype, "search", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)(["admin", "user", "moderator"]),
+    __metadata("design:type", String)
+], GetUsersParamsDto.prototype, "role", void 0);
+exports.GetUsersParamsDto = GetUsersParamsDto;
 //# sourceMappingURL=user.dto.js.map

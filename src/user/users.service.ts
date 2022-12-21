@@ -1,25 +1,59 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType, PrismaClient, Role } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
-import { sanitizeFileName } from "src/utils";
-import { updateUserDto } from "./user.dto";
+import { getPagination, sanitizeFileName } from "src/utils";
+import { GetUsersParamsDto, updateUserDto } from "./user.dto";
 
 const prisma = new PrismaClient();
+const DEFAULT_LIMIT = 10;
+
 @Injectable()
 export class UsersService {
-
-  async getAll() {
-    const users = await prisma.user.findMany({
+  async getAll(queries: GetUsersParamsDto) {
+    const pagination = getPagination(
+      queries.page,
+      queries.limit,
+      DEFAULT_LIMIT
+    );
+    const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
+    const whereConditions = {
+      where: {
+        ...(queries.role ? { role: Role[queries.role.toUpperCase()] } : ""),
+        ...(queries.search
+          ? {
+              OR: [
+                { firstName: { contains: queries.search } },
+                { lastName: { contains: queries.search } },
+                { email: { contains: queries.search } },
+              ],
+            }
+          : ""),
+      },
+    };
+    const totalPages = Math.ceil(
+      (await prisma.user.count({ ...whereConditions })) / limit
+    );
+    let users = await prisma.user.findMany({
+      ...whereConditions,
       include: {
         profilePicture: {
           select: {
             id: true,
             url: true,
-          }
+          },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      ...(pagination
+        ? { take: pagination["take"], skip: pagination["skip"] }
+        : ""),
     });
-    return users.map((user) => exclude(user, "password"));
+    return {
+      users: users.map((user) => exclude(user, "password")),
+      totalPages,
+    };
   }
   async findById(id: string, params: object = null): Promise<any | undefined> {
     const user = await prisma.user.findUnique({
@@ -31,7 +65,7 @@ export class UsersService {
           select: {
             id: true,
             url: true,
-          }
+          },
         },
       },
       ...params,
@@ -77,7 +111,7 @@ export class UsersService {
       },
     });
     if (req.files && req.files.length > 0) {
-      console.log("entered")
+      console.log("entered");
       try {
         const file = req.files[0];
         await prisma.media.create({
@@ -98,7 +132,7 @@ export class UsersService {
         throw err;
       }
     }
-    console.log("will return")
+    console.log("will return");
     return exclude(user, "password");
   }
 

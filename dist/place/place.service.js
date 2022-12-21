@@ -13,12 +13,16 @@ const const_1 = require("../const");
 const utils_1 = require("../utils");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const DEFAULT_LIMIT = 10;
 let PlaceService = class PlaceService {
-    async getAll(categoryId, page, limit, defaultLimit) {
-        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
-        limit = limit ? limit : defaultLimit;
-        const totalPages = Math.ceil((await prisma.place.count()) / limit);
-        let places = await prisma.place.findMany(Object.assign(Object.assign(Object.assign({}, (categoryId ? { where: { placeTypeId: Number(categoryId) } } : "")), { include: {
+    async getAll(queries) {
+        let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
+        const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
+        const whereConditions = {
+            where: Object.assign(Object.assign(Object.assign({}, (queries.category ? { placeTypeId: Number(queries.category) } : "")), (queries.merchant ? { ownerId: Number(queries.merchant) } : "")), (queries.search ? { name: { contains: queries.search } } : "")),
+        };
+        const totalPages = Math.ceil((await prisma.place.count(Object.assign({}, whereConditions))) / limit);
+        let places = await prisma.place.findMany(Object.assign(Object.assign(Object.assign({}, whereConditions), { include: {
                 address: true,
                 medias: {
                     select: {
@@ -35,27 +39,6 @@ let PlaceService = class PlaceService {
             }, orderBy: {
                 createdAt: "desc",
             } }), (pagination
-            ? { take: pagination["take"], skip: pagination["skip"] }
-            : "")));
-        return { places, totalPages };
-    }
-    async getMerchantPlaces(id, categoryId, page, limit, defaultLimit) {
-        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
-        limit = limit ? limit : defaultLimit;
-        const totalPages = Math.ceil((await prisma.place.count({
-            where: Object.assign({ ownerId: Number(id) }, (categoryId ? { placeTypeId: Number(categoryId) } : "")),
-        })) / limit);
-        const places = await prisma.place.findMany(Object.assign({ where: Object.assign({ ownerId: Number(id) }, (categoryId ? { placeTypeId: Number(categoryId) } : "")), include: {
-                address: true,
-                medias: {
-                    select: {
-                        id: true,
-                        url: true,
-                    },
-                },
-            }, orderBy: {
-                createdAt: "desc",
-            } }, (pagination
             ? { take: pagination["take"], skip: pagination["skip"] }
             : "")));
         return { places, totalPages };
@@ -81,52 +64,6 @@ let PlaceService = class PlaceService {
                     },
                 },
                 address: true,
-            },
-        });
-    }
-    async searchPlaces(searchString, categoryId, page, limit, defaultLimit) {
-        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
-        limit = limit ? limit : defaultLimit;
-        const totalPages = Math.ceil((await prisma.place.count({
-            where: Object.assign({ name: {
-                    search: searchString,
-                } }, (categoryId ? { placeTypeId: Number(categoryId) } : "")),
-        })) / limit);
-        const places = await prisma.place.findMany(Object.assign({ where: Object.assign({ name: {
-                    search: searchString,
-                } }, (categoryId ? { placeTypeId: Number(categoryId) } : "")), include: {
-                address: true,
-                type: {
-                    select: {
-                        name: true,
-                    },
-                },
-                medias: {
-                    select: {
-                        id: true,
-                        url: true,
-                    },
-                },
-            }, orderBy: {
-                createdAt: "desc",
-            } }, (pagination
-            ? { take: pagination["take"], skip: pagination["skip"] }
-            : "")));
-        return { places, totalPages };
-    }
-    async getByCategory(categoryId) {
-        return await prisma.place.findMany({
-            where: {
-                placeTypeId: Number(categoryId),
-            },
-            include: {
-                address: true,
-                medias: {
-                    select: {
-                        id: true,
-                        url: true,
-                    },
-                },
             },
         });
     }
@@ -291,13 +228,13 @@ let PlaceService = class PlaceService {
             where: { id: Number(id) },
         });
     }
-    async getActivities(id, search, page, limit, defaultLimit) {
-        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
-        limit = limit ? limit : defaultLimit;
+    async getActivities(id, queries) {
+        let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
+        const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
         const totalPages = Math.ceil((await prisma.activity.count({
-            where: Object.assign({ placeId: Number(id) }, (search ? { name: search } : "")),
+            where: Object.assign({ placeId: Number(id) }, (queries.search ? { name: queries.search } : "")),
         })) / limit);
-        const activities = await prisma.activity.findMany(Object.assign({ where: Object.assign({ placeId: Number(id) }, (search ? { name: search } : "")), include: {
+        const activities = await prisma.activity.findMany(Object.assign({ where: Object.assign({ placeId: Number(id) }, (queries.search ? { name: queries.search } : "")), include: {
                 address: true,
             }, orderBy: {
                 createdAt: "desc",

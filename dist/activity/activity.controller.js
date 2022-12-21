@@ -16,7 +16,6 @@ exports.ActivityController = void 0;
 const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
-const errorsHandler_1 = require("../prisma/errorsHandler");
 const activity_service_1 = require("./activity.service");
 const activity_dto_1 = require("./activity.dto");
 const platform_express_1 = require("@nestjs/platform-express");
@@ -29,44 +28,31 @@ let ActivityController = class ActivityController {
         this.activityService = activityService;
         this.cdnService = cdnService;
     }
-    async getMultiple(res, queries) {
-        const page = queries.page ? queries.page : null;
-        const limit = queries.limit ? queries.limit : null;
-        const merchantId = queries.merchant ? queries.merchant : null;
-        const categoryId = queries.category ? queries.category : null;
-        const search = queries.search ? queries.search : null;
-        if (merchantId) {
-            return this.getMerchantActivities(merchantId.toString(), categoryId, res, page, limit);
-        }
-        else if (search) {
-            return this.searchActivities(search, categoryId, res, page, limit);
-        }
-        else {
-            this.activityService
-                .getAll(categoryId, page, limit, 10)
-                .then((activities) => {
-                activities.activities = activities.activities.map((activity) => {
-                    return (0, utils_1.redeserialize)(activity, [
-                        {
-                            data: activity.place.owner.firstName,
-                            newKey: "ownerFirstName",
-                        },
-                        {
-                            data: activity.place.owner.lastName,
-                            newKey: "ownerLastName",
-                        },
-                        {
-                            data: activity.place.owner.id,
-                            newKey: "ownerId",
-                        },
-                    ], ["place"]);
-                });
-                res.status(200).send(activities);
-            })
-                .catch((err) => {
-                res.status(500).send(err);
+    async getAll(res, queries) {
+        this.activityService
+            .getAll(queries)
+            .then((activities) => {
+            activities.activities = activities.activities.map((activity) => {
+                return (0, utils_1.redeserialize)(activity, [
+                    {
+                        data: activity.place.owner.firstName,
+                        newKey: "ownerFirstName",
+                    },
+                    {
+                        data: activity.place.owner.lastName,
+                        newKey: "ownerLastName",
+                    },
+                    {
+                        data: activity.place.owner.id,
+                        newKey: "ownerId",
+                    },
+                ], ["place"]);
             });
-        }
+            res.status(200).send(activities);
+        })
+            .catch((err) => {
+            res.status(500).send(err);
+        });
     }
     async getById(id, res) {
         this.activityService
@@ -94,16 +80,6 @@ let ActivityController = class ActivityController {
             res.status(500).send(err);
         });
     }
-    async getMerchantActivities(id, categoryId, res, page, limit) {
-        this.activityService
-            .getMerchantActivities(id, categoryId, page, limit, 10)
-            .then((activities) => {
-            res.status(200).send(activities);
-        })
-            .catch((err) => {
-            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
-        });
-    }
     async getActivitySubscribers(id, res) {
         this.activityService
             .getActivitySubscribers(id)
@@ -119,18 +95,6 @@ let ActivityController = class ActivityController {
             .getByCategory(categoryId)
             .then((activities) => {
             res.status(200).send(activities);
-        })
-            .catch((err) => {
-            res.status(500).send(err);
-        });
-    }
-    async searchActivities(name, catgeoryId, res, page, limit) {
-        this.activityService
-            .searchActivities(name, catgeoryId, page, limit, 10)
-            .then((activity) => {
-            activity
-                ? res.status(200).send(activity)
-                : res.status(404).send("Activity not found");
         })
             .catch((err) => {
             res.status(500).send(err);
@@ -166,7 +130,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, activity_dto_1.getActivitiesParamsDto]),
     __metadata("design:returntype", Promise)
-], ActivityController.prototype, "getMultiple", null);
+], ActivityController.prototype, "getAll", null);
 __decorate([
     (0, common_1.Get)(":id"),
     openapi.ApiResponse({ status: 200 }),

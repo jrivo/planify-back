@@ -29,9 +29,9 @@ let UsersController = class UsersController {
         this.userService = userService;
         this.cdnService = cdnService;
     }
-    async getAll(res) {
+    async getAll(res, queries) {
         this.userService
-            .getAll()
+            .getAll(queries)
             .then((users) => {
             res.status(200).send(users);
         })
@@ -71,8 +71,9 @@ __decorate([
     (0, roles_decorator_1.Roles)("ADMIN", "MODERATOR"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Res)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, user_dto_1.GetUsersParamsDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getAll", null);
 __decorate([

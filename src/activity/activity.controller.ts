@@ -31,19 +31,9 @@ export class ActivityController {
   ) {}
 
   @Get()
-  async getMultiple(@Res() res, @Query() queries: getActivitiesParamsDto) {
-    const page = queries.page ? queries.page : null;
-    const limit = queries.limit ? queries.limit : null;
-    const merchantId = queries.merchant ? queries.merchant : null;
-    const categoryId = queries.category ? queries.category : null;
-    const search = queries.search ? queries.search : null;
-    if (merchantId) {
-      return this.getMerchantActivities(merchantId.toString(), categoryId,res, page, limit);
-    } else if (search) {
-      return this.searchActivities(search,categoryId, res, page, limit);
-    }else {
+  async getAll(@Res() res, @Query() queries: getActivitiesParamsDto) {
       this.activityService
-        .getAll(categoryId,page, limit, 10)
+        .getAll(queries)
         .then((activities) => {
           activities.activities = activities.activities.map((activity) => {
             return redeserialize(
@@ -70,7 +60,7 @@ export class ActivityController {
         .catch((err) => {
           res.status(500).send(err);
         });
-    }
+    
   }
 
   @Get(":id")
@@ -105,18 +95,6 @@ export class ActivityController {
       });
   }
 
-  // @Get("/merchant/:id")
-  async getMerchantActivities(id:string,categoryId:string,res,page:number,limit:number) {
-    this.activityService
-      .getMerchantActivities(id,categoryId,page,limit,10)
-      .then((activities) => {
-        res.status(200).send(activities);
-      })
-      .catch((err) => {
-        res.status(500).send(prismaErrorHandler(err));
-      });
-  }
-
   @Get(":id/subscribers")
   @UseGuards(JwtAuthGuard)
   async getActivitySubscribers(@Param("id") id: string, @Res() res) {
@@ -136,20 +114,6 @@ export class ActivityController {
       .getByCategory(categoryId)
       .then((activities) => {
         res.status(200).send(activities);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
-  }
-
-  // @Get("search/:name")
-  async searchActivities(name:string, catgeoryId:string,res,page:number,limit:number) {
-    this.activityService
-      .searchActivities(name, catgeoryId,page,limit,10)
-      .then((activity) => {
-        activity
-          ? res.status(200).send(activity)
-          : res.status(404).send("Activity not found");
       })
       .catch((err) => {
         res.status(500).send(err);

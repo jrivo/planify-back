@@ -11,3 +11,9 @@ export declare class updateUserDto {
     country?: string;
     region?: string;
 }
+export declare class GetUsersParamsDto {
+    page: number;
+    limit: number;
+    search: string;
+    role: string;
+}

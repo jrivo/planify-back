@@ -6,12 +6,10 @@ export declare class ActivityController {
     private activityService;
     private cdnService;
     constructor(activityService: ActivityService, cdnService: CdnService);
-    getMultiple(res: any, queries: getActivitiesParamsDto): Promise<void>;
+    getAll(res: any, queries: getActivitiesParamsDto): Promise<void>;
     getById(id: string, res: any): Promise<void>;
-    getMerchantActivities(id: string, categoryId: string, res: any, page: number, limit: number): Promise<void>;
     getActivitySubscribers(id: string, res: any): Promise<void>;
     getByCategory(categoryId: string, res: any): Promise<void>;
-    searchActivities(name: string, catgeoryId: string, res: any, page: number, limit: number): Promise<void>;
     update(id: string, body: updateActivityDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;
     delete(id: string, res: any): Promise<void>;
 }

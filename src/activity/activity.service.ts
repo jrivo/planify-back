@@ -2,24 +2,38 @@ import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
 import { getPagination, redeserialize, sanitizeFileName } from "src/utils";
-import { updateActivityDto } from "./activity.dto";
+import { getActivitiesParamsDto, updateActivityDto } from "./activity.dto";
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
+const DEFAULT_LIMIT = 10;
 
 @Injectable()
 export class ActivityService {
-  async getAll(
-    categoryId: string,
-    page: number,
-    limit: number,
-    defaultLimit: number
-  ) {
-    let pagination = getPagination(page, limit, defaultLimit);
-    limit = limit ? limit : defaultLimit;
+  async getAll(queries: getActivitiesParamsDto) {
+    let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
+    const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
     const totalPages = Math.ceil((await prisma.place.count()) / limit);
     let activities = await prisma.activity.findMany({
-      ...(categoryId ? { where: { placeTypeId: Number(categoryId) } } : ""),
+      where: {
+        ...(queries.category ? { place:{
+          placeTypeId: Number(queries.category)
+        }} : ""),
+        ...(queries.merchant
+          ? {
+              place: {
+                ownerId: Number(queries.merchant),
+              },
+            }
+          : ""),
+        ...(queries.search
+          ? {
+              name: {
+                contains: queries.search,
+              },
+            }
+          : ""),
+      },
       include: {
         medias: {
           select: {
@@ -80,25 +94,19 @@ export class ActivityService {
     });
   }
 
-  async searchActivities(
-    searchString: string,
-    categoryId: string,
-    page: number,
-    limit: number,
-    defaultLimit: number
-  ) {
-    let pagination = getPagination(page, limit, defaultLimit);
-    limit = limit ? limit : defaultLimit;
+  async searchActivities(queries: getActivitiesParamsDto) {
+    let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
+    const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
     const totalPages = Math.ceil(
       (await prisma.activity.count({
         where: {
           name: {
-            search: searchString,
+            search: queries.search,
           },
-          ...(categoryId
+          ...(queries.category
             ? {
                 place: {
-                  placeTypeId: Number(categoryId),
+                  placeTypeId: Number(queries.category),
                 },
               }
             : ""),
@@ -108,12 +116,12 @@ export class ActivityService {
     const activities = await prisma.activity.findMany({
       where: {
         name: {
-          search: searchString,
+          search: queries.search,
         },
-        ...(categoryId
+        ...(queries.category
           ? {
               place: {
-                placeTypeId: Number(categoryId),
+                placeTypeId: Number(queries.category),
               },
             }
           : ""),
@@ -154,25 +162,19 @@ export class ActivityService {
     });
   }
 
-  async getMerchantActivities(
-    id: string,
-    categoryId: string,
-    page: number,
-    limit: number,
-    defaultLimit: number
-  ) {
-    let pagination = getPagination(page, limit, defaultLimit);
-    limit = limit ? limit : defaultLimit;
+  async getMerchantActivities(queries: getActivitiesParamsDto) {
+    let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
+    const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
     const totalPages = Math.ceil(
       (await prisma.activity.count({
         where: {
           place: {
-            ownerId: Number(id),
+            ownerId: Number(queries.merchant),
           },
-          ...(categoryId
+          ...(queries.category
             ? {
                 place: {
-                  placeTypeId: Number(categoryId),
+                  placeTypeId: Number(queries.category),
                 },
               }
             : ""),
@@ -182,12 +184,12 @@ export class ActivityService {
     const activities = await prisma.activity.findMany({
       where: {
         place: {
-          ownerId: Number(id),
+          ownerId: Number(queries.merchant),
         },
-        ...(categoryId
+        ...(queries.category
           ? {
               place: {
-                placeTypeId: Number(categoryId),
+                placeTypeId: Number(queries.category),
               },
             }
           : ""),

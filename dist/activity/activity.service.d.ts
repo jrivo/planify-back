@@ -1,16 +1,16 @@
-import { updateActivityDto } from "./activity.dto";
+import { getActivitiesParamsDto, updateActivityDto } from "./activity.dto";
 export declare class ActivityService {
-    getAll(categoryId: string, page: number, limit: number, defaultLimit: number): Promise<{
+    getAll(queries: getActivitiesParamsDto): Promise<{
         activities: any;
         totalPages: number;
     }>;
     getById(id: string): Promise<any>;
-    searchActivities(searchString: string, categoryId: string, page: number, limit: number, defaultLimit: number): Promise<{
+    searchActivities(queries: getActivitiesParamsDto): Promise<{
         activities: any;
         totalPages: number;
     }>;
     getByCategory(categoryId: string): Promise<any>;
-    getMerchantActivities(id: string, categoryId: string, page: number, limit: number, defaultLimit: number): Promise<{
+    getMerchantActivities(queries: getActivitiesParamsDto): Promise<{
         activities: any;
         totalPages: number;
     }>;

@@ -12,19 +12,39 @@ const client_1 = require("@prisma/client");
 const const_1 = require("../const");
 const utils_1 = require("../utils");
 const prisma = new client_1.PrismaClient();
+const DEFAULT_LIMIT = 10;
 let UsersService = class UsersService {
-    async getAll() {
-        const users = await prisma.user.findMany({
-            include: {
+    async getAll(queries) {
+        const pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
+        const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
+        const whereConditions = {
+            where: Object.assign(Object.assign({}, (queries.role ? { role: client_1.Role[queries.role.toUpperCase()] } : "")), (queries.search
+                ? {
+                    OR: [
+                        { firstName: { contains: queries.search } },
+                        { lastName: { contains: queries.search } },
+                        { email: { contains: queries.search } },
+                    ],
+                }
+                : "")),
+        };
+        const totalPages = Math.ceil((await prisma.user.count(Object.assign({}, whereConditions))) / limit);
+        let users = await prisma.user.findMany(Object.assign(Object.assign(Object.assign({}, whereConditions), { include: {
                 profilePicture: {
                     select: {
                         id: true,
                         url: true,
-                    }
+                    },
                 },
-            },
-        });
-        return users.map((user) => exclude(user, "password"));
+            }, orderBy: {
+                createdAt: "desc",
+            } }), (pagination
+            ? { take: pagination["take"], skip: pagination["skip"] }
+            : "")));
+        return {
+            users: users.map((user) => exclude(user, "password")),
+            totalPages,
+        };
     }
     async findById(id, params = null) {
         const user = await prisma.user.findUnique(Object.assign({ where: {
@@ -34,7 +54,7 @@ let UsersService = class UsersService {
                     select: {
                         id: true,
                         url: true,
-                    }
+                    },
                 },
             } }, params));
         return exclude(user, "password");

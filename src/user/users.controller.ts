@@ -11,6 +11,7 @@ import {
   Req,
   UseInterceptors,
   UploadedFiles,
+  Query,
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
@@ -19,7 +20,7 @@ import { RolesGuard } from "src/auth/roles.guard";
 import { Self } from "src/auth/self.decorator";
 import { SelfGuard } from "src/auth/self.guard";
 import { CdnService } from "src/cdn/cdn.service";
-import { updateUserDto } from "./user.dto";
+import { GetUsersParamsDto, updateUserDto } from "./user.dto";
 import { UsersService } from "./users.service";
 
 @Controller("users")
@@ -32,9 +33,9 @@ export class UsersController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MODERATOR")
-  async getAll(@Res() res) {
+  async getAll(@Res() res,@Query() queries:GetUsersParamsDto) {
     this.userService
-      .getAll()
+      .getAll(queries)
       .then((users) => {
         res.status(200).send(users);
       })

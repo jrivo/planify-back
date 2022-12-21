@@ -13,12 +13,27 @@ const const_1 = require("../const");
 const utils_1 = require("../utils");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const DEFAULT_LIMIT = 10;
 let ActivityService = class ActivityService {
-    async getAll(categoryId, page, limit, defaultLimit) {
-        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
-        limit = limit ? limit : defaultLimit;
+    async getAll(queries) {
+        let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
+        const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
         const totalPages = Math.ceil((await prisma.place.count()) / limit);
-        let activities = await prisma.activity.findMany(Object.assign(Object.assign(Object.assign({}, (categoryId ? { where: { placeTypeId: Number(categoryId) } } : "")), { include: {
+        let activities = await prisma.activity.findMany(Object.assign({ where: Object.assign(Object.assign(Object.assign({}, (queries.category ? { place: {
+                    placeTypeId: Number(queries.category)
+                } } : "")), (queries.merchant
+                ? {
+                    place: {
+                        ownerId: Number(queries.merchant),
+                    },
+                }
+                : "")), (queries.search
+                ? {
+                    name: {
+                        contains: queries.search,
+                    },
+                }
+                : "")), include: {
                 medias: {
                     select: {
                         id: true,
@@ -38,7 +53,7 @@ let ActivityService = class ActivityService {
                 },
             }, orderBy: {
                 createdAt: "desc",
-            } }), (pagination
+            } }, (pagination
             ? { take: pagination["take"], skip: pagination["skip"] }
             : "")));
         return { activities, totalPages };
@@ -73,26 +88,26 @@ let ActivityService = class ActivityService {
             },
         });
     }
-    async searchActivities(searchString, categoryId, page, limit, defaultLimit) {
-        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
-        limit = limit ? limit : defaultLimit;
+    async searchActivities(queries) {
+        let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
+        const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
         const totalPages = Math.ceil((await prisma.activity.count({
             where: Object.assign({ name: {
-                    search: searchString,
-                } }, (categoryId
+                    search: queries.search,
+                } }, (queries.category
                 ? {
                     place: {
-                        placeTypeId: Number(categoryId),
+                        placeTypeId: Number(queries.category),
                     },
                 }
                 : "")),
         })) / limit);
         const activities = await prisma.activity.findMany(Object.assign({ where: Object.assign({ name: {
-                    search: searchString,
-                } }, (categoryId
+                    search: queries.search,
+                } }, (queries.category
                 ? {
                     place: {
-                        placeTypeId: Number(categoryId),
+                        placeTypeId: Number(queries.category),
                     },
                 }
                 : "")), include: {
@@ -126,26 +141,26 @@ let ActivityService = class ActivityService {
             },
         });
     }
-    async getMerchantActivities(id, categoryId, page, limit, defaultLimit) {
-        let pagination = (0, utils_1.getPagination)(page, limit, defaultLimit);
-        limit = limit ? limit : defaultLimit;
+    async getMerchantActivities(queries) {
+        let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
+        const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
         const totalPages = Math.ceil((await prisma.activity.count({
             where: Object.assign({ place: {
-                    ownerId: Number(id),
-                } }, (categoryId
+                    ownerId: Number(queries.merchant),
+                } }, (queries.category
                 ? {
                     place: {
-                        placeTypeId: Number(categoryId),
+                        placeTypeId: Number(queries.category),
                     },
                 }
                 : "")),
         })) / limit);
         const activities = await prisma.activity.findMany(Object.assign({ where: Object.assign({ place: {
-                    ownerId: Number(id),
-                } }, (categoryId
+                    ownerId: Number(queries.merchant),
+                } }, (queries.category
                 ? {
                     place: {
-                        placeTypeId: Number(categoryId),
+                        placeTypeId: Number(queries.category),
                     },
                 }
                 : "")), include: {

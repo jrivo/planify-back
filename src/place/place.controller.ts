@@ -40,33 +40,9 @@ export class PlaceController {
 
   @Get()
   //TODO: combine search with merchant
-  async getMutiple(@Res() res, @Query() queries: getPlacesParamsDto) {
-    const page = queries.page ? queries.page : null;
-    const limit = queries.limit ? queries.limit : null;
-    const merchantId = queries.merchant ? queries.merchant : null;
-    const search = queries.search ? queries.search : null;
-    const categoryId = queries.category ? queries.category : null;
-    if (merchantId) {
-      return this.getMerchantPlaces(merchantId.toString(), categoryId,res, page, limit);
-    } else if (search) {
-      return this.searchPlaces(search,categoryId, res, page, limit);
-    } else {
-      this.placeService
-        .getAll(categoryId,page, limit, 10)
-        .then((places) => {
-          res.status(200).send(places);
-        })
-        .catch((err) => {
-          res.status(500).send(prismaErrorHandler(err));
-        });
-    }
-  }
-
-  //TODO: not use prefix /places for the route
-  // @Get("/merchant/:id")
-  async getMerchantPlaces(id: string, categoryId:string,res, page: number, limit: number) {
+  async getAll(@Res() res, @Query() queries: getPlacesParamsDto) {
     this.placeService
-      .getMerchantPlaces(id, categoryId,page, limit, 10)
+      .getAll(queries)
       .then((places) => {
         res.status(200).send(places);
       })
@@ -80,7 +56,6 @@ export class PlaceController {
     this.placeService
       .getById(id)
       .then((place) => {
-        console.log(place);
         place
           ? res.status(200).send(place)
           : res.status(404).send("Place not found");
@@ -91,52 +66,14 @@ export class PlaceController {
       });
   }
 
-  // @Get("category/:id")
-  async getByCategory(@Param("id") categoryId: string, @Res() res) {
-    this.placeService
-      .getByCategory(categoryId)
-      .then((places) => {
-        res.status(200).send(places);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
-  }
-
-  // @Get("search/:name")
-  async searchPlaces(name: string, categoryId:string,res, page: number, limit: number) {
-    this.placeService
-      .searchPlaces(name, categoryId,page, limit, 10)
-      .then((places) => {
-        if (!places) {
-          res.status(404).send("Place not found");
-        }
-        places.places = places.places.map((place) => {
-          return redeserialize(
-            place,
-            [
-              {
-                data: place.type.name,
-                newKey: "placeType",
-              },
-            ],
-            ["type"]
-          );
-        });
-        res.status(200).send(places);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
-  }
-
   @Get(":id/activities")
-  async getActivities(@Param("id") id: string, @Res() res,@Query() queries: getPlaceActivitiesParamsDto) {
-    const page = queries.page ? queries.page : null;
-    const limit = queries.limit ? queries.limit : null;
-    const search = queries.search ? queries.search : null;
+  async getActivities(
+    @Param("id") id: string,
+    @Res() res,
+    @Query() queries: getPlaceActivitiesParamsDto
+  ) {
     this.placeService
-      .getActivities(id,search,page, limit, 10)
+      .getActivities(id, queries)
       .then((activities) => {
         res.status(200).send(activities);
       })

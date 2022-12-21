@@ -6,11 +6,8 @@ export declare class PlaceController {
     private placeService;
     private cdnService;
     constructor(placeService: PlaceService, cdnService: CdnService);
-    getMutiple(res: any, queries: getPlacesParamsDto): Promise<void>;
-    getMerchantPlaces(id: string, categoryId: string, res: any, page: number, limit: number): Promise<void>;
+    getAll(res: any, queries: getPlacesParamsDto): Promise<void>;
     getById(id: string, res: any): Promise<void>;
-    getByCategory(categoryId: string, res: any): Promise<void>;
-    searchPlaces(name: string, categoryId: string, res: any, page: number, limit: number): Promise<void>;
     getActivities(id: string, res: any, queries: getPlaceActivitiesParamsDto): Promise<void>;
     create(body: createPlaceDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;
     createActivity(id: string, body: createActivityDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;

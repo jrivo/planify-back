@@ -23,7 +23,6 @@ const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
 const platform_express_1 = require("@nestjs/platform-express");
 const cdn_service_1 = require("../cdn/cdn.service");
-const utils_1 = require("../utils");
 const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
 const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
 let PlaceController = class PlaceController {
@@ -31,32 +30,9 @@ let PlaceController = class PlaceController {
         this.placeService = placeService;
         this.cdnService = cdnService;
     }
-    async getMutiple(res, queries) {
-        const page = queries.page ? queries.page : null;
-        const limit = queries.limit ? queries.limit : null;
-        const merchantId = queries.merchant ? queries.merchant : null;
-        const search = queries.search ? queries.search : null;
-        const categoryId = queries.category ? queries.category : null;
-        if (merchantId) {
-            return this.getMerchantPlaces(merchantId.toString(), categoryId, res, page, limit);
-        }
-        else if (search) {
-            return this.searchPlaces(search, categoryId, res, page, limit);
-        }
-        else {
-            this.placeService
-                .getAll(categoryId, page, limit, 10)
-                .then((places) => {
-                res.status(200).send(places);
-            })
-                .catch((err) => {
-                res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
-            });
-        }
-    }
-    async getMerchantPlaces(id, categoryId, res, page, limit) {
+    async getAll(res, queries) {
         this.placeService
-            .getMerchantPlaces(id, categoryId, page, limit, 10)
+            .getAll(queries)
             .then((places) => {
             res.status(200).send(places);
         })
@@ -68,7 +44,6 @@ let PlaceController = class PlaceController {
         this.placeService
             .getById(id)
             .then((place) => {
-            console.log(place);
             place
                 ? res.status(200).send(place)
                 : res.status(404).send("Place not found");
@@ -78,43 +53,9 @@ let PlaceController = class PlaceController {
             res.status(500).send(err);
         });
     }
-    async getByCategory(categoryId, res) {
-        this.placeService
-            .getByCategory(categoryId)
-            .then((places) => {
-            res.status(200).send(places);
-        })
-            .catch((err) => {
-            res.status(500).send(err);
-        });
-    }
-    async searchPlaces(name, categoryId, res, page, limit) {
-        this.placeService
-            .searchPlaces(name, categoryId, page, limit, 10)
-            .then((places) => {
-            if (!places) {
-                res.status(404).send("Place not found");
-            }
-            places.places = places.places.map((place) => {
-                return (0, utils_1.redeserialize)(place, [
-                    {
-                        data: place.type.name,
-                        newKey: "placeType",
-                    },
-                ], ["type"]);
-            });
-            res.status(200).send(places);
-        })
-            .catch((err) => {
-            res.status(500).send(err);
-        });
-    }
     async getActivities(id, res, queries) {
-        const page = queries.page ? queries.page : null;
-        const limit = queries.limit ? queries.limit : null;
-        const search = queries.search ? queries.search : null;
         this.placeService
-            .getActivities(id, search, page, limit, 10)
+            .getActivities(id, queries)
             .then((activities) => {
             res.status(200).send(activities);
         })
@@ -174,7 +115,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, place_dto_1.getPlacesParamsDto]),
     __metadata("design:returntype", Promise)
-], PlaceController.prototype, "getMutiple", null);
+], PlaceController.prototype, "getAll", null);
 __decorate([
     (0, common_1.Get)(":id"),
     openapi.ApiResponse({ status: 200 }),
@@ -184,13 +125,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PlaceController.prototype, "getById", null);
-__decorate([
-    __param(0, (0, common_1.Param)("id")),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], PlaceController.prototype, "getByCategory", null);
 __decorate([
     (0, common_1.Get)(":id/activities"),
     openapi.ApiResponse({ status: 200 }),
