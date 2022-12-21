@@ -7,9 +7,9 @@ export declare class ActivityController {
     private cdnService;
     constructor(activityService: ActivityService, cdnService: CdnService);
     getAll(res: any, queries: getActivitiesParamsDto): Promise<void>;
+    getSubscribedActivities(req: any, res: any): Promise<void>;
     getById(id: string, res: any): Promise<void>;
     getActivitySubscribers(id: string, res: any): Promise<void>;
-    getByCategory(categoryId: string, res: any): Promise<void>;
     update(id: string, body: updateActivityDto, req: any, res: any, files: Array<Express.Multer.File>): Promise<void>;
     delete(id: string, res: any): Promise<void>;
 }

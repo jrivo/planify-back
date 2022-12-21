@@ -63,6 +63,20 @@ export class ActivityController {
     
   }
 
+  @Get("subscribed")
+  @UseGuards(JwtAuthGuard)
+  async getSubscribedActivities(@Request() req: any, @Res() res) {
+    console.log("ho")
+    this.activityService
+      .getSubscribedActivities(req.user.id)
+      .then((activities) => {
+        res.status(200).send(activities);
+      })
+      .catch((err) => {
+        res.status(500).send(prismaErrorHandler(err));
+      });
+  }
+
   @Get(":id")
   async getById(@Param("id") id: string, @Res() res) {
     this.activityService
@@ -102,18 +116,6 @@ export class ActivityController {
       .getActivitySubscribers(id)
       .then((subscribers) => {
         res.status(200).send(subscribers);
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
-  }
-
-  // @Get("category/:id")
-  async getByCategory(@Param("id") categoryId: string, @Res() res) {
-    this.activityService
-      .getByCategory(categoryId)
-      .then((activities) => {
-        res.status(200).send(activities);
       })
       .catch((err) => {
         res.status(500).send(err);

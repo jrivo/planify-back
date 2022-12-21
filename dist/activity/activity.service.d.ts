@@ -5,6 +5,7 @@ export declare class ActivityService {
         totalPages: number;
     }>;
     getById(id: string): Promise<any>;
+    getSubscribedActivities(userId: string): Promise<any>;
     searchActivities(queries: getActivitiesParamsDto): Promise<{
         activities: any;
         totalPages: number;

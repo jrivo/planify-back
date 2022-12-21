@@ -94,6 +94,36 @@ export class ActivityService {
     });
   }
 
+  async getSubscribedActivities(userId: string) {
+    return await prisma.activity.findMany({
+      where: {
+          trips: {
+            some: {
+              userId: Number(userId),
+            }
+          }
+      },
+      include: {
+        medias: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
+        place: {
+          select: {
+            owner: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
   async searchActivities(queries: getActivitiesParamsDto) {
     let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
     const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
