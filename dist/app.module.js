@@ -32,6 +32,8 @@ const trip_service_1 = require("./trip/trip.service");
 const trip_controller_1 = require("./trip/trip.controller");
 const cdn_service_1 = require("./cdn/cdn.service");
 const jwt_1 = require("@nestjs/jwt");
+const review_controller_1 = require("./review/review.controller");
+const review_service_1 = require("./review/review.service");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -56,6 +58,7 @@ AppModule = __decorate([
             place_type_controller_1.PlaceTypeController,
             activity_controller_1.ActivityController,
             trip_controller_1.TripController,
+            review_controller_1.ReviewController
         ],
         providers: [
             app_service_1.AppService,
@@ -66,7 +69,8 @@ AppModule = __decorate([
             trip_service_1.TripService,
             cdn_service_1.CdnService,
             auth_service_1.AuthService,
-            jwt_1.JwtService
+            jwt_1.JwtService,
+            review_service_1.ReviewService
         ],
     })
 ], AppModule);

@@ -13,7 +13,8 @@ let PlaceModule = class PlaceModule {
 };
 PlaceModule = __decorate([
     (0, common_1.Module)({
-        providers: [place_service_1.PlaceService]
+        providers: [place_service_1.PlaceService],
+        exports: [place_service_1.PlaceService]
     })
 ], PlaceModule);
 exports.PlaceModule = PlaceModule;

@@ -27,7 +27,6 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
-import { redeserialize } from "src/utils";
 import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
 import { Entity } from "src/auth/ownerOrAdmin.decorator";
 
@@ -130,7 +129,6 @@ export class PlaceController {
   @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
   @Entity("place")
   @UseInterceptors(AnyFilesInterceptor())
-  //add owner or admin guard
   async update(
     @Param("id") id: string,
     @Body() body: updatePlaceDto,

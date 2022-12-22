@@ -13,7 +13,8 @@ let ActivityModule = class ActivityModule {
 };
 ActivityModule = __decorate([
     (0, common_1.Module)({
-        providers: [activity_service_1.ActivityService]
+        providers: [activity_service_1.ActivityService],
+        exports: [activity_service_1.ActivityService]
     })
 ], ActivityModule);
 exports.ActivityModule = ActivityModule;

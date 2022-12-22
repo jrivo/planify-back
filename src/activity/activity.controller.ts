@@ -66,7 +66,6 @@ export class ActivityController {
   @Get("subscribed")
   @UseGuards(JwtAuthGuard)
   async getSubscribedActivities(@Request() req: any, @Res() res) {
-    console.log("ho")
     this.activityService
       .getSubscribedActivities(req.user.id)
       .then((activities) => {

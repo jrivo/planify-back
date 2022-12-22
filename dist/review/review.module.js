@@ -9,11 +9,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReviewModule = void 0;
 const common_1 = require("@nestjs/common");
 const review_service_1 = require("./review.service");
+const review_controller_1 = require("./review.controller");
+const users_module_1 = require("../user/users.module");
+const place_module_1 = require("../place/place.module");
+const activity_module_1 = require("../activity/activity.module");
+const cdn_module_1 = require("../cdn/cdn.module");
 let ReviewModule = class ReviewModule {
 };
 ReviewModule = __decorate([
     (0, common_1.Module)({
-        providers: [review_service_1.ReviewService]
+        imports: [users_module_1.UsersModule, place_module_1.PlaceModule, activity_module_1.ActivityModule, cdn_module_1.CdnModule],
+        providers: [review_service_1.ReviewService],
+        controllers: [review_controller_1.ReviewController],
+        exports: [review_service_1.ReviewService],
     })
 ], ReviewModule);
 exports.ReviewModule = ReviewModule;

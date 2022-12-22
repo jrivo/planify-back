@@ -61,7 +61,7 @@ model Review {
   author         User?         @relation(fields: [userId], references: [id])
   googleAuthor  String?
   place          Place        @relation(fields: [placeId], references: [id])
-  rating         Int?
+  rating         Int
   description    String?
   medias         Media[]
   status         ReviewStatus @default(PENDING)
@@ -69,7 +69,6 @@ model Review {
   updatedAt      DateTime     @updatedAt
   userId         Int?
   placeId        Int
-  reviewStatusId Int
 }
 
 // model Message {

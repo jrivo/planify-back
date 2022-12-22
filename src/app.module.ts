@@ -23,6 +23,8 @@ import { TripService } from "./trip/trip.service";
 import { TripController } from "./trip/trip.controller";
 import { CdnService } from "./cdn/cdn.service";
 import { JwtService } from "@nestjs/jwt";
+import { ReviewController } from "./review/review.controller";
+import { ReviewService } from "./review/review.service";
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { JwtService } from "@nestjs/jwt";
     PlaceTypeController,
     ActivityController,
     TripController,
+    ReviewController
   ],
   providers: [
     AppService,
@@ -55,7 +58,8 @@ import { JwtService } from "@nestjs/jwt";
     TripService,
     CdnService,
     AuthService,
-    JwtService
+    JwtService,
+    ReviewService
   ],
 })
 export class AppModule {}

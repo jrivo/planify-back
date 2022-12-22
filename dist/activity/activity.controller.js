@@ -56,7 +56,6 @@ let ActivityController = class ActivityController {
         });
     }
     async getSubscribedActivities(req, res) {
-        console.log("ho");
         this.activityService
             .getSubscribedActivities(req.user.id)
             .then((activities) => {
