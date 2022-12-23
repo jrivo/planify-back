@@ -17,9 +17,11 @@ const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
+const notBlocked_guard_1 = require("../auth/notBlocked.guard");
+const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
+const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
-const self_decorator_1 = require("../auth/self.decorator");
 const self_guard_1 = require("../auth/self.guard");
 const cdn_service_1 = require("../cdn/cdn.service");
 const user_dto_1 = require("./user.dto");
@@ -64,6 +66,54 @@ let UsersController = class UsersController {
             res.status(500).send;
         });
     }
+    async delete(id, res) {
+        this.userService
+            .delete(id)
+            .then((user) => {
+            user
+                ? res.status(200).send(user)
+                : res.status(404).send("User not found");
+        })
+            .catch((err) => {
+            res.status(500).send;
+        });
+    }
+    async updateRole(id, body, res) {
+        this.userService
+            .changeRole(id, body)
+            .then((user) => {
+            user
+                ? res.status(200).send(user)
+                : res.status(404).send("User not found");
+        })
+            .catch((err) => {
+            res.status(500).send;
+        });
+    }
+    async blockUser(id, body, res) {
+        this.userService
+            .updateStatus(id, body)
+            .then((user) => {
+            user
+                ? res.status(200).send(user)
+                : res.status(404).send("User not found");
+        })
+            .catch((err) => {
+            res.status(500).send;
+        });
+    }
+    async updatePassword(id, body, res) {
+        this.userService
+            .updatePassword(id, body)
+            .then((user) => {
+            user
+                ? res.status(200).send("Password updated")
+                : res.status(404).send("User not found");
+        })
+            .catch((err) => {
+            res.status(500).send;
+        });
+    }
 };
 __decorate([
     (0, common_1.Get)(),
@@ -89,8 +139,7 @@ __decorate([
 ], UsersController.prototype, "getById", null);
 __decorate([
     (0, common_1.Put)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, self_guard_1.SelfGuard),
-    (0, self_decorator_1.Self)({ userIdParam: "id", allowAdmins: true }),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
@@ -102,6 +151,52 @@ __decorate([
     __metadata("design:paramtypes", [String, Object, user_dto_1.updateUserDto, Object, Array]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateUser", null);
+__decorate([
+    (0, common_1.Delete)(":id"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("user"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "delete", null);
+__decorate([
+    (0, common_1.Put)(":id/role"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_dto_1.changeUserRoleDto, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateRole", null);
+__decorate([
+    (0, common_1.Put)(":id/status"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MODERATOR"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_dto_1.updateUserStatusDto, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "blockUser", null);
+__decorate([
+    (0, common_1.Put)(":id/password"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, self_guard_1.SelfGuard, notBlocked_guard_1.NotBlockedGuard),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_dto_1.updatePasswordDto, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updatePassword", null);
 UsersController = __decorate([
     (0, common_1.Controller)("users"),
     __metadata("design:paramtypes", [users_service_1.UsersService,

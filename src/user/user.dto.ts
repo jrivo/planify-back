@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Role } from "@prisma/client";
-import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsEmail, IsIn, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Length } from "class-validator";
 
 export class updateUserDto {
 
@@ -72,4 +72,23 @@ export class updateUserDto {
     @IsOptional()
     @IsIn(["admin", "user","moderator"])
     role: string;
+  }
+
+  export class changeUserRoleDto{
+    @IsNotEmpty()
+    @IsIn(["ADMIN", "USER","MODERATOR","MERCHANT"])
+    role: string;
+  }
+
+  export class updateUserStatusDto{
+    @IsNotEmpty()
+    @IsIn(["BLOCKED","BANNED","VERIFIED"])
+    status: string;
+  }
+
+  export class updatePasswordDto{
+    @IsNotEmpty()
+    @IsString()
+    @Length(8)
+    password: string;
   }

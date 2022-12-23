@@ -47,6 +47,7 @@ enum UserStatus {
   UNVERIFIED
   VERIFIED
   INACTIVE
+  BLOCKED
   BANNED
 }
 
@@ -56,19 +57,25 @@ enum ReviewStatus {
   REJECTED
 }
 
+enum ReviewSource {
+  GOOGLE
+  PLANIFY
+}
+
 model Review {
-  id             Int          @id @default(autoincrement())
-  author         User?         @relation(fields: [userId], references: [id])
-  googleAuthor  String?
-  place          Place        @relation(fields: [placeId], references: [id])
-  rating         Int
-  description    String?
-  medias         Media[]
-  status         ReviewStatus @default(PENDING)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  userId         Int?
-  placeId        Int
+  id           Int          @id @default(autoincrement())
+  author       User?        @relation(fields: [userId], references: [id])
+  googleAuthor String?
+  source       ReviewSource @default(PLANIFY)
+  place        Place        @relation(fields: [placeId], references: [id])
+  rating       Int
+  description  String?
+  medias       Media[]
+  status       ReviewStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  userId       Int?
+  placeId      Int
 }
 
 // model Message {
@@ -104,44 +111,44 @@ model Media {
 }
 
 model Place {
-  id          Int        @id @default(autoincrement())
-  name        String
-  owner       User       @relation(fields: [ownerId], references: [id])
-  type        PlaceType? @relation(fields: [placeTypeId], references: [id])
-  description String?
-  address     Address    @relation(fields: [addressId], references: [id])
-  medias      Media[]
-  mainImageId Int?
-  website     String?
-  phone       String?
-  email       String?
-  activities  Activity[]
-  Review      Review[]
-  placeTypeId Int?
-  ownerId     Int
-  addressId   Int
-  rating      Float?
+  id            Int        @id @default(autoincrement())
+  name          String
+  owner         User       @relation(fields: [ownerId], references: [id])
+  type          PlaceType? @relation(fields: [placeTypeId], references: [id])
+  description   String?
+  address       Address    @relation(fields: [addressId], references: [id])
+  medias        Media[]
+  mainImageId   Int?
+  website       String?
+  phone         String?
+  email         String?
+  activities    Activity[]
+  Review        Review[]
+  placeTypeId   Int?
+  ownerId       Int
+  addressId     Int
+  rating        Float?
   googlePlaceId String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 }
 
 model Address {
-  id           Int        @id @default(autoincrement())
-  street       String
-  streetNumber String
-  city         String
-  postalCode   String
-  country      String
-  region       String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  places       Place[]
-  users        User[]
-  latitude  Float?
-  longitude  Float?
+  id              Int        @id @default(autoincrement())
+  street          String
+  streetNumber    String
+  city            String
+  postalCode      String
+  country         String
+  region          String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  places          Place[]
+  users           User[]
+  latitude        Float?
+  longitude       Float?
   googleAddressId String?
-  activities   Activity[]
+  activities      Activity[]
 }
 
 model PlaceType {

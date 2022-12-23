@@ -11,37 +11,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SelfGuard = void 0;
 const common_1 = require("@nestjs/common");
-const core_1 = require("@nestjs/core");
-const client_1 = require("@prisma/client");
-const client_2 = require("@prisma/client");
-const prisma = new client_2.PrismaClient();
 let SelfGuard = class SelfGuard {
-    constructor(reflector) {
-        this.reflector = reflector;
-    }
+    constructor() { }
     async canActivate(context) {
         const request = context.switchToHttp().getRequest();
-        const user = await prisma.user.findUnique({
-            where: { id: request.user.id },
-        });
-        let selfParams = this.reflector.get('selfParams', context.getHandler());
-        if (!selfParams)
-            selfParams = this.reflector.get('selfParams', context.getClass());
-        if (!selfParams)
-            return true;
-        let allowAdmins = selfParams.allowAdmins || true;
-        let userIdParam = selfParams.userIdParam;
-        if (!user)
+        if (!request.user) {
             return false;
-        if (request.params[userIdParam] == user.id)
-            return true;
-        if (allowAdmins && user.role == client_1.Role.ADMIN)
-            return true;
+        }
+        return request.user.id == request.params.id;
     }
 };
 SelfGuard = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [core_1.Reflector])
+    __metadata("design:paramtypes", [])
 ], SelfGuard);
 exports.SelfGuard = SelfGuard;
 //# sourceMappingURL=self.guard.js.map

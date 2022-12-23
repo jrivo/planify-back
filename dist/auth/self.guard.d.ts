@@ -1,7 +1,5 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { CanActivate, ExecutionContext } from "@nestjs/common";
 export declare class SelfGuard implements CanActivate {
-    private readonly reflector;
-    constructor(reflector: Reflector);
+    constructor();
     canActivate(context: ExecutionContext): Promise<boolean>;
 }

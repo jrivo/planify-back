@@ -17,3 +17,12 @@ export declare class GetUsersParamsDto {
     search: string;
     role: string;
 }
+export declare class changeUserRoleDto {
+    role: string;
+}
+export declare class updateUserStatusDto {
+    status: string;
+}
+export declare class updatePasswordDto {
+    password: string;
+}

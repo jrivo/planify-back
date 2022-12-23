@@ -1,8 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { MediaType, PrismaClient, Role } from "@prisma/client";
+import { MediaType, PrismaClient, Role, UserStatus } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
 import { getPagination, sanitizeFileName } from "src/utils";
-import { GetUsersParamsDto, updateUserDto } from "./user.dto";
+import {
+  changeUserRoleDto,
+  GetUsersParamsDto,
+  updatePasswordDto,
+  updateUserDto,
+  updateUserStatusDto,
+} from "./user.dto";
+import * as bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 const DEFAULT_LIMIT = 10;
@@ -83,25 +90,41 @@ export class UsersService {
       ...params,
     });
     // return exclude(user, 'password');
-    return user;
+    return user ? user : null;
   }
 
-  async changeRole(id: string, role: string) {
-    const user = await prisma.user.update({
+  async changeRole(id: string, body: changeUserRoleDto) {
+    const user = await prisma.user.findUnique({
       where: {
         id: Number(id),
       },
+    });
+    if (!user) {
+      return null;
+    }
+    const userUpdated = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
       data: {
-        role: Role[role],
+        role: Role[body.role],
       },
     });
-    return exclude(user, "password");
+    return userUpdated ? exclude(userUpdated, "password") : null;
   }
 
   async update(id: string, req: any, body: updateUserDto) {
-    const user = await prisma.user.update({
+    const user = await prisma.user.findUnique({
       where: {
         id: Number(id),
+      },
+    })
+    if (!user) {
+      return null;
+    }
+    const userUpdated = await prisma.user.update({
+      where: {
+        id: Number(user.id),
       },
       data: {
         firstName: body.firstName && body.firstName,
@@ -125,19 +148,26 @@ export class UsersService {
               "/" +
               file.uploadName,
             type: MediaType.IMAGE,
-            user: { connect: { id: Number(id) } },
+            user: { connect: { id: Number(user.id) } },
           },
         });
       } catch (err) {
         throw err;
       }
     }
-    console.log("will return");
-    return exclude(user, "password");
+    return userUpdated ? exclude(userUpdated, "password") : null;
   }
 
   async delete(id: string) {
-    const user = await prisma.user.update({
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+    })
+    if (!user) {
+      return null;
+    }
+    const deletedUser = await prisma.user.update({
       where: {
         id: Number(id),
       },
@@ -154,7 +184,7 @@ export class UsersService {
         deletedAt: new Date(),
       },
     });
-    return exclude(user, "password");
+    return deletedUser ? exclude(deletedUser, "password") : null;
   }
 
   async getRole(id: string) {
@@ -166,7 +196,59 @@ export class UsersService {
         role: true,
       },
     });
-    return user.role;
+    return user? user.role : null;
+  }
+
+  async getStatus(id: string) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+      select: {
+        status: true,
+      },
+    });
+    return user? user.status : null;
+  }
+
+  async updateStatus(id: string, body: updateUserStatusDto) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (!user) {
+      return null;
+    }
+    const userUpdated = await prisma.user.update({
+      where: {
+        id: Number(user.id),
+      },
+      data: {
+        status: UserStatus[body.status],
+      },
+    });
+    return userUpdated ? exclude(userUpdated, "password") : null;
+  }
+
+  async updatePassword(id: string, body: updatePasswordDto) {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (!user) {
+      return null;
+    }
+    const userUpdated = await prisma.user.update({
+      where: {
+        id: Number(user.id),
+      },
+      data: {
+        password: bcrypt.hashSync(body.password, 10)
+      },
+    });
+    return userUpdated ? exclude(userUpdated, "password") : null;
   }
 }
 

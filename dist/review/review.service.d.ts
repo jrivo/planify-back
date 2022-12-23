@@ -6,7 +6,7 @@ export declare class ReviewService {
     }>;
     getById(id: string): Promise<any>;
     create(req: any, body: createReviewDto): Promise<any>;
-    update(id: string, req: any, body: updateReviewDto): Promise<void>;
+    update(id: string, req: any, body: updateReviewDto): Promise<any>;
     delete(id: string): Promise<any>;
     getOwnerId(id: string): Promise<any>;
 }

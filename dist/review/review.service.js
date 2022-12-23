@@ -25,10 +25,16 @@ let ReviewService = class ReviewService {
         };
         const totalPages = Math.ceil((await prisma.review.count(Object.assign({}, whereConditions))) / limit);
         let reviews = await prisma.review.findMany(Object.assign(Object.assign(Object.assign({}, whereConditions), { include: {
-                medias: {
+                author: {
                     select: {
-                        id: true,
-                        url: true,
+                        firstName: true,
+                        lastName: true,
+                        profilePicture: {
+                            select: {
+                                id: true,
+                                url: true,
+                            },
+                        },
                     },
                 },
             }, orderBy: {
@@ -42,10 +48,16 @@ let ReviewService = class ReviewService {
         return await prisma.review.findUnique({
             where: { id: Number(id) },
             include: {
-                medias: {
+                author: {
                     select: {
-                        id: true,
-                        url: true,
+                        firstName: true,
+                        lastName: true,
+                        profilePicture: {
+                            select: {
+                                id: true,
+                                url: true,
+                            },
+                        },
                     },
                 },
             },
@@ -57,12 +69,26 @@ let ReviewService = class ReviewService {
                 data: Object.assign({ author: {
                         connect: {
                             id: req.user.id,
-                        }
+                        },
                     }, place: {
                         connect: {
                             id: Number(body.placeId),
                         },
                     }, rating: Number(body.rating) }, (body.description ? { description: body.description } : "")),
+                include: {
+                    author: {
+                        select: {
+                            firstName: true,
+                            lastName: true,
+                            profilePicture: {
+                                select: {
+                                    id: true,
+                                    url: true,
+                                },
+                            },
+                        },
+                    },
+                },
             });
             if (req.files) {
                 req.files.foreach(async (file) => {
@@ -89,13 +115,27 @@ let ReviewService = class ReviewService {
         }
         catch (err) {
             console.log(err);
-            throw (err);
+            throw err;
         }
     }
     async update(id, req, body) {
         const review = await prisma.review.update({
             where: { id: Number(id) },
             data: Object.assign(Object.assign({}, (body.rating ? { rating: Number(body.rating) } : "")), (body.description ? { description: body.description } : "")),
+            include: {
+                author: {
+                    select: {
+                        firstName: true,
+                        lastName: true,
+                        profilePicture: {
+                            select: {
+                                id: true,
+                                url: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
         if (req.files) {
             req.files.foreach(async (file) => {
@@ -118,6 +158,7 @@ let ReviewService = class ReviewService {
                 });
             });
         }
+        return review;
     }
     async delete(id) {
         return await prisma.review.delete({

@@ -2,7 +2,11 @@ import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
 import { getPagination, sanitizeFileName } from "src/utils";
-import { createReviewDto, getReviewsParamsDto, updateReviewDto } from "./review.dto";
+import {
+  createReviewDto,
+  getReviewsParamsDto,
+  updateReviewDto,
+} from "./review.dto";
 const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
@@ -29,10 +33,16 @@ export class ReviewService {
     let reviews = await prisma.review.findMany({
       ...whereConditions,
       include: {
-        medias: {
+        author: {
           select: {
-            id: true,
-            url: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: {
+              select: {
+                id: true,
+                url: true,
+              },
+            },
           },
         },
       },
@@ -50,10 +60,16 @@ export class ReviewService {
     return await prisma.review.findUnique({
       where: { id: Number(id) },
       include: {
-        medias: {
+        author: {
           select: {
-            id: true,
-            url: true,
+            firstName: true,
+            lastName: true,
+            profilePicture: {
+              select: {
+                id: true,
+                url: true,
+              },
+            },
           },
         },
       },
@@ -61,60 +77,86 @@ export class ReviewService {
   }
 
   async create(req, body: createReviewDto) {
-    try{
-        const review = await prisma.review.create({
-            data: {
-              author:{
-                  connect: {
-                      id: req.user.id,
-                  }
-              },
-              place: {
-                connect: {
-                  id: Number(body.placeId),
+    try {
+      const review = await prisma.review.create({
+        data: {
+          author: {
+            connect: {
+              id: req.user.id,
+            },
+          },
+          place: {
+            connect: {
+              id: Number(body.placeId),
+            },
+          },
+          rating: Number(body.rating),
+          ...(body.description ? { description: body.description } : ""),
+        },
+        include: {
+          author: {
+            select: {
+              firstName: true,
+              lastName: true,
+              profilePicture: {
+                select: {
+                  id: true,
+                  url: true,
                 },
               },
-              rating: Number(body.rating),
-              ...(body.description ? { description: body.description } : ""),
+            },
+          },
+        },
+      });
+      if (req.files) {
+        req.files.foreach(async (file) => {
+          await prisma.media.create({
+            data: {
+              name: sanitizeFileName(file.originalname),
+              url:
+                "https://" +
+                CDN_STORAGE_ZONE +
+                ".b-cdn.net/" +
+                CDN_STORAGE_PATH +
+                "/" +
+                file.uploadName,
+              type: MediaType.IMAGE,
+              review: {
+                connect: {
+                  id: review.id,
+                },
+              },
             },
           });
-          if (req.files) {
-            req.files.foreach(async (file) => {
-              await prisma.media.create({
-                data: {
-                  name: sanitizeFileName(file.originalname),
-                  url:
-                    "https://" +
-                    CDN_STORAGE_ZONE +
-                    ".b-cdn.net/" +
-                    CDN_STORAGE_PATH +
-                    "/" +
-                    file.uploadName,
-                  type: MediaType.IMAGE,
-                  review: {
-                    connect: {
-                      id: review.id,
-                    },
-                  },
-                },
-              });
-            });
-          }
-          return review;
+        });
+      }
+      return review;
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
-    catch(err){
-        console.log(err)
-        throw(err)
-    }
-
   }
 
-  async update(id: string, req:any, body: updateReviewDto) {
+  async update(id: string, req: any, body: updateReviewDto) {
     const review = await prisma.review.update({
       where: { id: Number(id) },
       data: {
         ...(body.rating ? { rating: Number(body.rating) } : ""),
         ...(body.description ? { description: body.description } : ""),
+      },
+      include: {
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+            profilePicture: {
+              select: {
+                id: true,
+                url: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -140,6 +182,8 @@ export class ReviewService {
         });
       });
     }
+
+    return review;
   }
 
   async delete(id: string) {

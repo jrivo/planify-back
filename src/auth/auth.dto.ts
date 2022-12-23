@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
+  Length,
   MaxLength,
   MinLength,
 } from "class-validator";
@@ -16,6 +17,7 @@ export class LoginDto {
 
   @IsNotEmpty()
   @IsString()
+  @Length(8)
   password: string;
 }
 

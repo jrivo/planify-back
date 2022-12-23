@@ -1,5 +1,5 @@
-import { Role } from "@prisma/client";
-import { GetUsersParamsDto, updateUserDto } from "./user.dto";
+import { Role, UserStatus } from "@prisma/client";
+import { changeUserRoleDto, GetUsersParamsDto, updatePasswordDto, updateUserDto, updateUserStatusDto } from "./user.dto";
 export declare class UsersService {
     getAll(queries: GetUsersParamsDto): Promise<{
         users: Omit<import(".prisma/client").User & {
@@ -12,8 +12,11 @@ export declare class UsersService {
     }>;
     findById(id: string, params?: object): Promise<any | undefined>;
     findByEmail(email: string, params?: object): Promise<any | undefined>;
-    changeRole(id: string, role: string): Promise<Omit<import(".prisma/client").User, "password">>;
+    changeRole(id: string, body: changeUserRoleDto): Promise<Omit<import(".prisma/client").User, "password">>;
     update(id: string, req: any, body: updateUserDto): Promise<Omit<import(".prisma/client").User, "password">>;
     delete(id: string): Promise<Omit<import(".prisma/client").User, "password">>;
     getRole(id: string): Promise<Role>;
+    getStatus(id: string): Promise<UserStatus>;
+    updateStatus(id: string, body: updateUserStatusDto): Promise<Omit<import(".prisma/client").User, "password">>;
+    updatePassword(id: string, body: updatePasswordDto): Promise<Omit<import(".prisma/client").User, "password">>;
 }

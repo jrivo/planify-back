@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GetUsersParamsDto = exports.updateUserDto = void 0;
+exports.updatePasswordDto = exports.updateUserStatusDto = exports.changeUserRoleDto = exports.GetUsersParamsDto = exports.updateUserDto = void 0;
 const openapi = require("@nestjs/swagger");
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
@@ -107,4 +107,38 @@ __decorate([
     __metadata("design:type", String)
 ], GetUsersParamsDto.prototype, "role", void 0);
 exports.GetUsersParamsDto = GetUsersParamsDto;
+class changeUserRoleDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { role: { required: true, type: () => String, enum: ["ADMIN", "USER", "MODERATOR", "MERCHANT"] } };
+    }
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsIn)(["ADMIN", "USER", "MODERATOR", "MERCHANT"]),
+    __metadata("design:type", String)
+], changeUserRoleDto.prototype, "role", void 0);
+exports.changeUserRoleDto = changeUserRoleDto;
+class updateUserStatusDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { status: { required: true, type: () => String, enum: ["BLOCKED", "BANNED", "VERIFIED"] } };
+    }
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsIn)(["BLOCKED", "BANNED", "VERIFIED"]),
+    __metadata("design:type", String)
+], updateUserStatusDto.prototype, "status", void 0);
+exports.updateUserStatusDto = updateUserStatusDto;
+class updatePasswordDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { password: { required: true, type: () => String, minLength: 8 } };
+    }
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Length)(8),
+    __metadata("design:type", String)
+], updatePasswordDto.prototype, "password", void 0);
+exports.updatePasswordDto = updatePasswordDto;
 //# sourceMappingURL=user.dto.js.map

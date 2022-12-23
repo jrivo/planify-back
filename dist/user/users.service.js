@@ -11,6 +11,7 @@ const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
 const const_1 = require("../const");
 const utils_1 = require("../utils");
+const bcrypt = require("bcrypt");
 const prisma = new client_1.PrismaClient();
 const DEFAULT_LIMIT = 10;
 let UsersService = class UsersService {
@@ -63,23 +64,39 @@ let UsersService = class UsersService {
         const user = await prisma.user.findUnique(Object.assign({ where: {
                 email: email,
             } }, params));
-        return user;
+        return user ? user : null;
     }
-    async changeRole(id, role) {
-        const user = await prisma.user.update({
+    async changeRole(id, body) {
+        const user = await prisma.user.findUnique({
             where: {
                 id: Number(id),
-            },
-            data: {
-                role: client_1.Role[role],
             },
         });
-        return exclude(user, "password");
+        if (!user) {
+            return null;
+        }
+        const userUpdated = await prisma.user.update({
+            where: {
+                id: user.id,
+            },
+            data: {
+                role: client_1.Role[body.role],
+            },
+        });
+        return userUpdated ? exclude(userUpdated, "password") : null;
     }
     async update(id, req, body) {
-        const user = await prisma.user.update({
+        const user = await prisma.user.findUnique({
             where: {
                 id: Number(id),
+            },
+        });
+        if (!user) {
+            return null;
+        }
+        const userUpdated = await prisma.user.update({
+            where: {
+                id: Number(user.id),
             },
             data: {
                 firstName: body.firstName && body.firstName,
@@ -102,7 +119,7 @@ let UsersService = class UsersService {
                             "/" +
                             file.uploadName,
                         type: client_1.MediaType.IMAGE,
-                        user: { connect: { id: Number(id) } },
+                        user: { connect: { id: Number(user.id) } },
                     },
                 });
             }
@@ -110,11 +127,18 @@ let UsersService = class UsersService {
                 throw err;
             }
         }
-        console.log("will return");
-        return exclude(user, "password");
+        return userUpdated ? exclude(userUpdated, "password") : null;
     }
     async delete(id) {
-        const user = await prisma.user.update({
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+        });
+        if (!user) {
+            return null;
+        }
+        const deletedUser = await prisma.user.update({
             where: {
                 id: Number(id),
             },
@@ -131,7 +155,7 @@ let UsersService = class UsersService {
                 deletedAt: new Date(),
             },
         });
-        return exclude(user, "password");
+        return deletedUser ? exclude(deletedUser, "password") : null;
     }
     async getRole(id) {
         const user = await prisma.user.findUnique({
@@ -142,7 +166,56 @@ let UsersService = class UsersService {
                 role: true,
             },
         });
-        return user.role;
+        return user ? user.role : null;
+    }
+    async getStatus(id) {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+            select: {
+                status: true,
+            },
+        });
+        return user ? user.status : null;
+    }
+    async updateStatus(id, body) {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+        });
+        if (!user) {
+            return null;
+        }
+        const userUpdated = await prisma.user.update({
+            where: {
+                id: Number(user.id),
+            },
+            data: {
+                status: client_1.UserStatus[body.status],
+            },
+        });
+        return userUpdated ? exclude(userUpdated, "password") : null;
+    }
+    async updatePassword(id, body) {
+        const user = await prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+        });
+        if (!user) {
+            return null;
+        }
+        const userUpdated = await prisma.user.update({
+            where: {
+                id: Number(user.id),
+            },
+            data: {
+                password: bcrypt.hashSync(body.password, 10)
+            },
+        });
+        return userUpdated ? exclude(userUpdated, "password") : null;
     }
 };
 UsersService = __decorate([

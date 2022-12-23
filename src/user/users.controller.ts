@@ -12,15 +12,18 @@ import {
   UseInterceptors,
   UploadedFiles,
   Query,
+  Delete,
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { NotBlockedGuard } from "src/auth/notBlocked.guard";
+import { Entity } from "src/auth/ownerOrAdmin.decorator";
+import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
 import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
-import { Self } from "src/auth/self.decorator";
 import { SelfGuard } from "src/auth/self.guard";
 import { CdnService } from "src/cdn/cdn.service";
-import { GetUsersParamsDto, updateUserDto } from "./user.dto";
+import { changeUserRoleDto, GetUsersParamsDto, updatePasswordDto, updateUserDto, updateUserStatusDto } from "./user.dto";
 import { UsersService } from "./users.service";
 
 @Controller("users")
@@ -61,8 +64,7 @@ export class UsersController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard, SelfGuard)
-  @Self({ userIdParam: "id", allowAdmins: true })
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard,NotBlockedGuard)
   @UseInterceptors(AnyFilesInterceptor())
   async updateUser(
     @Param("id") id: string,
@@ -83,4 +85,68 @@ export class UsersController {
         res.status(500).send;
       });
   }
+
+  @Delete(":id")
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard,NotBlockedGuard)
+  @Entity("user")
+  async delete(@Param("id") id: string, @Res() res) {
+    this.userService
+      .delete(id)
+      .then((user) => {
+        user
+          ? res.status(200).send(user)
+          : res.status(404).send("User not found");
+      })
+      .catch((err) => {
+        res.status(500).send;
+      });
+  }
+
+  @Put(":id/role")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN")
+  async updateRole(@Param("id") id:string, @Body() body: changeUserRoleDto,@Res() res) {
+    this.userService
+      .changeRole(id,body)
+      .then((user) => {
+        user
+          ? res.status(200).send(user)
+          : res.status(404).send("User not found");
+      })
+      .catch((err) => {
+        res.status(500).send;
+      });
+  }
+
+  @Put(":id/status")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("ADMIN","MODERATOR")
+  async blockUser(@Param("id") id:string,@Body() body:updateUserStatusDto,@Res() res) {
+    this.userService
+      .updateStatus(id,body)
+      .then((user) => {
+        user
+          ? res.status(200).send(user)
+          : res.status(404).send("User not found");
+      })
+      .catch((err) => {
+        res.status(500).send;
+      });
+  }
+
+  @Put(":id/password")
+  @UseGuards(JwtAuthGuard, SelfGuard,NotBlockedGuard)
+  async updatePassword(@Param("id") id:string,@Body() body:updatePasswordDto,@Res() res) {
+    this.userService
+      .updatePassword(id,body)
+      .then((user) => {
+        user
+          ? res.status(200).send("Password updated")
+          : res.status(404).send("User not found");
+      })
+      .catch((err) => {
+        res.status(500).send;
+      });
+  }
+
 }

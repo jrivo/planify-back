@@ -14,7 +14,7 @@ const openapi = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class LoginDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { email: { required: true, type: () => String }, password: { required: true, type: () => String } };
+        return { email: { required: true, type: () => String }, password: { required: true, type: () => String, minLength: 8 } };
     }
 }
 __decorate([
@@ -25,6 +25,7 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
+    (0, class_validator_1.Length)(8),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
 exports.LoginDto = LoginDto;

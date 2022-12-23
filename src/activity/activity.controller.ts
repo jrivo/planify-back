@@ -22,6 +22,7 @@ import { CdnService } from "src/cdn/cdn.service";
 import { redeserialize } from "src/utils";
 import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
 import { Entity } from "src/auth/ownerOrAdmin.decorator";
+import { NotBlockedGuard } from "src/auth/notBlocked.guard";
 
 @Controller("activities")
 export class ActivityController {
@@ -123,7 +124,7 @@ export class ActivityController {
 
   @Put(":id")
   @UseInterceptors(AnyFilesInterceptor())
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, NotBlockedGuard)
   @Entity("activity")
   //add owner or admin guard
   async update(
@@ -145,7 +146,7 @@ export class ActivityController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard,NotBlockedGuard)
   @Entity("activity")
   async delete(@Param("id") id: string, @Res() res) {
     this.activityService

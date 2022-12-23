@@ -24,6 +24,7 @@ const cdn_service_1 = require("../cdn/cdn.service");
 const utils_1 = require("../utils");
 const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
 const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
+const notBlocked_guard_1 = require("../auth/notBlocked.guard");
 let ActivityController = class ActivityController {
     constructor(activityService, cdnService) {
         this.activityService = activityService;
@@ -164,7 +165,7 @@ __decorate([
 __decorate([
     (0, common_1.Put)(":id"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
     (0, ownerOrAdmin_decorator_1.Entity)("activity"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
@@ -178,7 +179,7 @@ __decorate([
 ], ActivityController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
     (0, ownerOrAdmin_decorator_1.Entity)("activity"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
