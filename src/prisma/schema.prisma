@@ -29,6 +29,7 @@ model User {
   userStatusId     Int?
   notifications    Notification[]
   trips            Trip[]
+  Settings         UserSettings?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   deletedAt        DateTime?
@@ -67,15 +68,47 @@ model Review {
   author       User?        @relation(fields: [userId], references: [id])
   googleAuthor String?
   source       ReviewSource @default(PLANIFY)
-  place        Place        @relation(fields: [placeId], references: [id])
-  rating       Int
+  place        Place?       @relation(fields: [placeId], references: [id])
+  activity     Activity?    @relation(fields: [activityId], references: [id])
   description  String?
   medias       Media[]
   status       ReviewStatus @default(PENDING)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
   userId       Int?
-  placeId      Int
+  placeId      Int?
+  activityId   Int?
+  ratingId     Int?
+}
+
+enum displayActivitiesMode {
+  ALL
+  NEARBY
+}
+
+model UserSettings {
+  id                Int                   @id @default(autoincrement())
+  user              User                  @relation(fields: [userId], references: [id])
+  userId            Int                   @unique
+  displayActivities displayActivitiesMode @default(ALL)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  one       Int      @default(0)
+  two       Int      @default(0)
+  three     Int      @default(0)
+  four      Int      @default(0)
+  five      Int      @default(0)
+  average   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  place    Place?   @relation(fields: [placeId], references: [id])
+  placeId   Int?   @unique
+  activity Activity? @relation(fields: [activityId], references: [id])
+  activityId Int? @unique
 }
 
 // model Message {
@@ -127,10 +160,11 @@ model Place {
   placeTypeId   Int?
   ownerId       Int
   addressId     Int
-  rating        Float?
+  rating        Rating?   
   googlePlaceId String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
+  ratingId      Int?
 }
 
 model Address {
@@ -175,6 +209,8 @@ model Activity {
   price       Float?
   address     Address?  @relation(fields: [addressId], references: [id])
   addressId   Int?
+  rating      Rating?
+  Review      Review[]
 }
 
 model Notification {

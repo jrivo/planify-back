@@ -19,9 +19,13 @@ let ActivityService = class ActivityService {
         let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
         const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
         const totalPages = Math.ceil((await prisma.place.count()) / limit);
-        let activities = await prisma.activity.findMany(Object.assign({ where: Object.assign(Object.assign(Object.assign({}, (queries.category ? { place: {
-                    placeTypeId: Number(queries.category)
-                } } : "")), (queries.merchant
+        let activities = await prisma.activity.findMany(Object.assign({ where: Object.assign(Object.assign(Object.assign({}, (queries.category
+                ? {
+                    place: {
+                        placeTypeId: Number(queries.category),
+                    },
+                }
+                : "")), (queries.merchant
                 ? {
                     place: {
                         ownerId: Number(queries.merchant),
@@ -56,10 +60,26 @@ let ActivityService = class ActivityService {
             } }, (pagination
             ? { take: pagination["take"], skip: pagination["skip"] }
             : "")));
+        activities = activities.map((activity) => {
+            return (0, utils_1.redeserialize)(activity, [
+                {
+                    data: activity.place.owner.firstName,
+                    newKey: "ownerFirstName",
+                },
+                {
+                    data: activity.place.owner.lastName,
+                    newKey: "ownerLastName",
+                },
+                {
+                    data: activity.place.owner.id,
+                    newKey: "ownerId",
+                },
+            ], ["place"]);
+        });
         return { activities, totalPages };
     }
     async getById(id) {
-        return await prisma.activity.findUnique({
+        const activity = await prisma.activity.findUnique({
             where: { id: Number(id) },
             include: {
                 medias: {
@@ -87,6 +107,22 @@ let ActivityService = class ActivityService {
                 },
             },
         });
+        return activity
+            ? (0, utils_1.redeserialize)(activity, [
+                {
+                    data: activity.place.owner.firstName,
+                    newKey: "ownerFirstName",
+                },
+                {
+                    data: activity.place.owner.lastName,
+                    newKey: "ownerLastName",
+                },
+                {
+                    data: activity.place.owner.id,
+                    newKey: "ownerId",
+                },
+            ], ["place"])
+            : null;
     }
     async getSubscribedActivities(userId) {
         return await prisma.activity.findMany({
@@ -94,8 +130,8 @@ let ActivityService = class ActivityService {
                 trips: {
                     some: {
                         userId: Number(userId),
-                    }
-                }
+                    },
+                },
             },
             include: {
                 medias: {
@@ -209,12 +245,13 @@ let ActivityService = class ActivityService {
         return { activities, totalPages };
     }
     async getActivitySubscribers(id) {
-        const trips = await prisma.activity
+        let trips = await prisma.activity
             .findUnique({
             where: { id: Number(id) },
         })
             .trips({
-            include: {
+            select: {
+                id: true,
                 user: {
                     include: {
                         profilePicture: {
@@ -227,7 +264,12 @@ let ActivityService = class ActivityService {
                 },
             },
         });
-        return trips.map((trip) => exclude(trip.user, "password"));
+        if (!trips)
+            return null;
+        let subscribers = trips.map((trip) => {
+            return Object.assign(Object.assign({}, exclude(trip.user, "password")), { tripId: trip.id });
+        });
+        return subscribers;
     }
     async update(id, req, body) {
         const activity = await prisma.activity.update({

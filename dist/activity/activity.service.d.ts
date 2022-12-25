@@ -4,7 +4,7 @@ export declare class ActivityService {
         activities: any;
         totalPages: number;
     }>;
-    getById(id: string): Promise<any>;
+    getById(id: string): Promise<object>;
     getSubscribedActivities(userId: string): Promise<any>;
     searchActivities(queries: getActivitiesParamsDto): Promise<{
         activities: any;

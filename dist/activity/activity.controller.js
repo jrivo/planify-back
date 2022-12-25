@@ -21,7 +21,6 @@ const activity_service_1 = require("./activity.service");
 const activity_dto_1 = require("./activity.dto");
 const platform_express_1 = require("@nestjs/platform-express");
 const cdn_service_1 = require("../cdn/cdn.service");
-const utils_1 = require("../utils");
 const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
 const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
 const notBlocked_guard_1 = require("../auth/notBlocked.guard");
@@ -34,22 +33,6 @@ let ActivityController = class ActivityController {
         this.activityService
             .getAll(queries)
             .then((activities) => {
-            activities.activities = activities.activities.map((activity) => {
-                return (0, utils_1.redeserialize)(activity, [
-                    {
-                        data: activity.place.owner.firstName,
-                        newKey: "ownerFirstName",
-                    },
-                    {
-                        data: activity.place.owner.lastName,
-                        newKey: "ownerLastName",
-                    },
-                    {
-                        data: activity.place.owner.id,
-                        newKey: "ownerId",
-                    },
-                ], ["place"]);
-            });
             res.status(200).send(activities);
         })
             .catch((err) => {
@@ -70,20 +53,6 @@ let ActivityController = class ActivityController {
         this.activityService
             .getById(id)
             .then((activity) => {
-            activity = (0, utils_1.redeserialize)(activity, [
-                {
-                    data: activity.place.owner.firstName,
-                    newKey: "ownerFirstName",
-                },
-                {
-                    data: activity.place.owner.lastName,
-                    newKey: "ownerLastName",
-                },
-                {
-                    data: activity.place.owner.id,
-                    newKey: "ownerId",
-                },
-            ], ["place"]);
             activity
                 ? res.status(200).send(activity)
                 : res.status(404).send("Activity not found");

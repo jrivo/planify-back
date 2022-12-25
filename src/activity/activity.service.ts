@@ -16,9 +16,13 @@ export class ActivityService {
     const totalPages = Math.ceil((await prisma.place.count()) / limit);
     let activities = await prisma.activity.findMany({
       where: {
-        ...(queries.category ? { place:{
-          placeTypeId: Number(queries.category)
-        }} : ""),
+        ...(queries.category
+          ? {
+              place: {
+                placeTypeId: Number(queries.category),
+              },
+            }
+          : ""),
         ...(queries.merchant
           ? {
               place: {
@@ -60,11 +64,31 @@ export class ActivityService {
         ? { take: pagination["take"], skip: pagination["skip"] }
         : ""),
     });
+    activities = activities.map((activity) => {
+      return redeserialize(
+        activity,
+        [
+          {
+            data: activity.place.owner.firstName,
+            newKey: "ownerFirstName",
+          },
+          {
+            data: activity.place.owner.lastName,
+            newKey: "ownerLastName",
+          },
+          {
+            data: activity.place.owner.id,
+            newKey: "ownerId",
+          },
+        ],
+        ["place"]
+      );
+    });
     return { activities, totalPages };
   }
 
   async getById(id: string) {
-    return await prisma.activity.findUnique({
+    const activity = await prisma.activity.findUnique({
       where: { id: Number(id) },
       include: {
         medias: {
@@ -92,16 +116,36 @@ export class ActivityService {
         },
       },
     });
+    return activity
+      ? redeserialize(
+          activity,
+          [
+            {
+              data: activity.place.owner.firstName,
+              newKey: "ownerFirstName",
+            },
+            {
+              data: activity.place.owner.lastName,
+              newKey: "ownerLastName",
+            },
+            {
+              data: activity.place.owner.id,
+              newKey: "ownerId",
+            },
+          ],
+          ["place"]
+        )
+      : null;
   }
 
   async getSubscribedActivities(userId: string) {
     return await prisma.activity.findMany({
       where: {
-          trips: {
-            some: {
-              userId: Number(userId),
-            }
-          }
+        trips: {
+          some: {
+            userId: Number(userId),
+          },
+        },
       },
       include: {
         medias: {
@@ -244,12 +288,13 @@ export class ActivityService {
   }
 
   async getActivitySubscribers(id: string) {
-    const trips = await prisma.activity
+    let trips = await prisma.activity
       .findUnique({
         where: { id: Number(id) },
       })
       .trips({
-        include: {
+        select: {
+          id: true,
           user: {
             include: {
               profilePicture: {
@@ -262,7 +307,14 @@ export class ActivityService {
           },
         },
       });
-    return trips.map((trip) => exclude(trip.user, "password"));
+    if (!trips) return null;
+    let subscribers = trips.map((trip) => {
+      return {
+        ...exclude(trip.user, "password"),
+        tripId: trip.id,
+      };
+    });
+    return subscribers;
   }
 
   async update(id: string, req: any, body: updateActivityDto) {

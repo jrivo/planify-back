@@ -19,7 +19,6 @@ import { ActivityService } from "./activity.service";
 import { getActivitiesParamsDto, updateActivityDto } from "./activity.dto";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
-import { redeserialize } from "src/utils";
 import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
 import { Entity } from "src/auth/ownerOrAdmin.decorator";
 import { NotBlockedGuard } from "src/auth/notBlocked.guard";
@@ -36,26 +35,6 @@ export class ActivityController {
       this.activityService
         .getAll(queries)
         .then((activities) => {
-          activities.activities = activities.activities.map((activity) => {
-            return redeserialize(
-              activity,
-              [
-                {
-                  data: activity.place.owner.firstName,
-                  newKey: "ownerFirstName",
-                },
-                {
-                  data: activity.place.owner.lastName,
-                  newKey: "ownerLastName",
-                },
-                {
-                  data: activity.place.owner.id,
-                  newKey: "ownerId",
-                },
-              ],
-              ["place"]
-            );
-          });
           res.status(200).send(activities);
         })
         .catch((err) => {
@@ -82,24 +61,6 @@ export class ActivityController {
     this.activityService
       .getById(id)
       .then((activity) => {
-        activity = redeserialize(
-          activity,
-          [
-            {
-              data: activity.place.owner.firstName,
-              newKey: "ownerFirstName",
-            },
-            {
-              data: activity.place.owner.lastName,
-              newKey: "ownerLastName",
-            },
-            {
-              data: activity.place.owner.id,
-              newKey: "ownerId",
-            },
-          ],
-          ["place"]
-        );
         activity
           ? res.status(200).send(activity)
           : res.status(404).send("Activity not found");
