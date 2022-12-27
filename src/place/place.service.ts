@@ -439,13 +439,18 @@ export class PlaceService {
       five: rating[5],
       average: rating["average"],
     };
-    prisma.rating.upsert({
+    console.log("will update rating", updateBody)
+    await prisma.rating.upsert({
       where: { placeId: Number(placeId) },
       update: updateBody,
       create: {
         place: { connect: { id: Number(placeId) } },
         ...updateBody,
       },
-    });
+    }).then((res) => {
+      console.log("updated rating", res)
+    }).catch((err) => {
+      console.log("error updating rating", err)
+      });
   }
 }

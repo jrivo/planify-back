@@ -164,7 +164,6 @@ export class ReviewService {
         },
       });
       if (req.files) {
-        console.log(req.files)
         req.files.forEach(async (file) => {
           await prisma.media.create({
             data: {

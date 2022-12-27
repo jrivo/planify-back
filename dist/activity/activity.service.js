@@ -383,7 +383,7 @@ let ActivityService = class ActivityService {
             average: rating["average"],
         };
         console.log(updateBody);
-        prisma.rating.upsert({
+        await prisma.rating.upsert({
             where: { activityId: Number(activityId) },
             update: updateBody,
             create: Object.assign({ activity: { connect: { id: Number(activityId) } } }, updateBody),
