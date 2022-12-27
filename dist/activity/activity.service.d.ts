@@ -19,4 +19,5 @@ export declare class ActivityService {
     update(id: string, req: any, body: updateActivityDto): Promise<any>;
     delete(id: string): Promise<any>;
     getOwnerId(id: string): Promise<any>;
+    refreshRating(activityId: string): Promise<void>;
 }

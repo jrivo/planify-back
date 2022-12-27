@@ -8,9 +8,15 @@ import {
 } from "class-validator";
 
 export class createReviewDto {
+  @IsOptional()
   @IsNumberString()
   @IsNotEmpty()
-  placeId: string;
+  placeId?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  @IsNotEmpty()
+  activityId?: string;
 
   @IsNumberString()
   @IsNotEmpty()

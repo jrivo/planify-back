@@ -36,6 +36,7 @@ let PlaceService = class PlaceService {
                         name: true,
                     },
                 },
+                rating: true,
             }, orderBy: {
                 createdAt: "desc",
             } }), (pagination
@@ -64,6 +65,7 @@ let PlaceService = class PlaceService {
                     },
                 },
                 address: true,
+                rating: true,
             },
         });
     }
@@ -173,7 +175,6 @@ let PlaceService = class PlaceService {
                     },
                 });
             }
-            console.log("FILES", req.files);
             if (req.files && req.files.length > 0) {
                 try {
                     req.files.forEach(async (file) => {
@@ -329,6 +330,41 @@ let PlaceService = class PlaceService {
                 owner: true,
             },
         })).owner.id;
+    }
+    async refreshRating(placeId) {
+        const reviews = await prisma.review.findMany({
+            where: {
+                placeId: Number(placeId),
+            },
+            select: {
+                rating: true,
+            },
+        });
+        const rating = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, average: 0 };
+        const ratedReviews = reviews.filter((review) => review.rating != null);
+        ratedReviews.map((review) => {
+            rating[review.rating] += 1;
+        });
+        rating["average"] =
+            (rating[1] +
+                rating[2] * 2 +
+                rating[3] * 3 +
+                rating[4] * 4 +
+                rating[5] * 5) /
+                ratedReviews.length;
+        const updateBody = {
+            one: rating[1],
+            two: rating[2],
+            three: rating[3],
+            four: rating[4],
+            five: rating[5],
+            average: rating["average"],
+        };
+        prisma.rating.upsert({
+            where: { placeId: Number(placeId) },
+            update: updateBody,
+            create: Object.assign({ place: { connect: { id: Number(placeId) } } }, updateBody),
+        });
     }
 };
 PlaceService = __decorate([

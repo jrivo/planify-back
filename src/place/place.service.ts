@@ -2,7 +2,12 @@ import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
 import { getActivitiesParamsDto } from "src/activity/activity.dto";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
-import { getPagination, redeserialize, sanitizeFileName } from "src/utils";
+import {
+  flattenObject,
+  getPagination,
+  removeObjectKeys,
+  sanitizeFileName,
+} from "src/utils";
 import {
   createActivityDto,
   createPlaceDto,
@@ -28,7 +33,7 @@ export class PlaceService {
       },
     };
     const totalPages = Math.ceil(
-      (await prisma.place.count({...whereConditions})) / limit
+      (await prisma.place.count({ ...whereConditions })) / limit
     );
     let places = await prisma.place.findMany({
       ...whereConditions,
@@ -46,6 +51,7 @@ export class PlaceService {
             name: true,
           },
         },
+        rating: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -54,6 +60,10 @@ export class PlaceService {
         ? { take: pagination["take"], skip: pagination["skip"] }
         : ""),
     });
+    // places = places.map((place) => {
+    //   place = flattenObject(place);
+    //   return removeObjectKeys(place, ["addressId", "placeTypeId"]);
+    // });
     return { places, totalPages };
   }
 
@@ -63,7 +73,6 @@ export class PlaceService {
       include: {
         activities: {
           include: {
-            //TODO: add address to activity
             medias: {
               select: {
                 id: true,
@@ -79,6 +88,7 @@ export class PlaceService {
           },
         },
         address: true,
+        rating: true,
       },
     });
   }
@@ -208,7 +218,6 @@ export class PlaceService {
         });
       }
 
-      console.log("FILES", req.files);
       if (req.files && req.files.length > 0) {
         try {
           req.files.forEach(async (file) => {
@@ -224,7 +233,6 @@ export class PlaceService {
                 type = MediaType.DOCUMENT;
                 break;
             }
-            //TODO: add mainImage ID to place
             await prisma.media.create({
               data: {
                 name: sanitizeFileName(file.originalname),
@@ -400,5 +408,44 @@ export class PlaceService {
         },
       })
     ).owner.id;
+  }
+
+  async refreshRating(placeId: string) {
+    const reviews = await prisma.review.findMany({
+      where: {
+        placeId: Number(placeId),
+      },
+      select: {
+        rating: true,
+      },
+    });
+    const rating = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, average: 0 };
+    const ratedReviews = reviews.filter((review) => review.rating != null);
+    ratedReviews.map((review) => {
+      rating[review.rating] += 1;
+    });
+    rating["average"] =
+      (rating[1] +
+        rating[2] * 2 +
+        rating[3] * 3 +
+        rating[4] * 4 +
+        rating[5] * 5) /
+      ratedReviews.length;
+    const updateBody = {
+      one: rating[1],
+      two: rating[2],
+      three: rating[3],
+      four: rating[4],
+      five: rating[5],
+      average: rating["average"],
+    };
+    prisma.rating.upsert({
+      where: { placeId: Number(placeId) },
+      update: updateBody,
+      create: {
+        place: { connect: { id: Number(placeId) } },
+        ...updateBody,
+      },
+    });
   }
 }

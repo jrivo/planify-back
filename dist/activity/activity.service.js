@@ -44,6 +44,7 @@ let ActivityService = class ActivityService {
                         url: true,
                     },
                 },
+                address: true,
                 place: {
                     select: {
                         owner: {
@@ -55,6 +56,7 @@ let ActivityService = class ActivityService {
                         },
                     },
                 },
+                rating: true
             }, orderBy: {
                 createdAt: "desc",
             } }, (pagination
@@ -105,6 +107,7 @@ let ActivityService = class ActivityService {
                         },
                     },
                 },
+                rating: true
             },
         });
         return activity
@@ -125,7 +128,7 @@ let ActivityService = class ActivityService {
             : null;
     }
     async getSubscribedActivities(userId) {
-        return await prisma.activity.findMany({
+        let activities = await prisma.activity.findMany({
             where: {
                 trips: {
                     some: {
@@ -151,8 +154,19 @@ let ActivityService = class ActivityService {
                         },
                     },
                 },
+                trips: true
             },
         });
+        activities = activities.map((activity) => {
+            activity.trips = activity.trips.find(trip => trip.userId === Number(userId));
+            return (0, utils_1.redeserialize)(activity, [
+                {
+                    data: activity.trips.id,
+                    newKey: "tripId",
+                },
+            ], ["trips"]);
+        });
+        return activities;
     }
     async searchActivities(queries) {
         let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
@@ -338,6 +352,46 @@ let ActivityService = class ActivityService {
                 },
             },
         })).place.ownerId;
+    }
+    async refreshRating(activityId) {
+        const reviews = await prisma.review.findMany({
+            where: {
+                activityId: Number(activityId),
+            },
+            select: {
+                rating: true,
+            },
+        });
+        const rating = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, average: 0 };
+        const ratedReviews = reviews.filter((review) => review.rating != null);
+        ratedReviews.map((review) => {
+            rating[review.rating] += 1;
+        });
+        rating["average"] =
+            (rating[1] +
+                rating[2] * 2 +
+                rating[3] * 3 +
+                rating[4] * 4 +
+                rating[5] * 5) /
+                ratedReviews.length;
+        const updateBody = {
+            one: rating[1],
+            two: rating[2],
+            three: rating[3],
+            four: rating[4],
+            five: rating[5],
+            average: rating["average"],
+        };
+        console.log(updateBody);
+        prisma.rating.upsert({
+            where: { activityId: Number(activityId) },
+            update: updateBody,
+            create: Object.assign({ activity: { connect: { id: Number(activityId) } } }, updateBody),
+        }).then((res) => {
+            console.log(res);
+        }).catch((err) => {
+            console.log(err);
+        });
     }
 };
 ActivityService = __decorate([

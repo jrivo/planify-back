@@ -26,11 +26,51 @@ export const redeserialize = function (
   return object;
 };
 
-export const getPagination = function (page:number,limit:number,defaultLimit:number){
-  let pagination = {};
-    if (page) {
-      limit ? (pagination["take"] = Number(limit)) : (pagination["take"] = defaultLimit);
-      pagination["skip"] = Number((page - 1) * pagination["take"])
+// export const flattenObjectMapping = function (obj, mapping, prefix = "") {
+//   return Object.keys(obj).reduce((acc, key) => {
+//     const newKey = mapping && mapping[key] ? mapping[key] : key;
+//     if (typeof obj[key] === "object") {
+//       Object.assign(
+//         acc,
+//         flattenObjectMapping(obj[key], mapping, `${prefix}${newKey}_`)
+//       );
+//     } else {
+//       acc[`${prefix}${newKey}`] = obj[key];
+//     }
+//     return acc;
+//   }, {});
+// };
+
+export const flattenObject = function (obj, prefix = "") {
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+  return Object.keys(obj).reduce((acc, key) => {
+    if (typeof obj[key] === "object") {
+      Object.assign(acc, flattenObject(obj[key], `${prefix}${key}_`));
+    } else {
+      acc[`${prefix}${key}`] = obj[key];
     }
-    return pagination;
-}
+    return acc;
+  }, {});
+};
+
+export const removeObjectKeys = function (obj, keys) {
+  keys.forEach((key) => delete obj[key]);
+  return obj;
+};
+
+export const getPagination = function (
+  page: number,
+  limit: number,
+  defaultLimit: number
+) {
+  let pagination = {};
+  if (page) {
+    limit
+      ? (pagination["take"] = Number(limit))
+      : (pagination["take"] = defaultLimit);
+    pagination["skip"] = Number((page - 1) * pagination["take"]);
+  }
+  return pagination;
+};

@@ -28,7 +28,6 @@ let CdnService = class CdnService {
             };
             (0, cross_fetch_1.default)(url, options)
                 .then((res) => {
-                console.log(res);
                 res.json();
             })
                 .then((json) => {

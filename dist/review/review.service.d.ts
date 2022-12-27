@@ -1,5 +1,10 @@
+import { ActivityService } from "src/activity/activity.service";
+import { PlaceService } from "src/place/place.service";
 import { createReviewDto, getReviewsParamsDto, updateReviewDto } from "./review.dto";
 export declare class ReviewService {
+    private placeService;
+    private activityService;
+    constructor(placeService: PlaceService, activityService: ActivityService);
     getAll(queries: getReviewsParamsDto): Promise<{
         reviews: any;
         totalPages: number;

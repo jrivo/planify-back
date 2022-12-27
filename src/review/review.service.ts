@@ -1,6 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
+import { ActivityService } from "src/activity/activity.service";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
+import { PlaceService } from "src/place/place.service";
 import { getPagination, sanitizeFileName } from "src/utils";
 import {
   createReviewDto,
@@ -14,6 +16,10 @@ const DEFAULT_LIMIT = 10;
 
 @Injectable()
 export class ReviewService {
+  constructor(
+    private placeService: PlaceService,
+    private activityService: ActivityService
+  ) {}
   async getAll(queries: getReviewsParamsDto) {
     let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
     const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
@@ -45,6 +51,12 @@ export class ReviewService {
             },
           },
         },
+        medias:{
+          select:{
+            id:true,
+            url:true,
+          }
+        }
       },
       orderBy: {
         createdAt: "desc",
@@ -72,11 +84,40 @@ export class ReviewService {
             },
           },
         },
+        medias:{
+          select:{
+            id:true,
+            url:true,
+          }
+        }
       },
     });
   }
 
   async create(req, body: createReviewDto) {
+    const isPlace = body.placeId ? true : false;
+    const isActivity = body.activityId ? true : false;
+    const isAlreadyReviewed = await prisma.review.findFirst({
+      where: {
+        authorId: req.user.id,
+        ...(isPlace
+          ? {
+              placeId: Number(body.placeId),
+            }
+          : ""),
+        ...(isActivity
+          ? {
+              activityId: Number(body.activityId),
+            }
+          : ""),
+      },
+    });
+    if (isAlreadyReviewed) {
+      throw new Error("You have already reviewed this place or activity");
+    }
+    if ((isPlace && isActivity) || (!isPlace && !isActivity)) {
+      throw new Error("You have to define either place or activity to review");
+    }
     try {
       const review = await prisma.review.create({
         data: {
@@ -85,11 +126,25 @@ export class ReviewService {
               id: req.user.id,
             },
           },
-          place: {
-            connect: {
-              id: Number(body.placeId),
-            },
-          },
+          ...(isPlace
+            ? {
+                place: {
+                  connect: {
+                    id: Number(body.placeId),
+                  },
+                },
+              }
+            : ""),
+          ...(isActivity
+            ? {
+                activity: {
+                  connect: {
+                    id: Number(body.activityId),
+                  },
+                },
+              }
+            : ""),
+
           rating: Number(body.rating),
           ...(body.description ? { description: body.description } : ""),
         },
@@ -109,7 +164,8 @@ export class ReviewService {
         },
       });
       if (req.files) {
-        req.files.foreach(async (file) => {
+        console.log(req.files)
+        req.files.forEach(async (file) => {
           await prisma.media.create({
             data: {
               name: sanitizeFileName(file.originalname),
@@ -130,6 +186,9 @@ export class ReviewService {
           });
         });
       }
+      isPlace
+        ? this.placeService.refreshRating(body.placeId)
+        : this.activityService.refreshRating(body.activityId);
       return review;
     } catch (err) {
       console.log(err);
@@ -182,14 +241,22 @@ export class ReviewService {
         });
       });
     }
-
+    review.placeId ? this.placeService.refreshRating(review.placeId) : "";
+    review.activityId
+      ? this.activityService.refreshRating(review.activityId)
+      : "";
     return review;
   }
 
   async delete(id: string) {
-    return await prisma.review.delete({
+    const review = await prisma.review.delete({
       where: { id: Number(id) },
     });
+    review.placeId ? this.placeService.refreshRating(review.placeId) : "";
+    review.activityId
+      ? this.activityService.refreshRating(review.activityId)
+      : "";
+    return review;
   }
 
   async getOwnerId(id: string) {

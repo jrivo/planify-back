@@ -37,10 +37,8 @@ export class OwnerOrAdminGuard implements CanActivate {
         service = this.reviewService;
         break;
       default:
-        console.log(request.user.id, request.params.id)
-        return request.user.id === request.params.id;
+        return request.user.id == request.params.id;
     }
-    // console.log(await service.getOwnerId(request.params.id), request.user.id);
     if ((await service.getOwnerId(request.params.id)) === request.user.id) {
       return true;
     } else {

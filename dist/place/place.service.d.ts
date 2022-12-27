@@ -14,4 +14,5 @@ export declare class PlaceService {
     }>;
     createActivity(id: string, req: any, body: createActivityDto): Promise<any>;
     getOwnerId(id: string): Promise<any>;
+    refreshRating(placeId: string): Promise<void>;
 }

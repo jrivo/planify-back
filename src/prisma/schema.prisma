@@ -53,7 +53,7 @@ enum UserStatus {
 }
 
 enum ReviewStatus {
-  PENDING
+  UNVERIFIED
   APPROVED
   REJECTED
 }
@@ -65,20 +65,20 @@ enum ReviewSource {
 
 model Review {
   id           Int          @id @default(autoincrement())
-  author       User?        @relation(fields: [userId], references: [id])
+  author       User?        @relation(fields: [authorId], references: [id])
   googleAuthor String?
   source       ReviewSource @default(PLANIFY)
   place        Place?       @relation(fields: [placeId], references: [id])
   activity     Activity?    @relation(fields: [activityId], references: [id])
   description  String?
   medias       Media[]
-  status       ReviewStatus @default(PENDING)
+  status       ReviewStatus @default(UNVERIFIED)
+  rating        Int?
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
-  userId       Int?
+  authorId       Int?
   placeId      Int?
   activityId   Int?
-  ratingId     Int?
 }
 
 enum displayActivitiesMode {
@@ -105,8 +105,8 @@ model Rating {
   average   Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  place    Place?   @relation(fields: [placeId], references: [id])
-  placeId   Int?   @unique
+  place    Place? @relation(fields: [placeId], references: [id])
+  placeId   Int?  @unique
   activity Activity? @relation(fields: [activityId], references: [id])
   activityId Int? @unique
 }
@@ -160,11 +160,10 @@ model Place {
   placeTypeId   Int?
   ownerId       Int
   addressId     Int
-  rating        Rating?   
+  rating        Rating?
   googlePlaceId String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
-  ratingId      Int?
 }
 
 model Address {

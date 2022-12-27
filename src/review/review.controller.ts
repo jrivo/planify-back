@@ -68,14 +68,14 @@ export class ReviewController {
     @Res() res,
     @UploadedFiles() files: Array<Express.Multer.File>
   ) {
-    files ? (req = await this.cdnService.upload(files, req)) : null;
+    files ? (req = await this.cdnService.upload(req,files)) : null;
     this.reviewService
       .create(req,body)
       .then((review) => {
         res.status(201).send(review);
       })
       .catch((err) => {
-        res.status(500).send(err);
+        res.status(500).send(err.message);
       });
   }
 

@@ -32,7 +32,7 @@ export class CdnService {
       };
       fetch(url, options)
         .then((res) => {
-          console.log(res)
+          // console.log(res);
           res.json();
         })
         .then((json) => {
