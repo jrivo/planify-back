@@ -34,6 +34,8 @@ const cdn_service_1 = require("./cdn/cdn.service");
 const jwt_1 = require("@nestjs/jwt");
 const review_controller_1 = require("./review/review.controller");
 const review_service_1 = require("./review/review.service");
+const email_verification_controller_1 = require("./email-verification/email-verification.controller");
+const email_verification_module_1 = require("./email-verification/email-verification.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -49,6 +51,7 @@ AppModule = __decorate([
             activity_module_1.ActivityModule,
             place_type_module_1.PlaceTypeModule,
             users_module_1.UsersModule,
+            email_verification_module_1.EmailVerificationModule
         ],
         controllers: [
             app_controller_1.AppController,
@@ -58,7 +61,8 @@ AppModule = __decorate([
             place_type_controller_1.PlaceTypeController,
             activity_controller_1.ActivityController,
             trip_controller_1.TripController,
-            review_controller_1.ReviewController
+            review_controller_1.ReviewController,
+            email_verification_controller_1.EmailVerificationController
         ],
         providers: [
             app_service_1.AppService,
@@ -70,7 +74,7 @@ AppModule = __decorate([
             cdn_service_1.CdnService,
             auth_service_1.AuthService,
             jwt_1.JwtService,
-            review_service_1.ReviewService
+            review_service_1.ReviewService,
         ],
     })
 ], AppModule);

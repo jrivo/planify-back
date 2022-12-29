@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 export declare class LoginDto {
     email: string;
     password: string;
@@ -14,4 +15,8 @@ export declare class RegisterDto {
     postalCode?: string;
     country?: string;
     region?: string;
+    role?: Role;
+}
+export declare class ForgotPasswordDto {
+    email: string;
 }

@@ -1,7 +1,16 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType, PrismaClient, Role, UserStatus } from "@prisma/client";
-import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
-import { getPagination, sanitizeFileName } from "src/utils";
+import {
+  BCRYPT_SALT_ROUNDS,
+  CDN_STORAGE_PATH,
+  CDN_STORAGE_ZONE,
+} from "src/const";
+import {
+  generateToken,
+  getPagination,
+  sanitizeFileName,
+  sendResetPasswordEmail,
+} from "src/utils";
 import {
   changeUserRoleDto,
   GetUsersParamsDto,
@@ -118,7 +127,7 @@ export class UsersService {
       where: {
         id: Number(id),
       },
-    })
+    });
     if (!user) {
       return null;
     }
@@ -163,7 +172,7 @@ export class UsersService {
       where: {
         id: Number(id),
       },
-    })
+    });
     if (!user) {
       return null;
     }
@@ -196,7 +205,7 @@ export class UsersService {
         role: true,
       },
     });
-    return user? user.role : null;
+    return user ? user.role : null;
   }
 
   async getStatus(id: string) {
@@ -208,7 +217,7 @@ export class UsersService {
         status: true,
       },
     });
-    return user? user.status : null;
+    return user ? user.status : null;
   }
 
   async updateStatus(id: string, body: updateUserStatusDto) {
@@ -245,7 +254,7 @@ export class UsersService {
         id: Number(user.id),
       },
       data: {
-        password: bcrypt.hashSync(body.password, 10)
+        password: bcrypt.hashSync(body.password, BCRYPT_SALT_ROUNDS),
       },
     });
     return userUpdated ? exclude(userUpdated, "password") : null;

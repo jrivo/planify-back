@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
@@ -32,7 +33,7 @@ import { ReviewService } from "./review.service";
 export class ReviewController {
   constructor(
     private reviewService: ReviewService,
-    private cdnService: CdnService
+    private cdnService: CdnService,
   ) {}
   @Get()
   async getAll(@Res() res, @Query() queries: getReviewsParamsDto) {

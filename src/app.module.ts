@@ -25,6 +25,8 @@ import { CdnService } from "./cdn/cdn.service";
 import { JwtService } from "@nestjs/jwt";
 import { ReviewController } from "./review/review.controller";
 import { ReviewService } from "./review/review.service";
+import { EmailVerificationController } from "./email-verification/email-verification.controller";
+import { EmailVerificationModule } from "./email-verification/email-verification.module";
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { ReviewService } from "./review/review.service";
     ActivityModule,
     PlaceTypeModule,
     UsersModule,
+    EmailVerificationModule
   ],
   controllers: [
     AppController,
@@ -47,7 +50,8 @@ import { ReviewService } from "./review/review.service";
     PlaceTypeController,
     ActivityController,
     TripController,
-    ReviewController
+    ReviewController,
+    EmailVerificationController
   ],
   providers: [
     AppService,
@@ -59,7 +63,7 @@ import { ReviewService } from "./review/review.service";
     CdnService,
     AuthService,
     JwtService,
-    ReviewService
+    ReviewService,
   ],
 })
 export class AppModule {}

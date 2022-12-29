@@ -83,15 +83,9 @@ let AuthService = class AuthService {
                 },
             })
             : null;
+        const verificationToken = (0, utils_1.generateToken)();
         let newUser = await prisma.user.create({
-            data: {
-                email: body.email,
-                password: bcrypt.hashSync(body.password, const_1.BCRYPT_SALT_ROUNDS),
-                firstName: body.firstName,
-                lastName: body.lastName,
-                phone: body.phoneNumber && body.phoneNumber,
-                address: address ? { connect: { id: address.id } } : undefined,
-            },
+            data: Object.assign(Object.assign(Object.assign({ email: body.email, password: bcrypt.hashSync(body.password, const_1.BCRYPT_SALT_ROUNDS), firstName: body.firstName, lastName: body.lastName, verificationToken: verificationToken }, (address ? { address: { connect: { id: address.id } } } : "")), (body.phoneNumber ? { phone: body.phoneNumber } : "")), (body.role ? { role: client_1.Role[body.role] } : "")),
             include: {
                 profilePicture: true,
                 address: true,
@@ -120,6 +114,7 @@ let AuthService = class AuthService {
                 throw err;
             }
         }
+        (0, utils_1.sendVerificationEmail)(newUser.email, verificationToken);
         const payload = { sub: newUser.id, email: newUser.email };
         return {
             id: newUser.id,
@@ -128,6 +123,27 @@ let AuthService = class AuthService {
                 secret: constants_1.jwtConstants.secret,
             }),
         };
+    }
+    async forgotPassword(body) {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: body.email
+            }
+        });
+        if (!user) {
+            return false;
+        }
+        const newPassword = (0, utils_1.generateToken)(10);
+        await prisma.user.update({
+            where: {
+                id: Number(user.id),
+            },
+            data: {
+                password: bcrypt.hashSync(newPassword, const_1.BCRYPT_SALT_ROUNDS),
+            },
+        });
+        (0, utils_1.sendResetPasswordEmail)(user.email, newPassword);
+        return true;
     }
 };
 AuthService = __decorate([

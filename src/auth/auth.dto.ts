@@ -1,6 +1,7 @@
 import { Role } from "@prisma/client";
 import {
   IsEmail,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsPhoneNumber,
@@ -71,8 +72,15 @@ export class RegisterDto {
   @IsString()
   region?: string;
 
-  // @IsOptional()
-  // @IsString()
-  // role?: Role;
+  @IsOptional()
+  @IsString()
+  @IsIn(["USER","MERCHANT"])
+  role?: Role;
   // address : Address
+}
+
+export class ForgotPasswordDto {
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 }

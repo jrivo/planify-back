@@ -9,8 +9,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RegisterDto = exports.LoginDto = void 0;
+exports.ForgotPasswordDto = exports.RegisterDto = exports.LoginDto = void 0;
 const openapi = require("@nestjs/swagger");
+const client_1 = require("@prisma/client");
 const class_validator_1 = require("class-validator");
 class LoginDto {
     static _OPENAPI_METADATA_FACTORY() {
@@ -30,7 +31,7 @@ __decorate([
 exports.LoginDto = LoginDto;
 class RegisterDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { email: { required: true, type: () => String }, password: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: false, type: () => String }, street: { required: false, type: () => String }, streetNumber: { required: false, type: () => String }, city: { required: false, type: () => String }, postalCode: { required: false, type: () => String }, country: { required: false, type: () => String }, region: { required: false, type: () => String } };
+        return { email: { required: true, type: () => String }, password: { required: true, type: () => String }, firstName: { required: true, type: () => String }, lastName: { required: true, type: () => String }, phoneNumber: { required: false, type: () => String }, street: { required: false, type: () => String }, streetNumber: { required: false, type: () => String }, city: { required: false, type: () => String }, postalCode: { required: false, type: () => String }, country: { required: false, type: () => String }, region: { required: false, type: () => String }, role: { required: false, type: () => Object, enum: ["USER", "MERCHANT"] } };
     }
 }
 __decorate([
@@ -93,5 +94,22 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "region", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsIn)(["USER", "MERCHANT"]),
+    __metadata("design:type", String)
+], RegisterDto.prototype, "role", void 0);
 exports.RegisterDto = RegisterDto;
+class ForgotPasswordDto {
+    static _OPENAPI_METADATA_FACTORY() {
+        return { email: { required: true, type: () => String } };
+    }
+}
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsEmail)(),
+    __metadata("design:type", String)
+], ForgotPasswordDto.prototype, "email", void 0);
+exports.ForgotPasswordDto = ForgotPasswordDto;
 //# sourceMappingURL=auth.dto.js.map

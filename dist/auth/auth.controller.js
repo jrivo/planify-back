@@ -41,6 +41,18 @@ let AuthController = class AuthController {
                 : res.status(404).send({ message: "User not found" });
         });
     }
+    async forgotPassword(body, res) {
+        this.authService
+            .forgotPassword(body)
+            .then((data) => {
+            data
+                ? res.status(200).send("Password reset, check your email for new password")
+                : res.status(404).send("User not found");
+        })
+            .catch((err) => {
+            res.status(500).send;
+        });
+    }
 };
 __decorate([
     (0, common_1.Post)("login"),
@@ -71,6 +83,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Post)("forgot-password"),
+    (0, common_1.UseGuards)(),
+    openapi.ApiResponse({ status: 201 }),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [auth_dto_1.ForgotPasswordDto, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "forgotPassword", null);
 AuthController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [auth_service_1.AuthService,

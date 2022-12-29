@@ -1,4 +1,10 @@
-export const generateRandomFileName = function (extension, length = 8) {
+import { APP_URL, SENDGRID_API_KEY } from "./const";
+
+const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(SENDGRID_API_KEY);
+
+// const MAIL_API_KEY = SENDINBLUE_API_KEY;
+export const generateToken = function (length=32) {
   var result = "";
   var characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -6,6 +12,11 @@ export const generateRandomFileName = function (extension, length = 8) {
   for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
+  return result;
+};
+
+export const generateRandomFileName = function (extension, length = 8) {
+  var result = generateToken();
   return result + "." + extension;
 };
 
@@ -73,4 +84,45 @@ export const getPagination = function (
     pagination["skip"] = Number((page - 1) * pagination["take"]);
   }
   return pagination;
+};
+
+export const sendVerificationEmail = function (to, token) {
+  const message = {
+    to: to,
+    from: "planify.esgi.app@gmail.com",
+    subject: "Planify - Email Verification",
+    templateId: "d-df277feb6dab4077a17979b4b17123c4",
+    dynamic_template_data: {
+      verification_link: `http://${APP_URL}/email-verification?token=${token}`,
+    },
+  };
+  sgMail
+    .send(message)
+    .then((res) => {
+      console.log(res);
+      console.log("Email sent");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+export const sendResetPasswordEmail = function (to,password) {
+  const message = {
+    to: to,
+    from: "planify.esgi.app@gmail.com",
+    subject: "Planify - Reset Password",
+    templateId: "d-8269cccc14a544a28248454a1d80a73b",
+    dynamic_template_data: {
+      new_password: password,
+    },
+  };
+
+  sgMail
+    .send(message).then((res) => {
+      console.log(res)
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };

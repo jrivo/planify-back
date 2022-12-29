@@ -1,5 +1,5 @@
 import { JwtService } from "@nestjs/jwt";
-import { RegisterDto } from "./auth.dto";
+import { ForgotPasswordDto, RegisterDto } from "./auth.dto";
 import { UsersService } from "src/user/users.service";
 export declare class AuthService {
     private usersService;
@@ -18,4 +18,5 @@ export declare class AuthService {
         email: string;
         access_token: string;
     }>;
+    forgotPassword(body: ForgotPasswordDto): Promise<boolean>;
 }

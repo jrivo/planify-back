@@ -12,7 +12,7 @@ import {
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
-import { LoginDto, RegisterDto } from "./auth.dto";
+import { ForgotPasswordDto, LoginDto, RegisterDto } from "./auth.dto";
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./jwt-auth.guard";
 
@@ -49,5 +49,20 @@ export class AuthController {
         ? res.status(200).send(user)
         : res.status(404).send({ message: "User not found" });
     });
+  }
+
+  @Post("forgot-password")
+  @UseGuards()
+  async forgotPassword(@Body() body:ForgotPasswordDto,@Res() res) {
+    this.authService
+      .forgotPassword(body)
+      .then((data) => {
+        data
+          ? res.status(200).send("Password reset, check your email for new password")
+          : res.status(404).send("User not found");
+      })
+      .catch((err) => {
+        res.status(500).send;
+      });
   }
 }

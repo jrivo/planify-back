@@ -1,14 +1,14 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { MediaType, PrismaClient, Role } from "@prisma/client";
-import { RegisterDto } from "./auth.dto";
+import { ForgotPasswordDto, RegisterDto } from "./auth.dto";
 import {
   BCRYPT_SALT_ROUNDS,
   CDN_STORAGE_PATH,
   CDN_STORAGE_ZONE,
 } from "../const";
 import * as bcrypt from "bcrypt";
-import { sanitizeFileName } from "src/utils";
+import { generateToken, sanitizeFileName, sendResetPasswordEmail, sendVerificationEmail } from "src/utils";
 import { UsersService } from "src/user/users.service";
 import { jwtConstants } from "./constants";
 
@@ -74,15 +74,17 @@ export class AuthService {
           },
         })
       : null;
+      const verificationToken = generateToken();
     let newUser = await prisma.user.create({
       data: {
         email: body.email,
         password: bcrypt.hashSync(body.password, BCRYPT_SALT_ROUNDS),
         firstName: body.firstName,
         lastName: body.lastName,
-        phone: body.phoneNumber && body.phoneNumber,
-        address: address ? { connect: { id: address.id } } : undefined,
-        // role: Role[body.role],
+        verificationToken: verificationToken,
+        ...(address ? { address: { connect: { id: address.id } } } : ""),
+        ...(body.phoneNumber ? { phone: body.phoneNumber } : ""),
+        ...(body.role ? { role: Role[body.role] } : ""),
       },
       include: {
         profilePicture: true,
@@ -112,6 +114,7 @@ export class AuthService {
         throw err;
       }
     }
+    sendVerificationEmail(newUser.email, verificationToken);
     const payload = { sub: newUser.id, email: newUser.email };
     return {
       id: newUser.id,
@@ -120,6 +123,28 @@ export class AuthService {
         secret: jwtConstants.secret,
       }),
     };
+  }
+
+  async forgotPassword(body: ForgotPasswordDto) {
+    const user = await prisma.user.findUnique({
+      where:{
+        email:body.email
+      }
+    })
+    if(!user){
+      return false
+    }
+    const newPassword = generateToken(10);
+    await prisma.user.update({
+      where: {
+        id: Number(user.id),
+      },
+      data: {
+        password: bcrypt.hashSync(newPassword, BCRYPT_SALT_ROUNDS),
+      },
+    });
+    sendResetPasswordEmail(user.email, newPassword);
+    return true;
   }
 }
 

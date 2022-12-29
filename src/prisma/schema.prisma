@@ -26,10 +26,10 @@ model User {
   reviews          Review[]
   status           UserStatus     @default(UNVERIFIED)
   places           Place[]
-  userStatusId     Int?
   notifications    Notification[]
   trips            Trip[]
   Settings         UserSettings?
+  verificationToken String?       @unique
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
   deletedAt        DateTime?

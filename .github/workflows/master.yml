@@ -72,14 +72,18 @@ jobs:
           key: ${{secrets.SSH_PRIVATE_KEY}}
           inventory: |
             [dev_server]
-            ${{secrets.DEV_URL}}
+            ${{secrets.PROD_URL}}
 
             [dev_server:vars]
-            DATABASE_URL=${{secrets.DATABASE_URL}}
+            DATABASE_URL=${{secrets.PROD_DATABASE_URL}}
             CDN_URL=${{secrets.CDN_URL}}
             CDN_STORAGE_ZONE=${{secrets.CDN_STORAGE_ZONE}}
             CDN_STORAGE_PATH=${{secrets.CDN_STORAGE_PATH}}
             CDN_ACCESS_KEY=${{secrets.CDN_ACCESS_KEY}}
+            GMAPS_API_KEY=${{secrets.GMAPS_API_KEY}}
+            SENDGRID_API_KEY=${{secrets.SENDGRID_API_KEY}}
+            APP_PORT=${{secrets.APP_PORT}}
+            APP_URL="${{secrets.PROD_URL}}
             BRANCH=${{ steps.extract_branch.outputs.branch }}
             NEW_VERSION=${{ steps.lastTag.outputs.tag }}
 

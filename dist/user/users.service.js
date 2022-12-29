@@ -212,7 +212,7 @@ let UsersService = class UsersService {
                 id: Number(user.id),
             },
             data: {
-                password: bcrypt.hashSync(body.password, 10)
+                password: bcrypt.hashSync(body.password, const_1.BCRYPT_SALT_ROUNDS),
             },
         });
         return userUpdated ? exclude(userUpdated, "password") : null;

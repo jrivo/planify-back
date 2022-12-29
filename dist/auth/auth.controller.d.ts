@@ -1,6 +1,6 @@
 /// <reference types="multer" />
 import { CdnService } from "src/cdn/cdn.service";
-import { LoginDto, RegisterDto } from "./auth.dto";
+import { ForgotPasswordDto, LoginDto, RegisterDto } from "./auth.dto";
 import { AuthService } from "./auth.service";
 export declare class AuthController {
     private authService;
@@ -18,4 +18,5 @@ export declare class AuthController {
         access_token: string;
     }>;
     getProfile(req: any, res: any): any;
+    forgotPassword(body: ForgotPasswordDto, res: any): Promise<void>;
 }
