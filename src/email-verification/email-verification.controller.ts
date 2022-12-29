@@ -8,6 +8,7 @@ export class EmailVerificationController {
   @Get()
   async verifyEmail(@Query('token') token: string,@Res() res: any) {
     this.emailVerificationService.verifyEmail(token).then((result) => {
+      //TODO: redirect to frontend when deployed
       return result ? res.status(200).send('Email verified') : res.status(400).send('Invalid token')
     })
   }

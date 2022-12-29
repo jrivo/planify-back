@@ -23,7 +23,13 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { SelfGuard } from "src/auth/self.guard";
 import { CdnService } from "src/cdn/cdn.service";
-import { changeUserRoleDto, GetUsersParamsDto, updatePasswordDto, updateUserDto, updateUserStatusDto } from "./user.dto";
+import {
+  changeUserRoleDto,
+  GetUsersParamsDto,
+  updatePasswordDto,
+  updateUserDto,
+  updateUserStatusDto,
+} from "./user.dto";
 import { UsersService } from "./users.service";
 
 @Controller("users")
@@ -36,7 +42,7 @@ export class UsersController {
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN", "MODERATOR")
-  async getAll(@Res() res,@Query() queries:GetUsersParamsDto) {
+  async getAll(@Res() res, @Query() queries: GetUsersParamsDto) {
     this.userService
       .getAll(queries)
       .then((users) => {
@@ -49,7 +55,7 @@ export class UsersController {
 
   @Get(":id")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN","MODERATOR")
+  @Roles("ADMIN", "MODERATOR")
   getById(@Param("id") id: string, @Res() res) {
     this.userService
       .findById(id)
@@ -64,7 +70,7 @@ export class UsersController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, NotBlockedGuard)
   @UseInterceptors(AnyFilesInterceptor())
   async updateUser(
     @Param("id") id: string,
@@ -87,7 +93,7 @@ export class UsersController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, NotBlockedGuard)
   @Entity("user")
   async delete(@Param("id") id: string, @Res() res) {
     this.userService
@@ -105,9 +111,13 @@ export class UsersController {
   @Put(":id/role")
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles("ADMIN")
-  async updateRole(@Param("id") id:string, @Body() body: changeUserRoleDto,@Res() res) {
+  async updateRole(
+    @Param("id") id: string,
+    @Body() body: changeUserRoleDto,
+    @Res() res
+  ) {
     this.userService
-      .changeRole(id,body)
+      .changeRole(id, body)
       .then((user) => {
         user
           ? res.status(200).send(user)
@@ -120,10 +130,14 @@ export class UsersController {
 
   @Put(":id/status")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN","MODERATOR")
-  async blockUser(@Param("id") id:string,@Body() body:updateUserStatusDto,@Res() res) {
+  @Roles("ADMIN", "MODERATOR")
+  async blockUser(
+    @Param("id") id: string,
+    @Body() body: updateUserStatusDto,
+    @Res() res
+  ) {
     this.userService
-      .updateStatus(id,body)
+      .updateStatus(id, body)
       .then((user) => {
         user
           ? res.status(200).send(user)
@@ -135,18 +149,21 @@ export class UsersController {
   }
 
   @Put(":id/password")
-  @UseGuards(JwtAuthGuard, SelfGuard,NotBlockedGuard)
-  async updatePassword(@Param("id") id:string,@Body() body:updatePasswordDto,@Res() res) {
+  @UseGuards(JwtAuthGuard, SelfGuard, NotBlockedGuard)
+  async updatePassword(
+    @Param("id") id: string,
+    @Body() body: updatePasswordDto,
+    @Res() res
+  ) {
     this.userService
-      .updatePassword(id,body)
+      .updatePassword(id, body)
       .then((user) => {
         user
-          ? res.status(200).send("Password updated")
-          : res.status(404).send("User not found");
+          ? res.status(200).send({ message: "Password updated" })
+          : res.status(404).send({ error: "User not found" });
       })
       .catch((err) => {
-        res.status(500).send;
+        res.status(500).send(err);
       });
   }
-
 }
