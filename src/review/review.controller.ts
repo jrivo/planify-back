@@ -76,7 +76,7 @@ export class ReviewController {
         res.status(201).send(review);
       })
       .catch((err) => {
-        res.status(500).send(err.message);
+        res.status(403).send({error: err.message});
       });
   }
 

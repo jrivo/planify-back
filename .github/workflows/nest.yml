@@ -84,7 +84,7 @@ jobs:
             GMAPS_API_KEY=${{secrets.GMAPS_API_KEY}}
             SENDGRID_API_KEY=${{secrets.SENDGRID_API_KEY}}
             APP_PORT=${{secrets.APP_PORT}}
-            APP_URL="${{secrets.DEV_URL}}
+            APP_URL=${{secrets.DEV_URL}}
             BRANCH=${{ steps.extract_branch.outputs.branch }}
             NEW_VERSION=${{ steps.lastTag.outputs.tag }}
 

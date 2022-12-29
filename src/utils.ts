@@ -96,8 +96,6 @@ export const sendVerificationEmail = function (to, token) {
       verification_link: `http://${APP_URL}/email-verification?token=${token}`,
     },
   };
-  console.log("MESSAGE")
-  console.log(`http://${APP_URL}/email-verification?token=${token}`)
   sgMail
     .send(message)
     .then((res) => {
