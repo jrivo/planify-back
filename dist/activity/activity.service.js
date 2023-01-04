@@ -16,69 +16,78 @@ const prisma = new PrismaClient();
 const DEFAULT_LIMIT = 10;
 let ActivityService = class ActivityService {
     async getAll(queries) {
-        let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
-        const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
-        const totalPages = Math.ceil((await prisma.place.count()) / limit);
-        let activities = await prisma.activity.findMany(Object.assign({ where: Object.assign(Object.assign(Object.assign({}, (queries.category
-                ? {
+        try {
+            let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
+            const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
+            const whereConditions = {
+                where: Object.assign(Object.assign(Object.assign({}, (queries.category
+                    ? {
+                        place: {
+                            placeTypeId: Number(queries.category),
+                        },
+                    }
+                    : "")), (queries.merchant
+                    ? {
+                        place: {
+                            ownerId: Number(queries.merchant),
+                        },
+                    }
+                    : "")), (queries.search
+                    ? {
+                        name: {
+                            contains: queries.search,
+                        },
+                    }
+                    : "")),
+            };
+            const totalPages = Math.ceil((await prisma.activity.count(Object.assign({}, whereConditions))) / limit);
+            let activities = await prisma.activity.findMany(Object.assign(Object.assign(Object.assign({}, whereConditions), { include: {
+                    medias: {
+                        select: {
+                            id: true,
+                            url: true,
+                        },
+                    },
+                    address: true,
                     place: {
-                        placeTypeId: Number(queries.category),
-                    },
-                }
-                : "")), (queries.merchant
-                ? {
-                    place: {
-                        ownerId: Number(queries.merchant),
-                    },
-                }
-                : "")), (queries.search
-                ? {
-                    name: {
-                        contains: queries.search,
-                    },
-                }
-                : "")), include: {
-                medias: {
-                    select: {
-                        id: true,
-                        url: true,
-                    },
-                },
-                address: true,
-                place: {
-                    select: {
-                        owner: {
-                            select: {
-                                id: true,
-                                firstName: true,
-                                lastName: true,
+                        select: {
+                            owner: {
+                                select: {
+                                    id: true,
+                                    firstName: true,
+                                    lastName: true,
+                                },
                             },
                         },
                     },
-                },
-                rating: true
-            }, orderBy: {
-                createdAt: "desc",
-            } }, (pagination
-            ? { take: pagination["take"], skip: pagination["skip"] }
-            : "")));
-        activities = activities.map((activity) => {
-            return (0, utils_1.redeserialize)(activity, [
-                {
-                    data: activity.place.owner.firstName,
-                    newKey: "ownerFirstName",
-                },
-                {
-                    data: activity.place.owner.lastName,
-                    newKey: "ownerLastName",
-                },
-                {
-                    data: activity.place.owner.id,
-                    newKey: "ownerId",
-                },
-            ], ["place"]);
-        });
-        return { activities, totalPages };
+                    rating: true,
+                }, orderBy: {
+                    createdAt: "desc",
+                } }), (pagination
+                ? { take: pagination["take"], skip: pagination["skip"] }
+                : "")));
+            activities = activities.map((activity) => {
+                return (0, utils_1.redeserialize)(activity, [
+                    {
+                        data: activity.place.owner.firstName,
+                        newKey: "ownerFirstName",
+                    },
+                    {
+                        data: activity.place.owner.lastName,
+                        newKey: "ownerLastName",
+                    },
+                    {
+                        data: activity.place.owner.id,
+                        newKey: "ownerId",
+                    },
+                ], ["place"]);
+            });
+            return { activities, totalPages };
+        }
+        catch (err) {
+            console.log(err);
+            throw err;
+        }
     }
     async getById(id) {
         const activity = await prisma.activity.findUnique({
@@ -107,9 +116,10 @@ let ActivityService = class ActivityService {
                         },
                     },
                 },
-                rating: true
+                rating: true,
             },
         });
+        console.log(activity);
         return activity
             ? (0, utils_1.redeserialize)(activity, [
                 {
@@ -154,11 +164,11 @@ let ActivityService = class ActivityService {
                         },
                     },
                 },
-                trips: true
+                trips: true,
             },
         });
         activities = activities.map((activity) => {
-            activity.trips = activity.trips.find(trip => trip.userId === Number(userId));
+            activity.trips = activity.trips.find((trip) => trip.userId === Number(userId));
             return (0, utils_1.redeserialize)(activity, [
                 {
                     data: activity.trips.id,
@@ -383,13 +393,16 @@ let ActivityService = class ActivityService {
             average: rating["average"],
         };
         console.log(updateBody);
-        await prisma.rating.upsert({
+        await prisma.rating
+            .upsert({
             where: { activityId: Number(activityId) },
             update: updateBody,
             create: Object.assign({ activity: { connect: { id: Number(activityId) } } }, updateBody),
-        }).then((res) => {
+        })
+            .then((res) => {
             console.log(res);
-        }).catch((err) => {
+        })
+            .catch((err) => {
             console.log(err);
         });
     }

@@ -36,6 +36,7 @@ const review_controller_1 = require("./review/review.controller");
 const review_service_1 = require("./review/review.service");
 const email_verification_controller_1 = require("./email-verification/email-verification.controller");
 const email_verification_module_1 = require("./email-verification/email-verification.module");
+const event_module_1 = require("./event/event.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -51,7 +52,8 @@ AppModule = __decorate([
             activity_module_1.ActivityModule,
             place_type_module_1.PlaceTypeModule,
             users_module_1.UsersModule,
-            email_verification_module_1.EmailVerificationModule
+            email_verification_module_1.EmailVerificationModule,
+            event_module_1.EventModule
         ],
         controllers: [
             app_controller_1.AppController,

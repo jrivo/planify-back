@@ -107,11 +107,11 @@ let UsersController = class UsersController {
             .updatePassword(id, body)
             .then((user) => {
             user
-                ? res.status(200).send("Password updated")
-                : res.status(404).send("User not found");
+                ? res.status(200).send({ message: "Password updated" })
+                : res.status(404).send({ error: "User not found" });
         })
             .catch((err) => {
-            res.status(500).send;
+            res.status(500).send(err);
         });
     }
 };

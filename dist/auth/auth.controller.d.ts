@@ -12,11 +12,7 @@ export declare class AuthController {
         role: any;
         access_token: string;
     }>;
-    register(body: RegisterDto, req: any, files: Array<Express.Multer.File>): Promise<{
-        id: number;
-        email: string;
-        access_token: string;
-    }>;
+    register(body: RegisterDto, req: any, files: Array<Express.Multer.File>): Promise<string>;
     getProfile(req: any, res: any): any;
     forgotPassword(body: ForgotPasswordDto, res: any): Promise<void>;
 }

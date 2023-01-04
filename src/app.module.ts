@@ -27,6 +27,7 @@ import { ReviewController } from "./review/review.controller";
 import { ReviewService } from "./review/review.service";
 import { EmailVerificationController } from "./email-verification/email-verification.controller";
 import { EmailVerificationModule } from "./email-verification/email-verification.module";
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { EmailVerificationModule } from "./email-verification/email-verification
     ActivityModule,
     PlaceTypeModule,
     UsersModule,
-    EmailVerificationModule
+    EmailVerificationModule,
+    EventModule
   ],
   controllers: [
     AppController,

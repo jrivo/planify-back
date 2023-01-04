@@ -65,7 +65,7 @@ __decorate([
 __decorate([
     (0, common_1.Post)("register"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
-    openapi.ApiResponse({ status: 201 }),
+    openapi.ApiResponse({ status: 201, type: String }),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Request)()),
     __param(2, (0, common_1.UploadedFiles)()),

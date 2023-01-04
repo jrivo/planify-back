@@ -48,8 +48,10 @@ let AuthService = class AuthService {
     async login(email, password) {
         const user = await this.validateUser(email, password);
         if (!user) {
-            console.log("oops");
             throw new common_1.UnauthorizedException("Invalid credentials");
+        }
+        if (user.status != "VERIFIED") {
+            throw new common_1.UnauthorizedException("Please verify your account to login");
         }
         const payload = { sub: user.id, email: user.email };
         return {
@@ -115,14 +117,7 @@ let AuthService = class AuthService {
             }
         }
         (0, utils_1.sendVerificationEmail)(newUser.email, verificationToken);
-        const payload = { sub: newUser.id, email: newUser.email };
-        return {
-            id: newUser.id,
-            email: newUser.email,
-            access_token: this.jwtService.sign(payload, {
-                secret: constants_1.jwtConstants.secret,
-            }),
-        };
+        return "User created adn verification email sent";
     }
     async forgotPassword(body) {
         const user = await prisma.user.findUnique({

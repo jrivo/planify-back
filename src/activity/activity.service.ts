@@ -1,7 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { MediaType } from "@prisma/client";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
-import { getPagination, redeserialize, removeObjectKeys, sanitizeFileName } from "src/utils";
+import {
+  getPagination,
+  redeserialize,
+  removeObjectKeys,
+  sanitizeFileName,
+} from "src/utils";
 import { getActivitiesParamsDto, updateActivityDto } from "./activity.dto";
 const { PrismaClient } = require("@prisma/client");
 
@@ -11,10 +16,10 @@ const DEFAULT_LIMIT = 10;
 @Injectable()
 export class ActivityService {
   async getAll(queries: getActivitiesParamsDto) {
-    let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
+    try{
+      let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
     const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
-    const totalPages = Math.ceil((await prisma.place.count()) / limit);
-    let activities = await prisma.activity.findMany({
+    const whereConditions = {
       where: {
         ...(queries.category
           ? {
@@ -26,7 +31,7 @@ export class ActivityService {
         ...(queries.merchant
           ? {
               place: {
-                ownerId: Number(queries.merchant),
+                ownerId: Number(queries.merchant),  
               },
             }
           : ""),
@@ -38,6 +43,10 @@ export class ActivityService {
             }
           : ""),
       },
+    };
+    const totalPages = Math.ceil((await prisma.activity.count({...whereConditions})) / limit);
+    let activities = await prisma.activity.findMany({
+      ...whereConditions,
       include: {
         medias: {
           select: {
@@ -57,7 +66,7 @@ export class ActivityService {
             },
           },
         },
-        rating: true
+        rating: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -87,6 +96,11 @@ export class ActivityService {
       );
     });
     return { activities, totalPages };
+    }
+    catch(err){
+      console.log(err)
+      throw err
+    }
   }
 
   async getById(id: string) {
@@ -116,9 +130,10 @@ export class ActivityService {
             },
           },
         },
-        rating: true
+        rating: true,
       },
     });
+    console.log(activity);
     return activity
       ? redeserialize(
           activity,
@@ -168,11 +183,13 @@ export class ActivityService {
             },
           },
         },
-        trips: true
+        trips: true,
       },
     });
     activities = activities.map((activity) => {
-      activity.trips = activity.trips.find(trip => trip.userId === Number(userId))
+      activity.trips = activity.trips.find(
+        (trip) => trip.userId === Number(userId)
+      );
       return redeserialize(
         activity,
         [
@@ -182,8 +199,8 @@ export class ActivityService {
           },
         ],
         ["trips"]
-      )
-    })
+      );
+    });
     return activities;
   }
   async searchActivities(queries: getActivitiesParamsDto) {
@@ -438,19 +455,22 @@ export class ActivityService {
       five: rating[5],
       average: rating["average"],
     };
-    console.log(updateBody)
-    await prisma.rating.upsert({
-      where: { activityId: Number(activityId) },
-      update: updateBody,
-      create: {
-        activity: { connect: { id: Number(activityId) } },
-        ...updateBody,
-      },
-    }).then((res) => {
-      console.log(res);
-    }).catch((err) => {
-      console.log(err);
-    });
+    console.log(updateBody);
+    await prisma.rating
+      .upsert({
+        where: { activityId: Number(activityId) },
+        update: updateBody,
+        create: {
+          activity: { connect: { id: Number(activityId) } },
+          ...updateBody,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 

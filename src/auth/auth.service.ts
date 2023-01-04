@@ -36,8 +36,10 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
     if (!user) {
-      console.log("oops");
       throw new UnauthorizedException("Invalid credentials");
+    }
+    if (user.status != "VERIFIED") {
+      throw new UnauthorizedException("Please verify your account to login");
     }
     //Here we add whatever we want to the token (in req.user)
     const payload = { sub: user.id, email: user.email };
@@ -115,14 +117,15 @@ export class AuthService {
       }
     }
     sendVerificationEmail(newUser.email, verificationToken);
-    const payload = { sub: newUser.id, email: newUser.email };
-    return {
-      id: newUser.id,
-      email: newUser.email,
-      access_token: this.jwtService.sign(payload, {
-        secret: jwtConstants.secret,
-      }),
-    };
+    // const payload = { sub: newUser.id, email: newUser.email };
+    // return {
+    //   id: newUser.id,
+    //   email: newUser.email,
+    //   access_token: this.jwtService.sign(payload, {
+    //     secret: jwtConstants.secret,
+    //   }),
+    // };
+    return "User created adn verification email sent"
   }
 
   async forgotPassword(body: ForgotPasswordDto) {

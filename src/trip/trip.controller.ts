@@ -110,7 +110,7 @@ export class TripController {
         res.status(200).send(trip);
       })
       .catch((err) => {
-        res.status(500).send(prismaErrorHandler(err));
+        res.status(500).send(err.message);
       });
   }
 

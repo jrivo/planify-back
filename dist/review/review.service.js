@@ -14,15 +14,17 @@ const common_1 = require("@nestjs/common");
 const client_1 = require("@prisma/client");
 const activity_service_1 = require("../activity/activity.service");
 const const_1 = require("../const");
+const event_service_1 = require("../event/event.service");
 const place_service_1 = require("../place/place.service");
 const utils_1 = require("../utils");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const DEFAULT_LIMIT = 10;
 let ReviewService = class ReviewService {
-    constructor(placeService, activityService) {
+    constructor(placeService, activityService, eventService) {
         this.placeService = placeService;
         this.activityService = activityService;
+        this.eventService = eventService;
     }
     async getAll(queries) {
         let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
@@ -50,8 +52,8 @@ let ReviewService = class ReviewService {
                     select: {
                         id: true,
                         url: true,
-                    }
-                }
+                    },
+                },
             }, orderBy: {
                 createdAt: "desc",
             } }), (pagination
@@ -79,8 +81,8 @@ let ReviewService = class ReviewService {
                     select: {
                         id: true,
                         url: true,
-                    }
-                }
+                    },
+                },
             },
         });
     }
@@ -166,6 +168,17 @@ let ReviewService = class ReviewService {
             isPlace
                 ? this.placeService.refreshRating(body.placeId)
                 : this.activityService.refreshRating(body.activityId);
+            this.eventService.create(Object.assign(Object.assign({ type: client_1.EventType.REVIEW_POSTED, user: {
+                    connect: {
+                        id: req.user.id,
+                    },
+                } }, (isPlace
+                ? { place: { connect: { id: Number(body.placeId) } } }
+                : { activity: { connect: { id: Number(body.activityId) } } })), { review: {
+                    connect: {
+                        id: review.id
+                    }
+                } }));
             return review;
         }
         catch (err) {
@@ -174,6 +187,12 @@ let ReviewService = class ReviewService {
         }
     }
     async update(id, req, body) {
+        const isReviewExist = await prisma.review.findUnique({
+            where: { id: Number(id) },
+        });
+        if (!isReviewExist) {
+            throw new Error("Review not found");
+        }
         const review = await prisma.review.update({
             where: { id: Number(id) },
             data: Object.assign(Object.assign({}, (body.rating ? { rating: Number(body.rating) } : "")), (body.description ? { description: body.description } : "")),
@@ -217,6 +236,15 @@ let ReviewService = class ReviewService {
         review.activityId
             ? this.activityService.refreshRating(review.activityId)
             : "";
+        this.eventService.create(Object.assign(Object.assign({ type: client_1.EventType.REVIEW_UPDATED, user: {
+                connect: {
+                    id: req.user.id,
+                },
+            } }, (review.placeId ? { place: { connect: { id: review.placeId } } } : { activity: { connect: { id: review.activityId } } })), { review: {
+                connect: {
+                    id: review.id
+                }
+            } }));
         return review;
     }
     async delete(id) {
@@ -230,18 +258,20 @@ let ReviewService = class ReviewService {
         return review;
     }
     async getOwnerId(id) {
-        return (await prisma.review.findUnique({
+        var _a;
+        return (_a = (await prisma.review.findUnique({
             where: { id: Number(id) },
             select: {
-                userId: true,
+                authorId: true,
             },
-        })).userId;
+        }))) === null || _a === void 0 ? void 0 : _a.authorId;
     }
 };
 ReviewService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [place_service_1.PlaceService,
-        activity_service_1.ActivityService])
+        activity_service_1.ActivityService,
+        event_service_1.EventService])
 ], ReviewService);
 exports.ReviewService = ReviewService;
 //# sourceMappingURL=review.service.js.map

@@ -13,10 +13,6 @@ export declare class AuthService {
         access_token: string;
     }>;
     getUser(id: string): Promise<Omit<any, "password">>;
-    register(req: any, body: RegisterDto): Promise<{
-        id: number;
-        email: string;
-        access_token: string;
-    }>;
+    register(req: any, body: RegisterDto): Promise<string>;
     forgotPassword(body: ForgotPasswordDto): Promise<boolean>;
 }

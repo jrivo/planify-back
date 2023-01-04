@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
-import { MediaType } from "@prisma/client";
+import { EventType, MediaType } from "@prisma/client";
 import { ActivityService } from "src/activity/activity.service";
 import { CDN_STORAGE_PATH, CDN_STORAGE_ZONE } from "src/const";
+import { EventService } from "src/event/event.service";
 import { PlaceService } from "src/place/place.service";
 import { getPagination, sanitizeFileName } from "src/utils";
 import {
@@ -18,7 +19,8 @@ const DEFAULT_LIMIT = 10;
 export class ReviewService {
   constructor(
     private placeService: PlaceService,
-    private activityService: ActivityService
+    private activityService: ActivityService,
+    private eventService: EventService
   ) {}
   async getAll(queries: getReviewsParamsDto) {
     let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
@@ -51,12 +53,12 @@ export class ReviewService {
             },
           },
         },
-        medias:{
-          select:{
-            id:true,
-            url:true,
-          }
-        }
+        medias: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
@@ -84,12 +86,12 @@ export class ReviewService {
             },
           },
         },
-        medias:{
-          select:{
-            id:true,
-            url:true,
-          }
-        }
+        medias: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
       },
     });
   }
@@ -188,6 +190,22 @@ export class ReviewService {
       isPlace
         ? this.placeService.refreshRating(body.placeId)
         : this.activityService.refreshRating(body.activityId);
+      this.eventService.create({
+        type: EventType.REVIEW_POSTED,
+        user: {
+          connect: {
+            id: req.user.id,
+          },
+        },
+        ...(isPlace
+          ? { place: { connect: { id: Number(body.placeId) } } }
+          : { activity: { connect: { id: Number(body.activityId) } } }),
+          review: {
+            connect: {
+              id: review.id
+            }
+          }
+      });
       return review;
     } catch (err) {
       console.log(err);
@@ -196,6 +214,12 @@ export class ReviewService {
   }
 
   async update(id: string, req: any, body: updateReviewDto) {
+    const isReviewExist = await prisma.review.findUnique({
+      where: { id: Number(id) },
+    });
+    if (!isReviewExist) {
+      throw new Error("Review not found");
+    }
     const review = await prisma.review.update({
       where: { id: Number(id) },
       data: {
@@ -244,6 +268,20 @@ export class ReviewService {
     review.activityId
       ? this.activityService.refreshRating(review.activityId)
       : "";
+      this.eventService.create({
+        type: EventType.REVIEW_UPDATED,
+        user: {
+          connect: {
+            id: req.user.id,
+          },
+        },
+        ...(review.placeId ? { place: { connect: { id: review.placeId } } } : { activity: { connect: { id: review.activityId } } }),
+        review: {
+          connect: {
+            id: review.id
+          }
+        }
+      });
     return review;
   }
 
@@ -263,9 +301,9 @@ export class ReviewService {
       await prisma.review.findUnique({
         where: { id: Number(id) },
         select: {
-          userId: true,
+          authorId: true,
         },
       })
-    ).userId;
+    )?.authorId;
   }
 }

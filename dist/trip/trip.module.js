@@ -8,11 +8,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TripModule = void 0;
 const common_1 = require("@nestjs/common");
+const event_module_1 = require("../event/event.module");
 const trip_service_1 = require("./trip.service");
 let TripModule = class TripModule {
 };
 TripModule = __decorate([
     (0, common_1.Module)({
+        imports: [event_module_1.EventModule],
         providers: [trip_service_1.TripService]
     })
 ], TripModule);

@@ -86,7 +86,7 @@ let TripController = class TripController {
             res.status(200).send(trip);
         })
             .catch((err) => {
-            res.status(500).send((0, errorsHandler_1.prismaErrorHandler)(err));
+            res.status(500).send(err.message);
         });
     }
     async removeActivity(id, body, res) {

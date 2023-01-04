@@ -28,6 +28,7 @@ model User {
   places           Place[]
   notifications    Notification[]
   trips            Trip[]
+  events          Event[]
   Settings         UserSettings?
   verificationToken String?       @unique
   createdAt        DateTime       @default(now())
@@ -79,6 +80,7 @@ model Review {
   authorId       Int?
   placeId      Int?
   activityId   Int?
+  events       Event[]
 }
 
 enum displayActivitiesMode {
@@ -157,11 +159,13 @@ model Place {
   email         String?
   activities    Activity[]
   Review        Review[]
+  trips         Trip[]
   placeTypeId   Int?
   ownerId       Int
   addressId     Int
   rating        Rating?
   googlePlaceId String?
+  events        Event[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 }
@@ -208,6 +212,7 @@ model Activity {
   price       Float?
   address     Address?  @relation(fields: [addressId], references: [id])
   addressId   Int?
+  events     Event[]
   rating      Rating?
   Review      Review[]
 }
@@ -226,8 +231,32 @@ model Trip {
   name        String
   description String?
   activities  Activity[]
+  places      Place[]
   user        User       @relation(fields: [userId], references: [id])
   userId      Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+enum EventType {
+  PLACE_SUBSCRIBED
+  ACTIVITY_SUBSCRIBED
+  ACTIVITY_UNSUBSCRIBED
+  REVIEW_POSTED
+  REVIEW_UPDATED
+}
+
+model Event {
+  id          Int        @id @default(autoincrement())
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  type        EventType
+  place       Place?     @relation(fields: [placeId], references: [id])
+  placeId     Int?
+  activity    Activity?  @relation(fields: [activityId], references: [id])
+  activityId  Int?
+  review      Review?    @relation(fields: [reviewId], references: [id])
+  reviewId    Int?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
