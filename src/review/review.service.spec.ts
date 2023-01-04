@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ActivityService } from 'src/activity/activity.service';
+import { EventService } from 'src/event/event.service';
 import { PlaceService } from 'src/place/place.service';
 import { ReviewService } from './review.service';
 
@@ -8,7 +9,7 @@ describe('ReviewService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ReviewService,PlaceService,ActivityService],
+      providers: [ReviewService,PlaceService,ActivityService,EventService],
     }).compile();
 
     service = module.get<ReviewService>(ReviewService);
