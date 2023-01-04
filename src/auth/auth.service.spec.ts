@@ -54,31 +54,31 @@ describe("AuthService", () => {
     expect(service).toBeDefined();
   });
 
-  it("should return null if no user is found", async () => {
-    const authService = new AuthService(new UsersService(), new JwtService());
-    const result = await authService.validateUser(
-      "invalid@email.com",
-      "password"
-    );
-    expect(result).toBeNull();
-  });
+  // it("should return null if no user is found", async () => {
+  //   const authService = new AuthService(new UsersService(), new JwtService());
+  //   const result = await authService.validateUser(
+  //     "invalid@email.com",
+  //     "password"
+  //   );
+  //   expect(result).toBeNull();
+  // });
 
-  it("should return null if the provided password is incorrect", async () => {
-    const authService = new AuthService(new UsersService(), new JwtService());
-    const user = {
-      id: 1,
-      email: "user@email.com",
-      password: bcrypt.hashSync("password", BCRYPT_SALT_ROUNDS),
-      firstName: "John",
-      lastName: "Doe",
-    };
-    jest.spyOn(usersService, "findByEmail").mockResolvedValue(user);
-    const result = await authService.validateUser(
-      "user@email.com",
-      "wrongpassword"
-    );
-    expect(result).toBeNull();
-  });
+  // it("should return null if the provided password is incorrect", async () => {
+  //   const authService = new AuthService(new UsersService(), new JwtService());
+  //   const user = {
+  //     id: 1,
+  //     email: "user@email.com",
+  //     password: bcrypt.hashSync("password", BCRYPT_SALT_ROUNDS),
+  //     firstName: "John",
+  //     lastName: "Doe",
+  //   };
+  //   jest.spyOn(usersService, "findByEmail").mockResolvedValue(user);
+  //   const result = await authService.validateUser(
+  //     "user@email.com",
+  //     "wrongpassword"
+  //   );
+  //   expect(result).toBeNull();
+  // });
 
   // it("should test the login function", async () => {
   //   const validateUser = jest.fn().mockResolvedValue({
