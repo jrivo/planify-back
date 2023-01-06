@@ -29,7 +29,29 @@ export class PlaceService {
       where: {
         ...(queries.category ? { placeTypeId: Number(queries.category) } : ""),
         ...(queries.merchant ? { ownerId: Number(queries.merchant) } : ""),
-        ...(queries.search ? { name: { contains: queries.search } } : ""),
+        ...(queries.search
+          ? {
+              OR: [
+                { name: { contains: queries.search, mode: "insensitive" } },
+                {
+                  description: {
+                    contains: queries.search,
+                    mode: "insensitive",
+                  },
+                },
+                {
+                  address: {
+                    city: { contains: queries.search, mode: "insensitive" },
+                  },
+                },
+                {
+                  type: {
+                    name: { contains: queries.search, mode: "insensitive" },
+                  },
+                },
+              ],
+            }
+          : ""),
       },
     };
     const totalPages = Math.ceil(
@@ -439,18 +461,21 @@ export class PlaceService {
       five: rating[5],
       average: rating["average"],
     };
-    console.log("will update rating", updateBody)
-    await prisma.rating.upsert({
-      where: { placeId: Number(placeId) },
-      update: updateBody,
-      create: {
-        place: { connect: { id: Number(placeId) } },
-        ...updateBody,
-      },
-    }).then((res) => {
-      console.log("updated rating", res)
-    }).catch((err) => {
-      console.log("error updating rating", err)
+    console.log("will update rating", updateBody);
+    await prisma.rating
+      .upsert({
+        where: { placeId: Number(placeId) },
+        update: updateBody,
+        create: {
+          place: { connect: { id: Number(placeId) } },
+          ...updateBody,
+        },
+      })
+      .then((res) => {
+        console.log("updated rating", res);
+      })
+      .catch((err) => {
+        console.log("error updating rating", err);
       });
   }
 }

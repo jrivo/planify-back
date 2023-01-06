@@ -19,7 +19,29 @@ let PlaceService = class PlaceService {
         let pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
         const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
         const whereConditions = {
-            where: Object.assign(Object.assign(Object.assign({}, (queries.category ? { placeTypeId: Number(queries.category) } : "")), (queries.merchant ? { ownerId: Number(queries.merchant) } : "")), (queries.search ? { name: { contains: queries.search } } : "")),
+            where: Object.assign(Object.assign(Object.assign({}, (queries.category ? { placeTypeId: Number(queries.category) } : "")), (queries.merchant ? { ownerId: Number(queries.merchant) } : "")), (queries.search
+                ? {
+                    OR: [
+                        { name: { contains: queries.search, mode: "insensitive" } },
+                        {
+                            description: {
+                                contains: queries.search,
+                                mode: "insensitive",
+                            },
+                        },
+                        {
+                            address: {
+                                city: { contains: queries.search, mode: "insensitive" },
+                            },
+                        },
+                        {
+                            type: {
+                                name: { contains: queries.search, mode: "insensitive" },
+                            },
+                        },
+                    ],
+                }
+                : "")),
         };
         const totalPages = Math.ceil((await prisma.place.count(Object.assign({}, whereConditions))) / limit);
         let places = await prisma.place.findMany(Object.assign(Object.assign(Object.assign({}, whereConditions), { include: {
@@ -361,13 +383,16 @@ let PlaceService = class PlaceService {
             average: rating["average"],
         };
         console.log("will update rating", updateBody);
-        await prisma.rating.upsert({
+        await prisma.rating
+            .upsert({
             where: { placeId: Number(placeId) },
             update: updateBody,
             create: Object.assign({ place: { connect: { id: Number(placeId) } } }, updateBody),
-        }).then((res) => {
+        })
+            .then((res) => {
             console.log("updated rating", res);
-        }).catch((err) => {
+        })
+            .catch((err) => {
             console.log("error updating rating", err);
         });
     }

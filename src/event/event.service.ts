@@ -64,6 +64,9 @@ export class EventService {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       ...(pagination
         ? { take: pagination["take"], skip: pagination["skip"] }
         : ""),

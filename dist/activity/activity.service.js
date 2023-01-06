@@ -34,9 +34,34 @@ let ActivityService = class ActivityService {
                     }
                     : "")), (queries.search
                     ? {
-                        name: {
-                            contains: queries.search,
-                        },
+                        OR: [
+                            {
+                                name: { contains: queries.search, mode: "insensitive" },
+                            },
+                            {
+                                description: {
+                                    contains: queries.search,
+                                    mode: "insensitive",
+                                },
+                            },
+                            {
+                                address: {
+                                    city: { contains: queries.search, mode: "insensitive" },
+                                },
+                            },
+                            {
+                                place: {
+                                    name: { contains: queries.search, mode: "insensitive" },
+                                },
+                            },
+                            {
+                                place: {
+                                    type: {
+                                        name: { contains: queries.search, mode: "insensitive" },
+                                    },
+                                },
+                            },
+                        ],
                     }
                     : "")),
             };

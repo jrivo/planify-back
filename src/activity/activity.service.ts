@@ -16,90 +16,120 @@ const DEFAULT_LIMIT = 10;
 @Injectable()
 export class ActivityService {
   async getAll(queries: getActivitiesParamsDto) {
-    try{
-      let pagination = getPagination(queries.page, queries.limit, DEFAULT_LIMIT);
-    const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
-    const whereConditions = {
-      where: {
-        ...(queries.category
-          ? {
-              place: {
-                placeTypeId: Number(queries.category),
-              },
-            }
-          : ""),
-        ...(queries.merchant
-          ? {
-              place: {
-                ownerId: Number(queries.merchant),  
-              },
-            }
-          : ""),
-        ...(queries.search
-          ? {
-              name: {
-                contains: queries.search,
-              },
-            }
-          : ""),
-      },
-    };
-    const totalPages = Math.ceil((await prisma.activity.count({...whereConditions})) / limit);
-    let activities = await prisma.activity.findMany({
-      ...whereConditions,
-      include: {
-        medias: {
-          select: {
-            id: true,
-            url: true,
-          },
+    try {
+      let pagination = getPagination(
+        queries.page,
+        queries.limit,
+        DEFAULT_LIMIT
+      );
+      const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
+      const whereConditions = {
+        where: {
+          ...(queries.category
+            ? {
+                place: {
+                  placeTypeId: Number(queries.category),
+                },
+              }
+            : ""),
+          ...(queries.merchant
+            ? {
+                place: {
+                  ownerId: Number(queries.merchant),
+                },
+              }
+            : ""),
+          ...(queries.search
+            ? {
+                OR: [
+                  {
+                    name: { contains: queries.search, mode: "insensitive" },
+                  },
+                  {
+                    description: {
+                      contains: queries.search,
+                      mode: "insensitive",
+                    },
+                  },
+                  {
+                    address: {
+                      city: { contains: queries.search, mode: "insensitive" },
+                    },
+                  },
+                  {
+                    place: {
+                      name: { contains: queries.search, mode: "insensitive" },
+                    },
+                  },
+                  {
+                    place: {
+                      type: {
+                        name: { contains: queries.search, mode: "insensitive" },
+                      },
+                    },
+                  },
+                ],
+              }
+            : ""),
         },
-        address: true,
-        place: {
-          select: {
-            owner: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
+      };
+      const totalPages = Math.ceil(
+        (await prisma.activity.count({ ...whereConditions })) / limit
+      );
+      let activities = await prisma.activity.findMany({
+        ...whereConditions,
+        include: {
+          medias: {
+            select: {
+              id: true,
+              url: true,
+            },
+          },
+          address: true,
+          place: {
+            select: {
+              owner: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                },
               },
             },
           },
+          rating: true,
         },
-        rating: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      ...(pagination
-        ? { take: pagination["take"], skip: pagination["skip"] }
-        : ""),
-    });
-    activities = activities.map((activity) => {
-      return redeserialize(
-        activity,
-        [
-          {
-            data: activity.place.owner.firstName,
-            newKey: "ownerFirstName",
-          },
-          {
-            data: activity.place.owner.lastName,
-            newKey: "ownerLastName",
-          },
-          {
-            data: activity.place.owner.id,
-            newKey: "ownerId",
-          },
-        ],
-        ["place"]
-      );
-    });
-    return { activities, totalPages };
-    }
-    catch(err){
-      console.log(err)
-      throw err
+        orderBy: {
+          createdAt: "desc",
+        },
+        ...(pagination
+          ? { take: pagination["take"], skip: pagination["skip"] }
+          : ""),
+      });
+      activities = activities.map((activity) => {
+        return redeserialize(
+          activity,
+          [
+            {
+              data: activity.place.owner.firstName,
+              newKey: "ownerFirstName",
+            },
+            {
+              data: activity.place.owner.lastName,
+              newKey: "ownerLastName",
+            },
+            {
+              data: activity.place.owner.id,
+              newKey: "ownerId",
+            },
+          ],
+          ["place"]
+        );
+      });
+      return { activities, totalPages };
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   }
 
