@@ -6,10 +6,9 @@ import {
   CDN_STORAGE_ZONE,
 } from "src/const";
 import {
-  generateToken,
   getPagination,
   sanitizeFileName,
-  sendResetPasswordEmail,
+
 } from "src/utils";
 import {
   changeUserRoleDto,
@@ -34,6 +33,9 @@ export class UsersService {
     const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
     const whereConditions = {
       where: {
+        NOT:{
+          role: Role.DELETED
+        },
         ...(queries.role ? { role: Role[queries.role.toUpperCase()] } : ""),
         ...(queries.search
           ? {
