@@ -1,4 +1,6 @@
-FROM node:alpine
+FROM node:16-slim
+RUN apt-get update
+RUN apt-get install -y openssl
 
 WORKDIR /usr/src/app
 
@@ -8,10 +10,12 @@ RUN yarn
 
 COPY . .
 
-RUN cd app; \
-    npx prisma generate; \
+RUN npx prisma generate --schema=./src/prisma/schema.prisma; \
     cd ..
+    
+RUN yarn build
+
 
 EXPOSE 5000
 
-CMD ["node", "server.js"]
+CMD [ "node", "dist/main.js" ]

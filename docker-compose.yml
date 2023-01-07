@@ -5,11 +5,16 @@ services:
         image: kreyzix/planify-back:${VERSION}
         build: .
         ports:
-            - "5000:5000"
+            - ${APP_PORT}:${APP_PORT}
+        restart: always
         environment:
             - DATABASE_URL=${DATABASE_URL}
             - CDN_URL=${CDN_URL}
             - CDN_STORAGE_ZONE=${CDN_STORAGE_ZONE}
             - CDN_STORAGE_PATH=${CDN_STORAGE_PATH}
             - CDN_ACCESS_KEY=${CDN_ACCESS_KEY}
+            - GMAPS_API_KEY=${GMAPS_API_KEY}
+            - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+            - APP_PORT=${APP_PORT}
+            - APP_URL=${APP_URL}:${APP_PORT}
 

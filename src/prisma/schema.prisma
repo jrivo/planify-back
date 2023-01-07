@@ -1,0 +1,262 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+  binaryTargets   = ["native", "linux-musl"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int            @id @default(autoincrement())
+  email            String         @unique
+  password         String
+  firstName        String?
+  lastName         String?
+  phone            String?
+  address          Address?       @relation(fields: [addressId], references: [id])
+  profilePicture   Media?         @relation(fields: [profilePictureId], references: [id])
+  profilePictureId Int?           @unique
+  role             Role           @default(USER)
+  reviews          Review[]
+  status           UserStatus     @default(UNVERIFIED)
+  places           Place[]
+  notifications    Notification[]
+  trips            Trip[]
+  events          Event[]
+  Settings         UserSettings?
+  verificationToken String?       @unique
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+  addressId        Int?
+}
+
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+  MERCHANT
+  DELETED
+}
+
+enum UserStatus {
+  UNVERIFIED
+  VERIFIED
+  INACTIVE
+  BLOCKED
+  BANNED
+}
+
+enum ReviewStatus {
+  UNVERIFIED
+  APPROVED
+  REJECTED
+}
+
+enum ReviewSource {
+  GOOGLE
+  PLANIFY
+}
+
+model Review {
+  id           Int          @id @default(autoincrement())
+  author       User?        @relation(fields: [authorId], references: [id])
+  googleAuthor String?
+  source       ReviewSource @default(PLANIFY)
+  place        Place?       @relation(fields: [placeId], references: [id])
+  activity     Activity?    @relation(fields: [activityId], references: [id])
+  description  String?
+  medias       Media[]
+  status       ReviewStatus @default(UNVERIFIED)
+  rating        Int?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  authorId       Int?
+  placeId      Int?
+  activityId   Int?
+  events       Event[]
+}
+
+enum displayActivitiesMode {
+  ALL
+  NEARBY
+}
+
+model UserSettings {
+  id                Int                   @id @default(autoincrement())
+  user              User                  @relation(fields: [userId], references: [id])
+  userId            Int                   @unique
+  displayActivities displayActivitiesMode @default(ALL)
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+}
+
+model Rating {
+  id        Int      @id @default(autoincrement())
+  one       Int      @default(0)
+  two       Int      @default(0)
+  three     Int      @default(0)
+  four      Int      @default(0)
+  five      Int      @default(0)
+  average   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  place    Place? @relation(fields: [placeId], references: [id])
+  placeId   Int?  @unique
+  activity Activity? @relation(fields: [activityId], references: [id])
+  activityId Int? @unique
+}
+
+// model Message {
+//   id         String   @id @default(uuid())
+//   author    User    @relation(name:"author",fields: [authorId], references: [id])
+//   authorId     String
+//   receiver   User    @relation(name:"receiver",fields: [receiverId], references: [id])
+//   receiverId String
+//   content    String
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+// }
+
+enum MediaType {
+  IMAGE
+  DOCUMENT
+}
+
+model Media {
+  id         Int        @id @default(autoincrement())
+  url        String
+  type       MediaType?
+  name       String
+  place      Place?     @relation(fields: [placeId], references: [id])
+  placeId    Int?
+  activity   Activity?  @relation(fields: [activityId], references: [id])
+  activityId Int?
+  review     Review?    @relation(fields: [reviewId], references: [id])
+  reviewId   Int?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  user       User?
+}
+
+model Place {
+  id            Int        @id @default(autoincrement())
+  name          String
+  owner         User       @relation(fields: [ownerId], references: [id])
+  type          PlaceType? @relation(fields: [placeTypeId], references: [id])
+  description   String?
+  address       Address    @relation(fields: [addressId], references: [id])
+  medias        Media[]
+  mainImageId   Int?
+  website       String?
+  phone         String?
+  email         String?
+  activities    Activity[]
+  Review        Review[]
+  trips         Trip[]
+  placeTypeId   Int?
+  ownerId       Int
+  addressId     Int
+  rating        Rating?
+  googlePlaceId String?
+  events        Event[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Address {
+  id              Int        @id @default(autoincrement())
+  street          String
+  streetNumber    String
+  city            String
+  postalCode      String
+  country         String
+  region          String?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  places          Place[]
+  users           User[]
+  latitude        Float?
+  longitude       Float?
+  googleAddressId String?
+  activities      Activity[]
+}
+
+model PlaceType {
+  id        Int      @id @default(autoincrement())
+  name      String
+  filters   String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Place     Place[]
+}
+
+model Activity {
+  id          Int       @id @default(autoincrement())
+  name        String
+  place       Place     @relation(fields: [placeId], references: [id])
+  medias      Media[]
+  mainImageId Int?
+  description String
+  date        DateTime? @default(now())
+  trips       Trip[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  placeId     Int
+  price       Float?
+  address     Address?  @relation(fields: [addressId], references: [id])
+  addressId   Int?
+  events     Event[]
+  rating      Rating?
+  Review      Review[]
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Trip {
+  id          Int        @id @default(autoincrement())
+  name        String
+  description String?
+  activities  Activity[]
+  places      Place[]
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+enum EventType {
+  PLACE_SUBSCRIBED
+  ACTIVITY_SUBSCRIBED
+  ACTIVITY_UNSUBSCRIBED
+  REVIEW_POSTED
+  REVIEW_UPDATED
+}
+
+model Event {
+  id          Int        @id @default(autoincrement())
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  type        EventType
+  place       Place?     @relation(fields: [placeId], references: [id])
+  placeId     Int?
+  activity    Activity?  @relation(fields: [activityId], references: [id])
+  activityId  Int?
+  review      Review?    @relation(fields: [reviewId], references: [id])
+  reviewId    Int?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
