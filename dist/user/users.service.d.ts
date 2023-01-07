@@ -14,7 +14,7 @@ export declare class UsersService {
     findByEmail(email: string, params?: object): Promise<any | undefined>;
     changeRole(id: string, body: changeUserRoleDto): Promise<Omit<import(".prisma/client").User, "password">>;
     update(id: string, req: any, body: updateUserDto): Promise<Omit<import(".prisma/client").User, "password">>;
-    delete(id: string): Promise<Omit<import(".prisma/client").User, "password">>;
+    delete(id: string): Promise<string>;
     getRole(id: string): Promise<Role>;
     getStatus(id: string): Promise<UserStatus>;
     updateStatus(id: string, body: updateUserStatusDto): Promise<Omit<import(".prisma/client").User, "password">>;

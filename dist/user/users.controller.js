@@ -69,13 +69,13 @@ let UsersController = class UsersController {
     async delete(id, res) {
         this.userService
             .delete(id)
-            .then((user) => {
-            user
-                ? res.status(200).send(user)
+            .then((data) => {
+            data
+                ? res.status(200).send("User deleted")
                 : res.status(404).send("User not found");
         })
             .catch((err) => {
-            res.status(500).send;
+            res.status(500).send(err);
         });
     }
     async updateRole(id, body, res) {
