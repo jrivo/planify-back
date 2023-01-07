@@ -17,6 +17,7 @@ import {
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { NotBlockedGuard } from "src/auth/notBlocked.guard";
+import { OwnerAdminOrModeratorGuard } from "src/auth/ownerAdminOrModerator.guard.ts";
 import { Entity } from "src/auth/ownerOrAdmin.decorator";
 import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
 import { Roles } from "src/auth/roles.decorator";
@@ -81,7 +82,7 @@ export class ReviewController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBlockedGuard)
   @Entity("review")
   @UseInterceptors(AnyFilesInterceptor())
   async update(
@@ -103,7 +104,7 @@ export class ReviewController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBlockedGuard)
   @Entity("review")
   async delete(@Param("id") id: string, @Res() res) {
     this.reviewService
