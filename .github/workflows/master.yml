@@ -71,10 +71,10 @@ jobs:
           directory: ./.ansible
           key: ${{secrets.SSH_PRIVATE_KEY}}
           inventory: |
-            [dev_server]
+            [server]
             ${{secrets.PROD_URL}}
 
-            [dev_server:vars]
+            [server:vars]
             DATABASE_URL=${{secrets.PROD_DATABASE_URL}}
             CDN_URL=${{secrets.CDN_URL}}
             CDN_STORAGE_ZONE=${{secrets.CDN_STORAGE_ZONE}}
