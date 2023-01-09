@@ -222,6 +222,14 @@ let TripService = class TripService {
         });
         return updatedTrip;
     }
+    async getOwnerId(id) {
+        return (await prisma.trip.findUnique({
+            where: { id: Number(id) },
+            select: {
+                userId: true,
+            },
+        })).userId;
+    }
 };
 TripService = __decorate([
     (0, common_1.Injectable)(),

@@ -17,7 +17,7 @@ const openapi = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const platform_express_1 = require("@nestjs/platform-express");
 const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
-const notBlocked_guard_1 = require("../auth/notBlocked.guard");
+const notBanned_guard_1 = require("../auth/notBanned.guard");
 const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
 const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
 const roles_decorator_1 = require("../auth/roles.decorator");
@@ -139,7 +139,7 @@ __decorate([
 ], UsersController.prototype, "getById", null);
 __decorate([
     (0, common_1.Put)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBanned_guard_1.NotBannedGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
@@ -153,7 +153,7 @@ __decorate([
 ], UsersController.prototype, "updateUser", null);
 __decorate([
     (0, common_1.Delete)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBanned_guard_1.NotBannedGuard),
     (0, ownerOrAdmin_decorator_1.Entity)("user"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
@@ -188,7 +188,7 @@ __decorate([
 ], UsersController.prototype, "blockUser", null);
 __decorate([
     (0, common_1.Put)(":id/password"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, self_guard_1.SelfGuard, notBlocked_guard_1.NotBlockedGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, self_guard_1.SelfGuard, notBanned_guard_1.NotBannedGuard),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),

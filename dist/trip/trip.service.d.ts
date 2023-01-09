@@ -14,4 +14,5 @@ export declare class TripService {
     addActivity(tripId: string, activityId: string): Promise<any>;
     addPlace(tripId: string, placeId: string): Promise<any>;
     removeActivity(tripId: string, activityId: string): Promise<any>;
+    getOwnerId(id: string): Promise<any>;
 }

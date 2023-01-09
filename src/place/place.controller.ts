@@ -29,7 +29,7 @@ import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { CdnService } from "src/cdn/cdn.service";
 import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
 import { Entity } from "src/auth/ownerOrAdmin.decorator";
-import { NotBlockedGuard } from "src/auth/notBlocked.guard";
+import { NotBannedGuard } from "src/auth/notBanned.guard";
 import { OwnerAdminOrModeratorGuard } from "src/auth/ownerAdminOrModerator.guard.ts";
 
 @Controller("places")
@@ -84,7 +84,7 @@ export class PlaceController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard,NotBannedGuard)
   @Roles("ADMIN", "MODERATOR","MERCHANT")
   @UseInterceptors(AnyFilesInterceptor())
   async create(
@@ -105,7 +105,7 @@ export class PlaceController {
   }
 
   @Post(":id/activities")
-  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBannedGuard)
   @UseInterceptors(AnyFilesInterceptor())
   @Entity("place")
   //add owner or admin guard
@@ -128,7 +128,7 @@ export class PlaceController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBannedGuard)
   @Entity("place")
   @UseInterceptors(AnyFilesInterceptor())
   async update(
@@ -150,7 +150,7 @@ export class PlaceController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBannedGuard)
   @Entity("place")
   async delete(@Param("id") id: string, @Res() res) {
     this.placeService

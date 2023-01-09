@@ -38,8 +38,11 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException("Invalid credentials");
     }
-    if (user.status != "VERIFIED") {
+    if (user.status == "UNVERIFIED") {
       throw new UnauthorizedException("Please verify your account to login");
+    }
+    else if (user.status == "BANNED") {
+      throw new UnauthorizedException("You have been banned");
     }
     //Here we add whatever we want to the token (in req.user)
     const payload = { sub: user.id, email: user.email };
@@ -125,7 +128,7 @@ export class AuthService {
     //     secret: jwtConstants.secret,
     //   }),
     // };
-    return "User created adn verification email sent"
+    return "User created and verification email sent"
   }
 
   async forgotPassword(body: ForgotPasswordDto) {

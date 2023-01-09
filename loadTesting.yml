@@ -1,0 +1,28 @@
+config:
+  target: "http://localhost:5000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warmup"
+    - duration: 60
+      arrivalRate: 50
+      name: "Peak Load"
+    - duration: 60
+      arrivalRate: 10
+      name: "Cool Down"
+scenarios:
+  - flow:
+      - get:
+          url: "/"
+      - think: 2
+      - post:
+          url: "/login"
+          json:
+            username: "user@user.com"
+            password: "user@user.com"
+      - think: 2
+      - get:
+          url: "/places"
+processors:
+  - think:
+      - think: 2

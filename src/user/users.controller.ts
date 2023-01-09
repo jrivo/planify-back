@@ -16,7 +16,7 @@ import {
 } from "@nestjs/common";
 import { AnyFilesInterceptor } from "@nestjs/platform-express";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { NotBlockedGuard } from "src/auth/notBlocked.guard";
+import { NotBannedGuard } from "src/auth/notBanned.guard";
 import { Entity } from "src/auth/ownerOrAdmin.decorator";
 import { OwnerOrAdminGuard } from "src/auth/ownerOrAdmin.guard";
 import { Roles } from "src/auth/roles.decorator";
@@ -70,7 +70,7 @@ export class UsersController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, NotBannedGuard)
   @UseInterceptors(AnyFilesInterceptor())
   async updateUser(
     @Param("id") id: string,
@@ -93,7 +93,7 @@ export class UsersController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, OwnerOrAdminGuard, NotBannedGuard)
   @Entity("user")
   async delete(@Param("id") id: string, @Res() res) {
     this.userService
@@ -149,7 +149,7 @@ export class UsersController {
   }
 
   @Put(":id/password")
-  @UseGuards(JwtAuthGuard, SelfGuard, NotBlockedGuard)
+  @UseGuards(JwtAuthGuard, SelfGuard, NotBannedGuard)
   async updatePassword(
     @Param("id") id: string,
     @Body() body: updatePasswordDto,

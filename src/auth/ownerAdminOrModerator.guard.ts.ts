@@ -4,6 +4,7 @@ import { Role } from "@prisma/client";
 import { ActivityService } from "src/activity/activity.service";
 import { PlaceService } from "src/place/place.service";
 import { ReviewService } from "src/review/review.service";
+import { TripService } from "src/trip/trip.service";
 import { UsersService } from "src/user/users.service";
 
 @Injectable()
@@ -13,7 +14,8 @@ export class OwnerAdminOrModeratorGuard implements CanActivate {
     private usersService: UsersService,
     private placeService: PlaceService,
     private activityService: ActivityService,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private tripService: TripService
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
@@ -36,6 +38,8 @@ export class OwnerAdminOrModeratorGuard implements CanActivate {
       case "review":
         service = this.reviewService;
         break;
+      case "trip":
+        service = this.tripService;
       default:
         return request.user.id == request.params.id;
     }

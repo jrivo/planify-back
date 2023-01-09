@@ -223,4 +223,15 @@ export class TripService {
     });
     return updatedTrip;
     }
+
+    async getOwnerId(id: string) {
+      return (
+        await prisma.trip.findUnique({
+          where: { id: Number(id) },
+          select: {
+            userId: true,
+          },
+        })
+      ).userId;
+    }
   }

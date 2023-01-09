@@ -16,6 +16,9 @@ import { Roles } from "src/auth/roles.decorator";
 import { RolesGuard } from "src/auth/roles.guard";
 import { TripService } from "./trip.service";
 import { createTripDto, updateTripDto } from "./trip.dto";
+import { OwnerAdminOrModeratorGuard } from "src/auth/ownerAdminOrModerator.guard.ts";
+import { Entity } from "src/auth/ownerOrAdmin.decorator";
+import { NotBannedGuard } from "src/auth/notBanned.guard";
 
 @Controller("trips")
 export class TripController {
@@ -71,7 +74,7 @@ export class TripController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard,NotBannedGuard)
   @Roles("ADMIN", "USER")
   async create(@Request() req: any, @Body() body: createTripDto, @Res() res) {
     this.tripService
@@ -101,8 +104,8 @@ export class TripController {
   }
 
   @Post(":id/activities")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "USER")
+  @UseGuards(JwtAuthGuard, RolesGuard,NotBannedGuard)
+  @Roles("ADMIN", "MODERATOR","USER")
   async addActivity(@Param("id") id: string,@Body() body, @Res() res) {
     this.tripService
       .addActivity(id,body.activityId)
@@ -115,8 +118,8 @@ export class TripController {
   }
 
   @Put(":id/activities")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "USER")
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBannedGuard)
+  @Entity("trip")
   async removeActivity(@Param("id") id: string,@Body() body, @Res() res) {
     this.tripService
       .removeActivity(id,body.activityId)
@@ -129,8 +132,8 @@ export class TripController {
   }
 
   @Put(":id")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "USER")
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBannedGuard)
+  @Entity("trip")
   async update(
     @Param("id") id: string,
     @Body() body: updateTripDto,
@@ -147,12 +150,12 @@ export class TripController {
   }
 
   @Delete(":id")
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles("ADMIN", "USER")
+  @UseGuards(JwtAuthGuard, OwnerAdminOrModeratorGuard,NotBannedGuard)
+  @Entity("trip")
   async delete(@Param("id") id: string, @Res() res) {
     this.tripService
       .delete(id)
-      .then((trip) => {
+      .then(() => {
         res.status(202).send();
       })
       .catch((err) => {

@@ -5,6 +5,6 @@ export declare class PlaceTypeController {
     constructor(placeTypeService: PlaceTypeService);
     getAll(res: any): Promise<void>;
     getById(id: string, res: any): Promise<void>;
-    delete(id: string, res: any): Promise<void>;
     create(body: createPlaceTypeDto, req: any): Promise<any>;
+    delete(id: string, res: any): Promise<void>;
 }

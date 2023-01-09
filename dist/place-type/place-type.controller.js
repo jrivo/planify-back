@@ -43,18 +43,18 @@ let PlaceTypeController = class PlaceTypeController {
             res.status(500).send(err);
         });
     }
+    async create(body, req) {
+        return this.placeTypeService.create(req, body);
+    }
     async delete(id, res) {
         this.placeTypeService
             .delete(id)
             .then(() => {
-            res.status(202).send("Place deleted");
+            res.status(202).send("Place type deleted");
         })
             .catch((err) => {
             res.status(500).send(err);
         });
-    }
-    async create(body, req) {
-        return this.placeTypeService.create(req, body);
     }
 };
 __decorate([
@@ -77,16 +77,6 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, roles_decorator_1.Roles)("ADMIN"),
-    openapi.ApiResponse({ status: 200 }),
-    __param(0, (0, common_1.Param)("id")),
-    __param(1, (0, common_1.Res)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Object]),
-    __metadata("design:returntype", Promise)
-], PlaceTypeController.prototype, "delete", null);
-__decorate([
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN"),
     (0, common_1.Post)(),
     openapi.ApiResponse({ status: 201, type: Object }),
     __param(0, (0, common_1.Body)()),
@@ -95,6 +85,17 @@ __decorate([
     __metadata("design:paramtypes", [place_type_dto_1.createPlaceTypeDto, Object]),
     __metadata("design:returntype", Promise)
 ], PlaceTypeController.prototype, "create", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)("ADMIN"),
+    (0, common_1.Delete)(":id"),
+    openapi.ApiResponse({ status: 200 }),
+    __param(0, (0, common_1.Param)("id")),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PlaceTypeController.prototype, "delete", null);
 PlaceTypeController = __decorate([
     (0, common_1.Controller)("place-types"),
     __metadata("design:paramtypes", [place_type_service_1.PlaceTypeService])
