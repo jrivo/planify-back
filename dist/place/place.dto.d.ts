@@ -2,8 +2,8 @@ import { Activity } from "@prisma/client";
 export declare class createPlaceDto {
     name: string;
     description?: string;
-    street: string;
-    streetNumber: string;
+    street?: string;
+    streetNumber?: string;
     city: string;
     postalCode: string;
     country: string;
@@ -16,7 +16,6 @@ export declare class createPlaceDto {
     email?: string;
     placeTypeId: string;
     activities?: Activity[];
-    mainImage?: any;
     images?: any;
     documents?: any;
 }

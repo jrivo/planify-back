@@ -15,7 +15,8 @@ let TripModule = class TripModule {
 TripModule = __decorate([
     (0, common_1.Module)({
         imports: [event_module_1.EventModule],
-        providers: [trip_service_1.TripService]
+        providers: [trip_service_1.TripService],
+        exports: [trip_service_1.TripService],
     })
 ], TripModule);
 exports.TripModule = TripModule;

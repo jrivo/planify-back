@@ -20,13 +20,15 @@ export class createPlaceDto {
   @IsString()
   description?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  street: string;
+  street?: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  streetNumber: string;
+  streetNumber?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -78,9 +80,6 @@ export class createPlaceDto {
 
   @IsOptional()
   activities?: Activity[];
-
-  @IsOptional()
-  mainImage?: any;
 
   @IsOptional()
   images?: any;

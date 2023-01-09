@@ -4,6 +4,7 @@ import { TripService } from './trip.service';
 
 @Module({
   imports: [EventModule],
-  providers: [TripService]
+  providers: [TripService],
+  exports: [TripService],
 })
 export class TripModule {}

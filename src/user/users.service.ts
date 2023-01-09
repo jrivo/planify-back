@@ -6,6 +6,7 @@ import {
   CDN_STORAGE_ZONE,
 } from "src/const";
 import {
+  generateToken,
   getPagination,
   sanitizeFileName,
 
@@ -170,32 +171,43 @@ export class UsersService {
   }
 
   async delete(id: string) {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: Number(id),
-      },
-    });
-    if (!user) {
-      return null;
-    }
-    const deletedUser = await prisma.user.update({
-      where: {
-        id: Number(id),
-      },
-      data: {
-        email: "",
-        password: "",
-        firstName: "",
-        lastName: "",
-        phone: "",
-        role: Role.DELETED,
-        profilePicture: {
-          disconnect: true,
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: Number(id),
         },
-        deletedAt: new Date(),
-      },
-    });
-    return deletedUser ? exclude(deletedUser, "password") : null;
+      });
+      if (!user) {
+        return null;
+      }
+      else if (user.role === Role.DELETED) {
+        return "ok";
+      }
+      const deletedUser = await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          email: generateToken(),
+          password: "DELETED USER",
+          firstName: null,
+          lastName: null,
+          phone: null,
+          role: Role.DELETED,
+          verificationToken: null,
+          profilePicture: {
+            disconnect: true,
+          },
+          deletedAt: new Date(),
+        },
+      });
+      console.log(deletedUser)
+      return deletedUser ? "ok" : null;
+    }
+    catch (err) {
+      console.log(err)
+      throw err;
+    }
   }
 
   async getRole(id: string) {

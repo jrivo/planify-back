@@ -19,7 +19,9 @@ let UsersService = class UsersService {
         const pagination = (0, utils_1.getPagination)(queries.page, queries.limit, DEFAULT_LIMIT);
         const limit = queries.limit ? queries.limit : DEFAULT_LIMIT;
         const whereConditions = {
-            where: Object.assign(Object.assign({}, (queries.role ? { role: client_1.Role[queries.role.toUpperCase()] } : "")), (queries.search
+            where: Object.assign(Object.assign({ NOT: {
+                    role: client_1.Role.DELETED
+                } }, (queries.role ? { role: client_1.Role[queries.role.toUpperCase()] } : "")), (queries.search
                 ? {
                     OR: [
                         { firstName: { contains: queries.search } },
@@ -130,32 +132,43 @@ let UsersService = class UsersService {
         return userUpdated ? exclude(userUpdated, "password") : null;
     }
     async delete(id) {
-        const user = await prisma.user.findUnique({
-            where: {
-                id: Number(id),
-            },
-        });
-        if (!user) {
-            return null;
-        }
-        const deletedUser = await prisma.user.update({
-            where: {
-                id: Number(id),
-            },
-            data: {
-                email: "",
-                password: "",
-                firstName: "",
-                lastName: "",
-                phone: "",
-                role: client_1.Role.DELETED,
-                profilePicture: {
-                    disconnect: true,
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: Number(id),
                 },
-                deletedAt: new Date(),
-            },
-        });
-        return deletedUser ? exclude(deletedUser, "password") : null;
+            });
+            if (!user) {
+                return null;
+            }
+            else if (user.role === client_1.Role.DELETED) {
+                return "ok";
+            }
+            const deletedUser = await prisma.user.update({
+                where: {
+                    id: user.id,
+                },
+                data: {
+                    email: (0, utils_1.generateToken)(),
+                    password: "DELETED USER",
+                    firstName: null,
+                    lastName: null,
+                    phone: null,
+                    role: client_1.Role.DELETED,
+                    verificationToken: null,
+                    profilePicture: {
+                        disconnect: true,
+                    },
+                    deletedAt: new Date(),
+                },
+            });
+            console.log(deletedUser);
+            return deletedUser ? "ok" : null;
+        }
+        catch (err) {
+            console.log(err);
+            throw err;
+        }
     }
     async getRole(id) {
         const user = await prisma.user.findUnique({

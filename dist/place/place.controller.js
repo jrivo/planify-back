@@ -23,9 +23,9 @@ const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
 const platform_express_1 = require("@nestjs/platform-express");
 const cdn_service_1 = require("../cdn/cdn.service");
-const ownerOrAdmin_guard_1 = require("../auth/ownerOrAdmin.guard");
 const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
-const notBlocked_guard_1 = require("../auth/notBlocked.guard");
+const notBanned_guard_1 = require("../auth/notBanned.guard");
+const ownerAdminOrModerator_guard_ts_1 = require("../auth/ownerAdminOrModerator.guard.ts");
 let PlaceController = class PlaceController {
     constructor(placeService, cdnService) {
         this.placeService = placeService;
@@ -138,8 +138,8 @@ __decorate([
 ], PlaceController.prototype, "getActivities", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, notBlocked_guard_1.NotBlockedGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "MERCHANT"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, notBanned_guard_1.NotBannedGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MODERATOR", "MERCHANT"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     openapi.ApiResponse({ status: 201 }),
     __param(0, (0, common_1.Body)()),
@@ -152,7 +152,7 @@ __decorate([
 ], PlaceController.prototype, "create", null);
 __decorate([
     (0, common_1.Post)(":id/activities"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerAdminOrModerator_guard_ts_1.OwnerAdminOrModeratorGuard, notBanned_guard_1.NotBannedGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     (0, ownerOrAdmin_decorator_1.Entity)("place"),
     openapi.ApiResponse({ status: 201 }),
@@ -167,7 +167,7 @@ __decorate([
 ], PlaceController.prototype, "createActivity", null);
 __decorate([
     (0, common_1.Put)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerAdminOrModerator_guard_ts_1.OwnerAdminOrModeratorGuard, notBanned_guard_1.NotBannedGuard),
     (0, ownerOrAdmin_decorator_1.Entity)("place"),
     (0, common_1.UseInterceptors)((0, platform_express_1.AnyFilesInterceptor)()),
     openapi.ApiResponse({ status: 200 }),
@@ -182,7 +182,7 @@ __decorate([
 ], PlaceController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerOrAdmin_guard_1.OwnerOrAdminGuard, notBlocked_guard_1.NotBlockedGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerAdminOrModerator_guard_ts_1.OwnerAdminOrModeratorGuard, notBanned_guard_1.NotBannedGuard),
     (0, ownerOrAdmin_decorator_1.Entity)("place"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),

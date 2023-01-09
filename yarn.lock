@@ -1205,6 +1205,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/k6@^0.42.0":
+  version "0.42.0"
+  resolved "https://registry.yarnpkg.com/@types/k6/-/k6-0.42.0.tgz#4e670579f8becd2032838d8760dd90914093d60f"
+  integrity sha512-btIVh1X3aC3iiYHL3J6vnWx65tFhTZyA6c3RjsizlVRAk80a83mL9ybwClUpxo/gl8C7nii1NGMGmmN7yH5doQ==
+
 "@types/mime@*":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-3.0.1.tgz#5f8f2bca0a5863cb69bc0b0acd88c96cb1d4ae10"

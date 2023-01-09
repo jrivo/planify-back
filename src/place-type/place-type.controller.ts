@@ -7,6 +7,7 @@ import {
   Body,
   Param,
   Res,
+  Delete,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { Roles } from "src/auth/roles.decorator";
@@ -43,21 +44,22 @@ export class PlaceTypeController {
 
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles("ADMIN")
-  async delete(@Param("id") id: string, @Res() res) {
-    this.placeTypeService
-      .delete(id)
-      .then(() => {
-        res.status(202).send("Place deleted");
-      })
-      .catch((err) => {
-        res.status(500).send(err);
-      });
+  @Post()
+  async create(@Body() body: createPlaceTypeDto, @Request() req: any) {
+    return this.placeTypeService.create(req, body);
   }
 
   @UseGuards(JwtAuthGuard,RolesGuard)
   @Roles("ADMIN")
-  @Post()
-  async create(@Body() body: createPlaceTypeDto, @Request() req: any) {
-    return this.placeTypeService.create(req, body);
+  @Delete(":id")
+  async delete(@Param("id") id: string, @Res() res) {
+    this.placeTypeService
+      .delete(id)
+      .then(() => {
+        res.status(202).send("Place type deleted");
+      })
+      .catch((err) => {
+        res.status(500).send(err);
+      });
   }
 }

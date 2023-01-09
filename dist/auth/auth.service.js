@@ -50,8 +50,11 @@ let AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnauthorizedException("Invalid credentials");
         }
-        if (user.status != "VERIFIED") {
+        if (user.status == "UNVERIFIED") {
             throw new common_1.UnauthorizedException("Please verify your account to login");
+        }
+        else if (user.status == "BANNED") {
+            throw new common_1.UnauthorizedException("You have been banned");
         }
         const payload = { sub: user.id, email: user.email };
         return {
@@ -117,7 +120,7 @@ let AuthService = class AuthService {
             }
         }
         (0, utils_1.sendVerificationEmail)(newUser.email, verificationToken);
-        return "User created adn verification email sent";
+        return "User created and verification email sent";
     }
     async forgotPassword(body) {
         const user = await prisma.user.findUnique({

@@ -21,6 +21,9 @@ const roles_decorator_1 = require("../auth/roles.decorator");
 const roles_guard_1 = require("../auth/roles.guard");
 const trip_service_1 = require("./trip.service");
 const trip_dto_1 = require("./trip.dto");
+const ownerAdminOrModerator_guard_ts_1 = require("../auth/ownerAdminOrModerator.guard.ts");
+const ownerOrAdmin_decorator_1 = require("../auth/ownerOrAdmin.decorator");
+const notBanned_guard_1 = require("../auth/notBanned.guard");
 let TripController = class TripController {
     constructor(tripService) {
         this.tripService = tripService;
@@ -112,7 +115,7 @@ let TripController = class TripController {
     async delete(id, res) {
         this.tripService
             .delete(id)
-            .then((trip) => {
+            .then(() => {
             res.status(202).send();
         })
             .catch((err) => {
@@ -150,7 +153,7 @@ __decorate([
 ], TripController.prototype, "getByName", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, notBanned_guard_1.NotBannedGuard),
     (0, roles_decorator_1.Roles)("ADMIN", "USER"),
     openapi.ApiResponse({ status: 201 }),
     __param(0, (0, common_1.Request)()),
@@ -173,8 +176,8 @@ __decorate([
 ], TripController.prototype, "getActivities", null);
 __decorate([
     (0, common_1.Post)(":id/activities"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "USER"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard, notBanned_guard_1.NotBannedGuard),
+    (0, roles_decorator_1.Roles)("ADMIN", "MODERATOR", "USER"),
     openapi.ApiResponse({ status: 201 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
@@ -185,8 +188,8 @@ __decorate([
 ], TripController.prototype, "addActivity", null);
 __decorate([
     (0, common_1.Put)(":id/activities"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "USER"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerAdminOrModerator_guard_ts_1.OwnerAdminOrModeratorGuard, notBanned_guard_1.NotBannedGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("trip"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
@@ -197,8 +200,8 @@ __decorate([
 ], TripController.prototype, "removeActivity", null);
 __decorate([
     (0, common_1.Put)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "USER"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerAdminOrModerator_guard_ts_1.OwnerAdminOrModeratorGuard, notBanned_guard_1.NotBannedGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("trip"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Body)()),
@@ -209,8 +212,8 @@ __decorate([
 ], TripController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(":id"),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
-    (0, roles_decorator_1.Roles)("ADMIN", "USER"),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, ownerAdminOrModerator_guard_ts_1.OwnerAdminOrModeratorGuard, notBanned_guard_1.NotBannedGuard),
+    (0, ownerOrAdmin_decorator_1.Entity)("trip"),
     openapi.ApiResponse({ status: 200 }),
     __param(0, (0, common_1.Param)("id")),
     __param(1, (0, common_1.Res)()),

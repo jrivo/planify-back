@@ -15,7 +15,7 @@ const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class createPlaceDto {
     static _OPENAPI_METADATA_FACTORY() {
-        return { name: { required: true, type: () => String }, description: { required: false, type: () => String }, street: { required: true, type: () => String }, streetNumber: { required: true, type: () => String }, city: { required: true, type: () => String }, postalCode: { required: true, type: () => String }, country: { required: true, type: () => String }, region: { required: false, type: () => String }, googleAddressId: { required: false, type: () => String }, latitude: { required: false, type: () => String }, longitude: { required: false, type: () => String }, website: { required: false, type: () => String }, phone: { required: false, type: () => String }, email: { required: false, type: () => String }, placeTypeId: { required: true, type: () => String }, activities: { required: false, type: () => [Object] }, mainImage: { required: false, type: () => Object }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object } };
+        return { name: { required: true, type: () => String }, description: { required: false, type: () => String }, street: { required: false, type: () => String }, streetNumber: { required: false, type: () => String }, city: { required: true, type: () => String }, postalCode: { required: true, type: () => String }, country: { required: true, type: () => String }, region: { required: false, type: () => String }, googleAddressId: { required: false, type: () => String }, latitude: { required: false, type: () => String }, longitude: { required: false, type: () => String }, website: { required: false, type: () => String }, phone: { required: false, type: () => String }, email: { required: false, type: () => String }, placeTypeId: { required: true, type: () => String }, activities: { required: false, type: () => [Object] }, images: { required: false, type: () => Object }, documents: { required: false, type: () => Object } };
     }
 }
 __decorate([
@@ -30,11 +30,13 @@ __decorate([
     __metadata("design:type", String)
 ], createPlaceDto.prototype, "description", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], createPlaceDto.prototype, "street", void 0);
 __decorate([
+    (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
@@ -102,10 +104,6 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Array)
 ], createPlaceDto.prototype, "activities", void 0);
-__decorate([
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], createPlaceDto.prototype, "mainImage", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Object)

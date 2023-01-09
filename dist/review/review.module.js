@@ -15,11 +15,12 @@ const place_module_1 = require("../place/place.module");
 const activity_module_1 = require("../activity/activity.module");
 const cdn_module_1 = require("../cdn/cdn.module");
 const event_module_1 = require("../event/event.module");
+const trip_module_1 = require("../trip/trip.module");
 let ReviewModule = class ReviewModule {
 };
 ReviewModule = __decorate([
     (0, common_1.Module)({
-        imports: [users_module_1.UsersModule, place_module_1.PlaceModule, activity_module_1.ActivityModule, cdn_module_1.CdnModule, event_module_1.EventModule],
+        imports: [users_module_1.UsersModule, place_module_1.PlaceModule, activity_module_1.ActivityModule, cdn_module_1.CdnModule, event_module_1.EventModule, trip_module_1.TripModule],
         providers: [review_service_1.ReviewService],
         controllers: [review_controller_1.ReviewController],
         exports: [review_service_1.ReviewService],
