@@ -109,7 +109,7 @@ let PlaceService = class PlaceService {
             const place = await prisma.place.create({
                 data: {
                     name: body.name,
-                    description: body.description,
+                    description: body.description && body.description,
                     address: { connect: { id: address.id } },
                     website: body.website,
                     phone: body.phone,
@@ -174,7 +174,7 @@ let PlaceService = class PlaceService {
                 body.region;
             const place = await prisma.place.update({
                 where: { id: Number(id) },
-                data: Object.assign({ name: body.name && body.name, description: body.description && body.description, website: body.website && body.website, phone: body.phone && body.phone, email: body.email && body.email }, (body.placeTypeId && {
+                data: Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (body.name && { name: body.name })), (body.description && { description: body.description })), (body.website && { website: body.website })), (body.phone && { phone: body.phone })), (body.email && { email: body.email })), (body.placeTypeId && {
                     type: { connect: { id: Number(body.placeTypeId) } },
                 })),
                 include: {
@@ -290,7 +290,7 @@ let PlaceService = class PlaceService {
             });
         }
         const activity = await prisma.activity.create({
-            data: Object.assign({ name: body.name, description: body.description, place: { connect: { id: Number(id) } }, price: body.price && Number(body.price), date: body.date && body.date }, (isAddress && { address: { connect: { id: address.id } } })),
+            data: Object.assign(Object.assign(Object.assign({ name: body.name }, (body.description && { description: body.description })), { place: { connect: { id: Number(id) } }, price: body.price && Number(body.price), date: body.date && body.date }), (isAddress && { address: { connect: { id: address.id } } })),
             include: {
                 medias: {
                     select: {

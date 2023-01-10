@@ -128,13 +128,14 @@ export class PlaceService {
           googleAddressId: body.googleAddressId && body.googleAddressId,
           latitude: body.latitude && parseFloat(body.latitude),
           longitude: body.longitude && parseFloat(body.longitude),
+
         },
       });
 
       const place = await prisma.place.create({
         data: {
           name: body.name,
-          description: body.description,
+          description: body.description && body.description,
           address: { connect: { id: address.id } },
           website: body.website,
           phone: body.phone,
@@ -208,11 +209,11 @@ export class PlaceService {
       const place = await prisma.place.update({
         where: { id: Number(id) },
         data: {
-          name: body.name && body.name,
-          description: body.description && body.description,
-          website: body.website && body.website,
-          phone: body.phone && body.phone,
-          email: body.email && body.email,
+          ...(body.name && { name: body.name }),
+          ...(body.description && { description: body.description }),
+          ...(body.website && { website: body.website }),
+          ...(body.phone && { phone: body.phone }),
+          ...(body.email && { email: body.email }),
           //add type:{ connect: { id: Number(body.placeTypeId) } } if placeTypeId is not null
           ...(body.placeTypeId && {
             type: { connect: { id: Number(body.placeTypeId) } },
@@ -355,7 +356,7 @@ export class PlaceService {
     const activity = await prisma.activity.create({
       data: {
         name: body.name,
-        description: body.description,
+        ...(body.description && { description: body.description }),
         place: { connect: { id: Number(id) } },
         price: body.price && Number(body.price),
         date: body.date && body.date,
