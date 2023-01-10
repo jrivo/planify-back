@@ -37,6 +37,8 @@ const review_service_1 = require("./review/review.service");
 const email_verification_controller_1 = require("./email-verification/email-verification.controller");
 const email_verification_module_1 = require("./email-verification/email-verification.module");
 const event_module_1 = require("./event/event.module");
+const maps_controller_1 = require("./maps/maps.controller");
+const maps_module_1 = require("./maps/maps.module");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -53,7 +55,8 @@ AppModule = __decorate([
             place_type_module_1.PlaceTypeModule,
             users_module_1.UsersModule,
             email_verification_module_1.EmailVerificationModule,
-            event_module_1.EventModule
+            event_module_1.EventModule,
+            maps_module_1.MapsModule
         ],
         controllers: [
             app_controller_1.AppController,
@@ -64,7 +67,8 @@ AppModule = __decorate([
             activity_controller_1.ActivityController,
             trip_controller_1.TripController,
             review_controller_1.ReviewController,
-            email_verification_controller_1.EmailVerificationController
+            email_verification_controller_1.EmailVerificationController,
+            maps_controller_1.MapsController
         ],
         providers: [
             app_service_1.AppService,

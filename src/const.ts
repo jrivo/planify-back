@@ -6,5 +6,6 @@ export const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
 export const SENDINBLUE_API_KEY = process.env.SENDINBLUE_API_KEY;
 export const APP_PORT= process.env.APP_PORT
 export const APP_URL= process.env.APP_URL
+export const GMAPS_API_KEY = process.env.GMAPS_API_KEY;
 
 export const BCRYPT_SALT_ROUNDS = 10;

@@ -28,6 +28,8 @@ import { ReviewService } from "./review/review.service";
 import { EmailVerificationController } from "./email-verification/email-verification.controller";
 import { EmailVerificationModule } from "./email-verification/email-verification.module";
 import { EventModule } from './event/event.module';
+import { MapsController } from "./maps/maps.controller";
+import { MapsModule } from "./maps/maps.module";
 
 @Module({
   imports: [
@@ -42,7 +44,8 @@ import { EventModule } from './event/event.module';
     PlaceTypeModule,
     UsersModule,
     EmailVerificationModule,
-    EventModule
+    EventModule,
+    MapsModule
   ],
   controllers: [
     AppController,
@@ -53,7 +56,8 @@ import { EventModule } from './event/event.module';
     ActivityController,
     TripController,
     ReviewController,
-    EmailVerificationController
+    EmailVerificationController,
+    MapsController
   ],
   providers: [
     AppService,

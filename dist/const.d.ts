@@ -6,4 +6,5 @@ export declare const SENDGRID_API_KEY: string;
 export declare const SENDINBLUE_API_KEY: string;
 export declare const APP_PORT: string;
 export declare const APP_URL: string;
+export declare const GMAPS_API_KEY: string;
 export declare const BCRYPT_SALT_ROUNDS = 10;
