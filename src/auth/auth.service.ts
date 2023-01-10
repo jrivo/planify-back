@@ -82,7 +82,7 @@ export class AuthService {
       const verificationToken = generateToken();
     let newUser = await prisma.user.create({
       data: {
-        email: body.email,
+        email: (body.email).toLowerCase(),
         password: bcrypt.hashSync(body.password, BCRYPT_SALT_ROUNDS),
         firstName: body.firstName,
         lastName: body.lastName,
