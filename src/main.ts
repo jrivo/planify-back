@@ -8,7 +8,7 @@ import { APP_PORT } from "./const";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
-  // app.enableCors();
+  app.enableCors();
   const config = new DocumentBuilder()
     .setTitle("Planify Backend")
     .setDescription("The Planify API description")
