@@ -97,7 +97,7 @@ export class UsersService {
   ): Promise<any | undefined> {
     const user = await prisma.user.findUnique({
       where: {
-        email: email,
+        email: email.toLowerCase(),
       },
       ...params,
     });
@@ -142,7 +142,7 @@ export class UsersService {
         firstName: body.firstName && body.firstName,
         lastName: body.lastName && body.lastName,
         phone: body.phoneNumber && body.phoneNumber,
-        email: body.email && body.email,
+        email: body.email && (body.email).toLowerCase(),
       },
     });
     if (req.files && req.files.length > 0) {
