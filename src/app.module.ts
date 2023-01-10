@@ -28,7 +28,6 @@ import { ReviewService } from "./review/review.service";
 import { EmailVerificationController } from "./email-verification/email-verification.controller";
 import { EmailVerificationModule } from "./email-verification/email-verification.module";
 import { EventModule } from './event/event.module';
-import {CorsModule}
 
 @Module({
   imports: [
