@@ -179,9 +179,10 @@ export class createActivityDto {
   @IsString()
   name: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
-  description: string;
+  description?: string;
 
   @IsOptional()
   @IsString()
