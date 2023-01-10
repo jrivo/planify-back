@@ -40,9 +40,11 @@ export class OwnerAdminOrModeratorGuard implements CanActivate {
         break;
       case "trip":
         service = this.tripService;
+        break;
       default:
         return request.user.id == request.params.id;
     }
+    console.log(await service.getOwnerId(request.params.id), request.user.id)
     if ((await service.getOwnerId(request.params.id)) === request.user.id) {
       return true;
     } else {

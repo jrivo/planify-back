@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { MediaType, PrismaClient, Role, UserStatus } from "@prisma/client";
 import {
   BCRYPT_SALT_ROUNDS,
@@ -243,6 +243,9 @@ export class UsersService {
     if (!user) {
       return null;
     }
+    // if (user.role === Role.ADMIN || user.role === Role.MODERATOR) {
+    //   return HttpException(403, "You can't change status of admin or moderator")
+    // }
     const userUpdated = await prisma.user.update({
       where: {
         id: Number(user.id),

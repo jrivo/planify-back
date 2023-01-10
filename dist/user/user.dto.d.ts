@@ -4,12 +4,6 @@ export declare class updateUserDto {
     firstName?: string;
     lastName?: string;
     phoneNumber?: string;
-    street?: string;
-    streetNumber?: string;
-    city?: string;
-    postalCode?: string;
-    country?: string;
-    region?: string;
 }
 export declare class GetUsersParamsDto {
     page: number;

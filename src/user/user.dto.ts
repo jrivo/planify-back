@@ -28,34 +28,34 @@ export class updateUserDto {
     @IsPhoneNumber()
     phoneNumber?: string;
   
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    street?: string;
+    // @IsOptional()
+    // @IsNotEmpty()
+    // @IsString()
+    // street?: string;
   
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    streetNumber?: string;
+    // @IsOptional()
+    // @IsNotEmpty()
+    // @IsString()
+    // streetNumber?: string;
   
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    city?: string;
+    // @IsOptional()
+    // @IsNotEmpty()
+    // @IsString()
+    // city?: string;
   
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    postalCode?: string;
+    // @IsOptional()
+    // @IsNotEmpty()
+    // @IsString()
+    // postalCode?: string;
   
-    @IsOptional()
-    @IsNotEmpty()
-    @IsString()
-    country?: string;
+    // @IsOptional()
+    // @IsNotEmpty()
+    // @IsString()
+    // country?: string;
   
-    @IsOptional()
-    @IsString()
-    region?: string;
+    // @IsOptional()
+    // @IsString()
+    // region?: string;
   }
 
   export class GetUsersParamsDto {
